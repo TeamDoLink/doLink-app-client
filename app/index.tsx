@@ -1,9 +1,24 @@
-import { View, Text } from 'react-native';
+import { useRef, useState } from 'react';
+// import { View, Text, ScrollView } from 'react-native';
+import WebView, { WebViewMessageEvent } from 'react-native-webview';
+import { config } from '@/src/utils/domainConfig';
+// import { handleWebViewMessage } from '@/src/utils/webviewBridge';
 
 export default function Index() {
+  const webViewRef = useRef<WebView>(null);
+  const webUrl = `${domain}`;
+  const handleMessage = async (event: WebViewMessageEvent) => {};
+
   return (
-    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-      <Text>DoLink App Client</Text>
-    </View>
+    <WebView
+      ref={webViewRef}
+      source={{
+        uri: webUrl,
+      }}
+      onMessage={handleMessage}
+      style={{
+        flex: 1,
+      }}
+    />
   );
 }
