@@ -2,6 +2,7 @@
   "expo": {
     "name": "dolink-app-client",
     "slug": "dolink-app-client",
+    "scheme": "dolink",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",

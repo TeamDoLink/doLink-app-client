@@ -48,7 +48,7 @@ import { saveDraft, getDraft, deleteDraft } from './draftStorage';
  * App에서 WebView로 응답을 보냅니다
  */
 export const sendToWebView_draft = <T = any>(
-  webViewRef: React.RefObject<WebView>,
+  webViewRef: React.RefObject<WebView | null>,
   response: AppResponse<T>,
 ) => {
   webViewRef.current?.postMessage(JSON.stringify(response));
@@ -59,7 +59,7 @@ export const sendToWebView_draft = <T = any>(
  */
 export const handleTaskDraftMessage_draft = async (
   message: WebViewMessage,
-  webViewRef: React.RefObject<WebView>,
+  webViewRef: React.RefObject<WebView | null>,
 ) => {
   const { type, payload } = message;
   const { key, data } = payload;
@@ -71,7 +71,7 @@ export const handleTaskDraftMessage_draft = async (
         sendToWebView_draft(webViewRef, {
           type,
           success,
-          data: success ? { key } : undefined,
+          data: success ? { key, data } : undefined,
           error: success ? undefined : '임시저장에 실패했습니다',
         });
         break;
@@ -93,7 +93,7 @@ export const handleTaskDraftMessage_draft = async (
         sendToWebView_draft(webViewRef, {
           type,
           success,
-          data: success ? { key } : undefined,
+          data: success ? { key, data } : undefined,
           error: success ? undefined : '삭제에 실패했습니다',
         });
         break;
@@ -121,7 +121,7 @@ export const handleTaskDraftMessage_draft = async (
  */
 export const handleWebViewMessage_draft = (
   event: { nativeEvent: { data: string } },
-  webViewRef: React.RefObject<WebView>,
+  webViewRef: React.RefObject<WebView | null>,
 ) => {
   try {
     const message: WebViewMessage = JSON.parse(event.nativeEvent.data);
