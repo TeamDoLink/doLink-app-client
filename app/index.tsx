@@ -6,6 +6,7 @@ import { config } from '@/src/utils/domainConfig';
 
 export default function Index() {
   const webViewRef = useRef<WebView>(null);
+  const domain = config.domain;
   const webUrl = `${domain}`;
   const handleMessage = async (event: WebViewMessageEvent) => {};
 
