@@ -5,11 +5,11 @@
 
 import { useCallback } from 'react';
 import type { WebViewMessageEvent } from 'react-native-webview';
-import { handleLinkButtonClicked } from '@/src/utils/webviewBridge';
+import { handleLinkButtonClicked } from '@/src/utils/linkWebviewBridge';
 import type {
   WebViewMessageData,
   LinkButtonClickedPayload,
-} from '@/src/types/webview';
+} from '@/src/types/linkWebview';
 
 /**
  * WebView 메시지 핸들러를 제공하는 커스텀 훅
