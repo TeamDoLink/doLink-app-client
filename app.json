@@ -8,28 +8,21 @@
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
     "newArchEnabled": true,
+    "androidNavigationBar": {
+      "backgroundColor": "#ffffff",
+      "barStyle": "dark-content"
+    },
     "splash": {
       "image": "./assets/splash-icon.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
     "ios": {
-      "supportsTablet": true,
-      "statusBar": {
-        "barStyle": "dark-content",
-        "backgroundColor": "#ffffff"
-      }
+      "supportsTablet": true
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
-      },
-      "navigationBar": {
-        "backgroundColor": "#ffffff"
-      },
-      "statusBar": {
-        "barStyle": "dark-content",
         "backgroundColor": "#ffffff"
       },
       "edgeToEdgeEnabled": true,
