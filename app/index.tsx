@@ -1,7 +1,7 @@
 import { useRef, useState } from 'react';
 // import { View, Text, ScrollView } from 'react-native';
 import WebView, { WebViewMessageEvent } from 'react-native-webview';
-import { config } from '@/src/utils/domainConfig';
+import { config } from '@/src/utils/envConfig';
 // import { handleWebViewMessage } from '@/src/utils/webviewBridge';
 
 export default function Index() {
