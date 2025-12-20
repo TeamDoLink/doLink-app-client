@@ -1,5 +1,6 @@
 {
   "expo": {
+    "scheme": "dolink",
     "name": "dolink-app-client",
     "slug": "dolink-app-client",
     "version": "1.0.0",

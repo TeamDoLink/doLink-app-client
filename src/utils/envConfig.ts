@@ -8,7 +8,7 @@ const isDevice = Constants.isDevice;
 
 function getDomain() {
   if (!isDev) {
-    return process.env.EXPO_PUBLIC_DOMAIN!;
+    return process.env.EXPO_PUBLIC_DOMAIN;
   }
 
   // DEV
@@ -19,7 +19,7 @@ function getDomain() {
 
   // DEV 실기기 (iOS + Android)
   // 시뮬레이터
-  return process.env.EXPO_PUBLIC_DEVICE_DOMAIN!;
+  return process.env.EXPO_PUBLIC_DOMAIN;
 }
 
 export const config = {
