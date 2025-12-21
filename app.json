@@ -1,5 +1,6 @@
 {
   "expo": {
+    "scheme": "dolink",
     "name": "dolink-app-client",
     "slug": "dolink-app-client",
     "version": "1.0.0",
@@ -7,6 +8,10 @@
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
     "newArchEnabled": true,
+    "androidNavigationBar": {
+      "backgroundColor": "#ffffff",
+      "barStyle": "dark-content"
+    },
     "splash": {
       "image": "./assets/splash-icon.png",
       "resizeMode": "contain",

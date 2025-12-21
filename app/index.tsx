@@ -1,7 +1,8 @@
 import { useRef, useState } from 'react';
-// import { View, Text, ScrollView } from 'react-native';
+import { StatusBar } from 'react-native';
 import WebView, { WebViewMessageEvent } from 'react-native-webview';
-import { config } from '@/src/utils/domainConfig';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { config } from '@/src/utils/envConfig';
 // import { handleWebViewMessage } from '@/src/utils/webviewBridge';
 
 export default function Index() {
@@ -11,15 +12,21 @@ export default function Index() {
   const handleMessage = async (event: WebViewMessageEvent) => {};
 
   return (
-    <WebView
-      ref={webViewRef}
-      source={{
-        uri: webUrl,
-      }}
-      onMessage={handleMessage}
-      style={{
-        flex: 1,
-      }}
-    />
+    <SafeAreaView
+      style={{ flex: 1, backgroundColor: '#ffffff' }}
+      edges={['top']}
+    >
+      <StatusBar barStyle="dark-content" backgroundColor="#ffffff" />
+      <WebView
+        ref={webViewRef}
+        source={{
+          uri: webUrl,
+        }}
+        onMessage={handleMessage}
+        style={{
+          flex: 1,
+        }}
+      />
+    </SafeAreaView>
   );
 }
