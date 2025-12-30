@@ -1,5 +1,5 @@
 import { useRef } from 'react';
-import { StatusBar } from 'react-native';
+import { StatusBar, Platform } from 'react-native';
 import WebView from 'react-native-webview';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { config } from '@/src/utils/envConfig';
@@ -17,7 +17,7 @@ export default function Index() {
   return (
     <SafeAreaView
       style={{ flex: 1, backgroundColor: '#ffffff' }}
-      edges={['top']}
+      edges={Platform.OS === 'ios' ? ['top'] : ['top', 'bottom']}
     >
       <StatusBar barStyle="dark-content" backgroundColor="#ffffff" />
       <WebView
