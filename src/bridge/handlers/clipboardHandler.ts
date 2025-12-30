@@ -1,8 +1,8 @@
 /**
  * Clipboard 관련 네이티브 기능 핸들러
- *
  */
 
+import * as Clipboard from 'expo-clipboard';
 import type { ClipboardResponse } from '../types';
 import {
   createClipboardDataResponse,
@@ -11,16 +11,29 @@ import {
 
 /**
  * Clipboard 읽기 핸들러
+ * @returns 성공 시 clipboard:data (빈 클립보드는 null), 실패 시 clipboard:error
  */
 const handleRead = async (): Promise<ClipboardResponse> => {
-  // TODO:  합치기 위해 임시 생성
-  // import * as Clipboard from 'expo-clipboard';
-  // const text = await Clipboard.getStringAsync();
-  // return createClipboardDataResponse(text);
+  try {
+    const text = await Clipboard.getStringAsync();
 
-  return createClipboardErrorResponse(
-    'Clipboard 기능은 아직 구현되지 않았습니다',
-  );
+    // 빈 클립보드는 null로 반환
+    return createClipboardDataResponse(text || null);
+  } catch (error) {
+    const errorMsg = error instanceof Error ? error.message : String(error);
+
+    // 권한 에러 체크 (iOS/Android 권한 거부)
+    if (
+      errorMsg.includes('permission') ||
+      errorMsg.includes('Permission') ||
+      errorMsg.includes('denied') ||
+      errorMsg.includes('Denied')
+    ) {
+      return createClipboardErrorResponse('CLIPBOARD_PERMISSION_FAILED');
+    }
+
+    return createClipboardErrorResponse(errorMsg || 'Unknown error occurred');
+  }
 };
 
 /**

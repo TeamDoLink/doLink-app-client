@@ -21,15 +21,12 @@ const isDraftMessage = (type: BridgeMessageType): type is DraftMessageType => {
 
 /**
  * 메시지 타입이 Clipboard 관련인지 확인 (Type Guard)
+ * WebView → Native 요청만 체크 (응답 타입은 제외)
  */
 const isClipboardMessage = (
   type: BridgeMessageType,
 ): type is ClipboardMessageType => {
-  return (
-    type === 'clipboard:read' ||
-    type === 'clipboard:data' ||
-    type === 'clipboard:error'
-  );
+  return type === 'clipboard:read';
 };
 
 /**

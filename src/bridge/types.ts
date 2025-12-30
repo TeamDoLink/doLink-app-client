@@ -33,7 +33,7 @@ export interface DraftResponse<T = any> {
 // Clipboard 성공 응답
 export interface ClipboardDataMessage {
   type: 'clipboard:data';
-  payload: string;
+  payload: string | null; // 빈 클립보드는 null
 }
 
 // Clipboard 에러 응답

@@ -55,7 +55,7 @@ export const createDraftErrorResponse = (
  * Clipboard 성공 응답 생성 헬퍼
  */
 export const createClipboardDataResponse = (
-  payload: string,
+  payload: string | null,
 ): ClipboardDataMessage => ({
   type: 'clipboard:data',
   payload,
