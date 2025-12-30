@@ -3,8 +3,8 @@ import {
   ClipboardMessage,
   ClipboardDataResponse,
   ClipboardErrorResponse,
-} from '@/src/types/webview';
-import { WEBVIEW_MESSAGE_TYPES } from '@/src/constants/webview';
+} from '@/src/types/clipboardTypes';
+import { WEBVIEW_MESSAGE_TYPES } from '@/src/constants/clipboardConst';
 
 /**
  * WebView 메시지를 파싱합니다
