@@ -3,7 +3,6 @@
     "scheme": "dolink",
     "name": "dolink-app-client",
     "slug": "dolink-app-client",
-    "scheme": "dolink",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -20,7 +19,10 @@
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.teamdolink.dolinkappclient"
+      "bundleIdentifier": "com.teamdolink.dolinkappclient",
+      "infoPlist": {
+        "LSApplicationQueriesSchemes": ["http", "https", "tel", "mailto"]
+      }
     },
     "android": {
       "adaptiveIcon": {
