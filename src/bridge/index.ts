@@ -4,11 +4,14 @@ import type {
   BridgeMessageType,
   DraftMessageType,
   ClipboardMessageType,
+  LinkMessageType,
   DraftPayload,
+  LinkPayload,
 } from './types';
 import { sendToWebView, createBridgeErrorResponse } from './sender';
 import { draftHandler } from './handlers/draftHandler';
 import { clipboardHandler } from './handlers/clipboardHandler';
+import { linkHandler } from './handlers/linkHandler';
 
 /**
  * 메시지 타입이 Draft 관련인지 확인 (Type Guard)
@@ -27,6 +30,14 @@ const isClipboardMessage = (
   type: BridgeMessageType,
 ): type is ClipboardMessageType => {
   return type === 'clipboard:read';
+};
+
+/**
+ * 메시지 타입이 Link 관련인지 확인 (Type Guard)
+ * WebView → Native 요청만 체크 (응답 타입은 제외)
+ */
+const isLinkMessage = (type: BridgeMessageType): type is LinkMessageType => {
+  return type === 'link:open' || type === 'link:canOpen';
 };
 
 /**
@@ -49,6 +60,13 @@ export const handleBridgeMessage = async (
     // Clipboard 메시지 처리
     if (isClipboardMessage(type)) {
       const response = await clipboardHandler(type);
+      sendToWebView(webViewRef, response);
+      return;
+    }
+
+    // Link 메시지 처리
+    if (isLinkMessage(type)) {
+      const response = await linkHandler(type, payload as LinkPayload);
       sendToWebView(webViewRef, response);
       return;
     }

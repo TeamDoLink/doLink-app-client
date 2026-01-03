@@ -9,6 +9,8 @@ import type {
   DraftResponse,
   ClipboardDataMessage,
   ClipboardErrorMessage,
+  LinkResponseMessage,
+  LinkErrorMessage,
   BridgeErrorMessage,
 } from './types';
 
@@ -24,6 +26,7 @@ export const sendToWebView = (
     return;
   }
 
+  console.log('[Bridge] 웹으로 응답 전송:', response);
   webViewRef.current.postMessage(JSON.stringify(response));
 };
 
@@ -69,6 +72,32 @@ export const createClipboardErrorResponse = (
 ): ClipboardErrorMessage => ({
   type: 'clipboard:error',
   error,
+});
+
+/**
+ * Link 성공 응답 생성 헬퍼
+ */
+export const createLinkResponseMessage = (
+  url: string,
+  success: boolean,
+  canOpen?: boolean,
+): LinkResponseMessage => ({
+  type: 'link:response',
+  success,
+  url,
+  canOpen,
+});
+
+/**
+ * Link 에러 응답 생성 헬퍼
+ */
+export const createLinkErrorResponse = (
+  error: string,
+  url?: string,
+): LinkErrorMessage => ({
+  type: 'link:error',
+  error,
+  url,
 });
 
 /**
