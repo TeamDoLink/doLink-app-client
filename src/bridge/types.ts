@@ -3,6 +3,7 @@
  * Web Client 타입 구조와 호환
  */
 
+// TODO 명명 규칙 불일치 (SAVE_DRAFT vs clipboard:read)
 // Draft 메시지 타입
 export type DraftMessageType = 'SAVE_DRAFT' | 'LOAD_DRAFT' | 'DELETE_DRAFT';
 
