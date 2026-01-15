@@ -1,20 +1,24 @@
-import { useRef, useState } from 'react';
-import { StatusBar } from 'react-native';
-import WebView, { WebViewMessageEvent } from 'react-native-webview';
+import { useRef } from 'react';
+import { StatusBar, Platform } from 'react-native';
+import WebView from 'react-native-webview';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { config } from '@/src/utils/envConfig';
-// import { handleWebViewMessage } from '@/src/utils/webviewBridge';
+import { useWebViewBridge } from '@/src/hooks/useWebViewBridge';
 
 export default function Index() {
   const webViewRef = useRef<WebView>(null);
+  const { handleMessage } = useWebViewBridge(webViewRef);
+
   const domain = config.domain;
-  const webUrl = `${domain}`;
-  const handleMessage = async (event: WebViewMessageEvent) => {};
+  // 할일 추가 페이지 test 위한 path
+  // const DEFAULT_PATH = '/task/create';
+  const DEFAULT_PATH = '/';
+  const webUrl = `${domain}${DEFAULT_PATH}`;
 
   return (
     <SafeAreaView
       style={{ flex: 1, backgroundColor: '#ffffff' }}
-      edges={['top']}
+      edges={Platform.OS === 'ios' ? ['top'] : ['top', 'bottom']}
     >
       <StatusBar barStyle="dark-content" backgroundColor="#ffffff" />
       <WebView
