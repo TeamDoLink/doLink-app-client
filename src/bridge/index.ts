@@ -4,11 +4,14 @@ import type {
   BridgeMessageType,
   DraftMessageType,
   ClipboardMessageType,
+  LinkMessageType,
   DraftPayload,
+  LinkPayload,
 } from './types';
 import { sendToWebView, createBridgeErrorResponse } from './sender';
 import { draftHandler } from './handlers/draftHandler';
 import { clipboardHandler } from './handlers/clipboardHandler';
+import { linkHandler } from './handlers/linkHandler';
 
 /**
  * 메시지 타입이 Draft 관련인지 확인 (Type Guard)
@@ -27,6 +30,14 @@ const isClipboardMessage = (
   type: BridgeMessageType,
 ): type is ClipboardMessageType => {
   return type === 'clipboard:read';
+};
+
+/**
+ * 메시지 타입이 Link 관련인지 확인 (Type Guard)
+ * WebView → Native 요청만 체크 (응답 타입은 제외)
+ */
+const isLinkMessage = (type: BridgeMessageType): type is LinkMessageType => {
+  return type === 'link:open' || type === 'link:canOpen';
 };
 
 /**
@@ -53,6 +64,13 @@ export const handleBridgeMessage = async (
       return;
     }
 
+    // Link 메시지 처리
+    if (isLinkMessage(type)) {
+      const response = await linkHandler(type, payload as LinkPayload);
+      sendToWebView(webViewRef, response);
+      return;
+    }
+
     // 알 수 없는 메시지 타입 - 에러 응답 전송
     console.warn(`[Bridge] 지원하지 않는 메시지 타입: ${type}`);
     const errorResponse = createBridgeErrorResponse(
@@ -62,16 +80,21 @@ export const handleBridgeMessage = async (
     sendToWebView(webViewRef, errorResponse);
   } catch (error) {
     console.error(`[Bridge] ${type} 처리 중 오류:`, error);
+    const errorResponse = createBridgeErrorResponse(
+      error instanceof Error ? error.message : '처리 중 오류가 발생했습니다',
+      type,
+    );
+    sendToWebView(webViewRef, errorResponse);
   }
 };
 
 /**
  * WebView의 onMessage 이벤트 핸들러
  */
-export const handleWebViewMessage = (
+export const handleWebViewMessage = async (
   event: { nativeEvent: { data: string } },
   webViewRef: React.RefObject<WebView | null>,
-): void => {
+): Promise<void> => {
   try {
     const message: BridgeMessage = JSON.parse(event.nativeEvent.data);
 
@@ -81,7 +104,7 @@ export const handleWebViewMessage = (
       return;
     }
 
-    handleBridgeMessage(message, webViewRef);
+    await handleBridgeMessage(message, webViewRef);
   } catch (error) {
     console.error('[Bridge] 메시지 파싱 실패:', error);
   }
