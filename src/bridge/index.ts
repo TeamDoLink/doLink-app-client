@@ -80,6 +80,11 @@ export const handleBridgeMessage = async (
     sendToWebView(webViewRef, errorResponse);
   } catch (error) {
     console.error(`[Bridge] ${type} 처리 중 오류:`, error);
+    const errorResponse = createBridgeErrorResponse(
+      error instanceof Error ? error.message : '처리 중 오류가 발생했습니다',
+      type,
+    );
+    sendToWebView(webViewRef, errorResponse);
   }
 };
 
