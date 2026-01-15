@@ -91,10 +91,10 @@ export const handleBridgeMessage = async (
 /**
  * WebView의 onMessage 이벤트 핸들러
  */
-export const handleWebViewMessage = (
+export const handleWebViewMessage = async (
   event: { nativeEvent: { data: string } },
   webViewRef: React.RefObject<WebView | null>,
-): void => {
+): Promise<void> => {
   try {
     const message: BridgeMessage = JSON.parse(event.nativeEvent.data);
 
@@ -104,7 +104,7 @@ export const handleWebViewMessage = (
       return;
     }
 
-    handleBridgeMessage(message, webViewRef);
+    await handleBridgeMessage(message, webViewRef);
   } catch (error) {
     console.error('[Bridge] 메시지 파싱 실패:', error);
   }
