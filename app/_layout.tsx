@@ -1,18 +1,30 @@
 import '../src/styles/global.css';
 import { useState, useEffect } from 'react';
-import { View, BackHandler } from 'react-native';
+import { View, BackHandler, Platform, StatusBar } from 'react-native';
 import { Stack } from 'expo-router';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
-import { useShareIntent, type ShareIntent } from 'expo-share-intent';
+import { useShareIntent, ShareIntent } from 'expo-share-intent';
 import ShareIntentModal from '@/src/components/ShareIntentModal';
 
 export default function RootLayout() {
   const [modalVisible, setModalVisible] = useState(false);
   const [currentIntent, setCurrentIntent] = useState<ShareIntent | null>(null);
   const [isShareMode, setIsShareMode] = useState(false);
-  const { shareIntent, resetShareIntent } = useShareIntent();
 
+  // iOS: expo-share-intent 사용
+  // Android: app/share.tsx에서 처리 (deeplink 라우팅)
+  const { shareIntent, resetShareIntent } = useShareIntent({
+    debug: __DEV__,
+    resetOnBackground: true,
+    disabled: Platform.OS === 'android',
+  });
+
+  // iOS: expo-share-intent 데이터 처리
   useEffect(() => {
+    if (Platform.OS === 'android') return;
+
+    console.log('받은 공유 인텐트:', shareIntent);
+
     if (
       shareIntent?.text ||
       (shareIntent?.files && shareIntent.files.length > 0)
@@ -39,15 +51,21 @@ export default function RootLayout() {
     handleClose();
   };
 
-  // 공유 모드일 때는 BottomSheet만 렌더링 (투명 배경)
+  // iOS 공유 모드일 때는 BottomSheet만 렌더링
   if (isShareMode) {
     return (
       <View style={{ flex: 1, backgroundColor: 'transparent' }}>
+        <StatusBar
+          translucent
+          backgroundColor="transparent"
+          barStyle="dark-content"
+        />
         <ShareIntentModal
           visible={modalVisible}
           shareIntent={currentIntent}
           onClose={handleClose}
           onConfirm={handleConfirm}
+          isShareMode={true}
         />
       </View>
     );
@@ -60,12 +78,6 @@ export default function RootLayout() {
         screenOptions={{
           headerShown: false,
         }}
-      />
-      <ShareIntentModal
-        visible={modalVisible}
-        shareIntent={currentIntent}
-        onClose={handleClose}
-        onConfirm={handleConfirm}
       />
     </SafeAreaProvider>
   );

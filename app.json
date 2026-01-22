@@ -39,6 +39,12 @@
     "plugins": [
       "expo-router",
       [
+        "expo-share-intent",
+        {
+          "disableAndroid": true
+        }
+      ],
+      [
         "expo-share-extension",
         {
           "backgroundColor": {
@@ -58,7 +64,7 @@
           ]
         }
       ],
-      "./plugins/withShareNative.js"
+      "./plugins/withShareNative"
     ]
   }
 }

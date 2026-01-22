@@ -1,5 +1,5 @@
 import { useRef } from 'react';
-import { StatusBar, Platform } from 'react-native';
+import { StatusBar, Platform, Text } from 'react-native';
 import WebView from 'react-native-webview';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { config } from '@/src/utils/envConfig';
