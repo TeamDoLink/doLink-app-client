@@ -1,8 +1,8 @@
 {
   "expo": {
     "scheme": "dolink",
-    "name": "dolink-app-client",
-    "slug": "dolink-app-client",
+    "name": "dolink",
+    "slug": "dolink",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -19,7 +19,7 @@
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.teamdolink.dolinkappclient",
+      "bundleIdentifier": "com.teamdolink.dolink",
       "infoPlist": {
         "LSApplicationQueriesSchemes": ["http", "https", "tel", "mailto"]
       }
@@ -31,7 +31,7 @@
       },
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
-      "package": "com.teamdolink.dolinkappclient"
+      "package": "com.teamdolink.dolink"
     },
     "web": {
       "favicon": "./assets/favicon.png"
@@ -57,7 +57,8 @@
             }
           ]
         }
-      ]
+      ],
+      "./plugins/withShareNative.js"
     ]
   }
 }
