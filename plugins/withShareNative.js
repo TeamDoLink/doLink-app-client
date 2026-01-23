@@ -27,7 +27,7 @@ module.exports = function withShareNative(config) {
       styles.resources.style.push({
         $: {
           name: 'Theme.Share.Transparent',
-          parent: '@android:style/Theme.Translucent.NoTitleBar',
+          parent: 'Theme.AppCompat.NoActionBar',
         },
         item: [
           { $: { name: 'android:windowIsTranslucent' }, _: 'true' },
@@ -38,11 +38,12 @@ module.exports = function withShareNative(config) {
           { $: { name: 'android:windowContentOverlay' }, _: '@null' },
           { $: { name: 'android:backgroundDimEnabled' }, _: 'false' },
           { $: { name: 'android:windowIsFloating' }, _: 'false' },
+          { $: { name: 'android:windowNoTitle' }, _: 'true' },
+          { $: { name: 'android:windowActionBar' }, _: 'false' },
+          { $: { name: 'android:colorBackgroundCacheHint' }, _: '@null' },
         ],
       });
-      console.log(
-        'withShareNative: Theme.Share.Transparent added to styles.xml',
-      );
+      console.log('withShareNative: styles.xml에 투명 테마가 추가되었습니다.');
     }
     return config;
   });
@@ -53,7 +54,7 @@ module.exports = function withShareNative(config) {
     async (config) => {
       const packageName = config.android?.package;
       if (!packageName) {
-        throw new Error('withShareNative: android.package is required');
+        throw new Error('withShareNative: android.package 설정이 필요합니다.');
       }
 
       const packagePath = packageName.split('.').join('/');
@@ -77,32 +78,36 @@ module.exports = function withShareNative(config) {
 
       if (!fs.existsSync(sourceFile)) {
         throw new Error(
-          `withShareNative: ShareActivity.kt not found at ${sourceFile}`,
+          `withShareNative: 원본 파일을 찾을 수 없습니다: ${sourceFile}`,
         );
       }
 
+      // 파일 내용을 읽어서 패키지명을 실제 앱 패키지명으로 치환
       let activityContent = fs.readFileSync(sourceFile, 'utf-8');
       activityContent = activityContent.replace(
         /\{\{PACKAGE_NAME\}\}/g,
         packageName,
       );
 
+      // 실제 안드로이드 프로젝트 내부로 파일 쓰기
       const targetFile = path.join(targetDir, 'ShareActivity.kt');
       fs.writeFileSync(targetFile, activityContent);
 
-      console.log(`withShareNative: ShareActivity.kt written to ${targetFile}`);
+      console.log(
+        `withShareNative: ShareActivity.kt 파일이 생성되었습니다: ${targetFile}`,
+      );
       return config;
     },
   ]);
 
-  // 3. AndroidManifest.xml에 ShareActivity 등록 (MainActivity는 수정하지 않음)
+  // 3. AndroidManifest.xml에 ShareActivity 등록
   config = withAndroidManifest(config, (config) => {
     const manifest = config.modResults;
     const application = manifest.manifest.application?.[0];
 
     if (!application) {
       throw new Error(
-        'withShareNative: application element not found in manifest',
+        'withShareNative: AndroidManifest에서 application 태그를 찾을 수 없습니다.',
       );
     }
 
@@ -118,28 +123,30 @@ module.exports = function withShareNative(config) {
     if (!hasShareActivity) {
       application.activity.push({
         $: {
-          'android:name': '.ShareActivity',
-          'android:label': 'dolink',
-          'android:theme': '@style/Theme.Share.Transparent',
-          'android:exported': 'true',
-          'android:excludeFromRecents': 'true',
-          'android:taskAffinity': '',
-          'android:launchMode': 'singleInstance',
+          'android:name': '.ShareActivity', // 2단계에서 만든 파일명
+          'android:label': 'dolink', // 사용자에게 보여질 이름
+          'android:theme': '@style/Theme.Share.Transparent', // 1단계에서 만든 투명 테마 적용
+          'android:exported': 'true', // 외부 앱에서 호출 가능하도록 설정
+          'android:excludeFromRecents': 'true', // 최근 사용 앱 목록에 표시 안 함
+          'android:taskAffinity': '', // 별도의 작업 단위로 분리
+          'android:launchMode': 'singleInstance', // 항상 독립적인 인스턴스로 실행
           'android:configChanges':
             'orientation|screenSize|keyboard|keyboardHidden',
         },
         'intent-filter': [
           {
+            // '공유하기' 액션을 받았을 때 실행됨
             action: [{ $: { 'android:name': 'android.intent.action.SEND' } }],
             category: [
               { $: { 'android:name': 'android.intent.category.DEFAULT' } },
             ],
+            // '텍스트' 형태의 공유 데이터만 받음
             data: [{ $: { 'android:mimeType': 'text/plain' } }],
           },
         ],
       });
       console.log(
-        'withShareNative: ShareActivity added to AndroidManifest.xml',
+        'withShareNative: AndroidManifest.xml에 ShareActivity가 등록되었습니다.',
       );
     }
 

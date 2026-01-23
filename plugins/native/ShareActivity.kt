@@ -13,9 +13,9 @@ import android.os.Bundle
  *
  * 전달 데이터:
  * - text: 공유된 텍스트 (URL 포함)
- * - title: 제목 (EXTRA_SUBJECT)
+ * - title: 링크 제목 (EXTRA_SUBJECT)
  * - url: 텍스트에서 추출한 URL
- * - thumbnail: 공유된 이미지 URI (있는 경우)
+ * - thumbnailUrl: 공유된 이미지 URI (있는 경우)
  */
 class ShareActivity : Activity() {
 
@@ -52,7 +52,7 @@ class ShareActivity : Activity() {
             text = sharedText,
             title = sharedTitle,
             url = url,
-            thumbnail = imageUri?.toString()
+            thumbnailUrl = imageUri?.toString()
         )
     }
 
@@ -65,7 +65,7 @@ class ShareActivity : Activity() {
             text = sharedText,
             title = sharedTitle,
             url = null,
-            thumbnail = imageUri.toString()
+            thumbnailUrl = imageUri.toString()
         )
     }
 
@@ -79,14 +79,14 @@ class ShareActivity : Activity() {
         text: String?,
         title: String?,
         url: String?,
-        thumbnail: String?
+        thumbnailUrl: String?
     ) {
         val params = mutableListOf<String>()
 
         text?.let { params.add("text=${Uri.encode(it)}") }
         title?.let { params.add("title=${Uri.encode(it)}") }
         url?.let { params.add("url=${Uri.encode(it)}") }
-        thumbnail?.let { params.add("thumbnail=${Uri.encode(it)}") }
+        thumbnailUrl?.let { params.add("thumbnailUrl=${Uri.encode(it)}") }
 
         if (params.isEmpty()) return
 
