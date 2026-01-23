@@ -3,8 +3,14 @@ import { useState, useEffect } from 'react';
 import { View, BackHandler, Platform, StatusBar } from 'react-native';
 import { Stack } from 'expo-router';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
-import { useShareIntent, ShareIntent } from 'expo-share-intent';
+import type { ShareIntent } from 'expo-share-intent';
 import ShareIntentModal from '@/src/components/ShareIntentModal';
+
+// iOS에서만 useShareIntent 훅 사용 (Android는 ShareActivity에서 처리)
+const useShareIntentIOS =
+  Platform.OS === 'ios'
+    ? require('expo-share-intent').useShareIntent
+    : () => ({ shareIntent: null, resetShareIntent: () => {} });
 
 export default function RootLayout() {
   const [modalVisible, setModalVisible] = useState(false);
@@ -12,11 +18,9 @@ export default function RootLayout() {
   const [isShareMode, setIsShareMode] = useState(false);
 
   // iOS: expo-share-intent 사용
-  // Android: app/share.tsx에서 처리 (deeplink 라우팅)
-  const { shareIntent, resetShareIntent } = useShareIntent({
+  const { shareIntent, resetShareIntent } = useShareIntentIOS({
     debug: __DEV__,
     resetOnBackground: true,
-    disabled: Platform.OS === 'android',
   });
 
   // iOS: expo-share-intent 데이터 처리
@@ -51,7 +55,7 @@ export default function RootLayout() {
     handleClose();
   };
 
-  // iOS 공유 모드일 때는 BottomSheet만 렌더링
+  // iOS 공유 모드일 때는 모달만 렌더링 (투명 배경)
   if (isShareMode) {
     return (
       <View style={{ flex: 1, backgroundColor: 'transparent' }}>
