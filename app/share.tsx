@@ -1,7 +1,7 @@
 import { useLocalSearchParams } from 'expo-router';
 import { useState, useEffect } from 'react';
 import { View, BackHandler, StatusBar, StyleSheet } from 'react-native';
-import ShareIntentModal from '@/src/components/ShareIntentModal';
+import CollectionBottomSheet from '@/src/components/CollectionBottomSheet';
 import type { ShareIntent } from 'expo-share-intent';
 
 /**
@@ -59,6 +59,11 @@ export default function ShareRoute() {
     handleClose();
   };
 
+  const handleSelectCollection = (collectionId: string) => {
+    console.log('선택된 컬렉션:', collectionId);
+    handleConfirm();
+  };
+
   return (
     <View style={styles.container}>
       <StatusBar
@@ -66,11 +71,11 @@ export default function ShareRoute() {
         backgroundColor="transparent"
         barStyle="dark-content"
       />
-      <ShareIntentModal
+      <CollectionBottomSheet
         visible={modalVisible}
-        shareIntent={shareIntent}
         onClose={handleClose}
-        onConfirm={handleConfirm}
+        onSelect={handleSelectCollection}
+        shareIntent={shareIntent}
         isShareMode={true}
       />
     </View>
@@ -80,6 +85,6 @@ export default function ShareRoute() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: 'transparent',
+    backgroundColor: '#000000',
   },
 });

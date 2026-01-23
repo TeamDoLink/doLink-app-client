@@ -4,7 +4,7 @@ import { View, BackHandler, Platform, StatusBar } from 'react-native';
 import { Stack } from 'expo-router';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import type { ShareIntent } from 'expo-share-intent';
-import ShareIntentModal from '@/src/components/ShareIntentModal';
+import CollectionBottomSheet from '@/src/components/CollectionBottomSheet';
 
 // iOS에서만 useShareIntent 훅 사용 (Android는 ShareActivity에서 처리)
 const useShareIntentIOS =
@@ -55,6 +55,11 @@ export default function RootLayout() {
     handleClose();
   };
 
+  const handleSelectCollection = (collectionId: string) => {
+    console.log('선택된 컬렉션:', collectionId);
+    handleConfirm();
+  };
+
   // iOS 공유 모드일 때는 모달만 렌더링 (투명 배경)
   if (isShareMode) {
     return (
@@ -64,11 +69,11 @@ export default function RootLayout() {
           backgroundColor="transparent"
           barStyle="dark-content"
         />
-        <ShareIntentModal
+        <CollectionBottomSheet
           visible={modalVisible}
-          shareIntent={currentIntent}
           onClose={handleClose}
-          onConfirm={handleConfirm}
+          onSelect={handleSelectCollection}
+          shareIntent={currentIntent}
           isShareMode={true}
         />
       </View>

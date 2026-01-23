@@ -3,7 +3,7 @@ import { AppRegistry } from 'react-native';
 import { useState, useEffect } from 'react';
 import { View, BackHandler, StatusBar, StyleSheet } from 'react-native';
 import 'expo-router/entry';
-import ShareIntentModal from './src/components/ShareIntentModal';
+import CollectionBottomSheet from './src/components/CollectionBottomSheet';
 import type { ShareIntentData } from './src/types/shareIntent';
 import type { ShareIntent } from 'expo-share-intent';
 
@@ -36,6 +36,11 @@ function ShareIntentRoot(props: ShareIntentData) {
     handleClose();
   };
 
+  const handleSelectCollection = (collectionId: string) => {
+    console.log('선택된 컬렉션:', collectionId);
+    handleConfirm();
+  };
+
   return (
     <View style={styles.container}>
       <StatusBar
@@ -43,11 +48,11 @@ function ShareIntentRoot(props: ShareIntentData) {
         backgroundColor="transparent"
         barStyle="light-content"
       />
-      <ShareIntentModal
+      <CollectionBottomSheet
         visible={modalVisible}
-        shareIntent={shareIntent}
         onClose={handleClose}
-        onConfirm={handleConfirm}
+        onSelect={handleSelectCollection}
+        shareIntent={shareIntent}
         isShareMode={true}
       />
     </View>
