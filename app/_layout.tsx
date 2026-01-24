@@ -1,4 +1,5 @@
 import '../src/styles/global.css';
+import '../src/lib/nativewind-setup';
 import { useState, useEffect } from 'react';
 import { View, BackHandler, Platform, StatusBar } from 'react-native';
 import { Stack } from 'expo-router';
