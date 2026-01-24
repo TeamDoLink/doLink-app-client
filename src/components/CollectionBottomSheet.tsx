@@ -4,15 +4,15 @@ import {
   Text,
   TouchableOpacity,
   StyleSheet,
-  Image,
   ScrollView,
   Animated,
   TextInput,
-  Linking,
   Platform,
 } from 'react-native';
 import { AntDesign } from '@expo/vector-icons';
 import type { ShareIntent } from 'expo-share-intent';
+import ArchiveSocialMediaListItem from './common/list/ArchiveSocialMediaListItem';
+import { TodoBottomSheet } from './common/bottomSheet/todoBottomSheet';
 
 const BOTTOM_SHEET_HEIGHT = 500;
 
@@ -159,83 +159,47 @@ export default function CollectionBottomSheet({
           },
         ]}
       >
-        {/* 핸들 바 */}
-        <View style={styles.handleContainer}>
-          <View style={styles.handle} />
-        </View>
+        <TodoBottomSheet onClickAddCollection={() => {}} onClose={onClose}>
+          {/* 검색 */}
+          <View style={styles.searchContainer}>
+            <AntDesign
+              name="search"
+              size={16}
+              color="#999999"
+              style={styles.searchIcon}
+            />
+            <TextInput
+              style={styles.searchInput}
+              placeholder="어느 모음에 담아볼까?"
+              placeholderTextColor="#CCCCCC"
+              value={searchText}
+              onChangeText={setSearchText}
+            />
+          </View>
 
-        {/* 헤더 */}
-        <View style={styles.header}>
-          <Text style={styles.headerTitle}>할 일 담기</Text>
-          <TouchableOpacity onPress={() => handleSelectCollection('new')}>
-            <Text style={styles.addButton}>+ 모음 추가</Text>
-          </TouchableOpacity>
-        </View>
-
-        {/* 검색 */}
-        <View style={styles.searchContainer}>
-          <AntDesign
-            name="search1"
-            size={16}
-            color="#999999"
-            style={styles.searchIcon}
-          />
-          <TextInput
-            style={styles.searchInput}
-            placeholder="어느 모음에 담아볼까?"
-            placeholderTextColor="#CCCCCC"
-            value={searchText}
-            onChangeText={setSearchText}
-          />
-        </View>
-
-        {/* 컬렉션 목록 */}
-        <ScrollView
-          style={styles.listContainer}
-          contentContainerStyle={styles.listContent}
-          showsVerticalScrollIndicator={false}
-        >
-          {filteredCollections.map((item) => {
-            const isSelected = selectedItems.includes(item.id);
-            return (
-              <TouchableOpacity
-                key={item.id}
-                style={styles.collectionItem}
-                onPress={() => handleSelectCollection(item.id)}
-                activeOpacity={0.7}
-              >
-                {/* 썸네일 */}
-                <Image
-                  source={{ uri: item.thumbnail }}
-                  style={styles.thumbnail}
-                  resizeMode="cover"
+          {/* 컬렉션 목록 */}
+          <ScrollView
+            style={styles.listContainer}
+            contentContainerStyle={styles.listContent}
+            showsVerticalScrollIndicator={false}
+          >
+            {filteredCollections.map((item, index) => {
+              const isSelected = selectedItems.includes(item.id);
+              return (
+                <ArchiveSocialMediaListItem
+                  key={item.id}
+                  title={item.title}
+                  category="카테고리"
+                  itemCount={item.itemCount}
+                  thumbnail={item.thumbnail}
+                  isSelected={isSelected}
+                  onPress={() => handleSelectCollection(item.id)}
+                  showDivider={index < filteredCollections.length - 1}
                 />
-
-                {/* 정보 */}
-                <View style={styles.collectionInfo}>
-                  <Text style={styles.collectionTitle} numberOfLines={1}>
-                    {item.title}
-                  </Text>
-                  <Text style={styles.collectionDesc} numberOfLines={1}>
-                    {item.description}
-                  </Text>
-                </View>
-
-                {/* 체크박스 */}
-                <View
-                  style={[
-                    styles.checkbox,
-                    isSelected && styles.checkboxSelected,
-                  ]}
-                >
-                  {isSelected && (
-                    <AntDesign name="check" size={16} color="#007AFF" />
-                  )}
-                </View>
-              </TouchableOpacity>
-            );
-          })}
-        </ScrollView>
+              );
+            })}
+          </ScrollView>
+        </TodoBottomSheet>
 
         {/* 닫기 버튼 */}
         <View style={styles.footer}>
@@ -360,59 +324,9 @@ const styles = StyleSheet.create({
   // 리스트
   listContainer: {
     flex: 1,
-    paddingHorizontal: 0,
   },
   listContent: {
-    paddingHorizontal: 16,
     paddingVertical: 6,
-  },
-
-  // 컬렉션 아이템
-  collectionItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingVertical: 12,
-    paddingHorizontal: 0,
-    marginVertical: 4,
-    backgroundColor: 'transparent',
-    borderRadius: 0,
-  },
-  thumbnail: {
-    width: 56,
-    height: 56,
-    borderRadius: 10,
-    marginRight: 14,
-    backgroundColor: '#E5E5E5',
-  },
-  collectionInfo: {
-    flex: 1,
-  },
-  collectionTitle: {
-    fontSize: 15,
-    fontWeight: '600',
-    color: '#1a1a1a',
-    marginBottom: 3,
-    letterSpacing: -0.3,
-  },
-  collectionDesc: {
-    fontSize: 13,
-    color: '#a0a0a0',
-    fontWeight: '500',
-  },
-
-  // 체크박스
-  checkbox: {
-    width: 28,
-    height: 28,
-    borderRadius: 14,
-    borderWidth: 2,
-    borderColor: '#e0e0e0',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  checkboxSelected: {
-    borderColor: '#007AFF',
-    backgroundColor: '#f0f8ff',
   },
 
   // 푸터
