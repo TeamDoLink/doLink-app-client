@@ -17,6 +17,28 @@ export interface ShareIntentData {
 }
 
 /**
+ * iOS Share Extension에서 전달되는 데이터 타입
+ */
+export interface IOSShareExtensionData {
+  /** 공유된 URL */
+  url?: string;
+  /** 공유된 텍스트 */
+  text?: string;
+  /** 공유된 이미지 파일 경로 배열 */
+  images?: string[];
+  /** 공유된 비디오 파일 경로 배열 */
+  videos?: string[];
+  /** 공유된 파일 경로 배열 */
+  files?: string[];
+  /** Safari 전처리 결과 (웹페이지 공유 시) */
+  preprocessingResults?: {
+    baseURI?: string;
+    title?: string;
+    [key: string]: unknown;
+  };
+}
+
+/**
  * 공유 데이터 저장 결과
  */
 export interface ShareIntentSaveResult {

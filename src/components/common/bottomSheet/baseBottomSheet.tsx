@@ -109,8 +109,8 @@ export const BaseBottomSheet = ({
   /** 사용자 드래그 제스처 처리를 위한 PanResponder 설정 */
   const panResponder = useRef(
     PanResponder.create({
-      // 1. 응답기 활성화 판단
-      onStartShouldSetPanResponder: () => true,
+      // 1. 터치 시작 시에는 이벤트를 가로채지 않음 (TextInput 클릭 허용)
+      onStartShouldSetPanResponder: () => false,
       onMoveShouldSetPanResponder: (_, gestureState) => {
         // 미세한 움직임(5px 미만)에는 반응하지 않음 (스크롤 뷰 등과 간섭 방지)
         return Math.abs(gestureState.dy) > 5;

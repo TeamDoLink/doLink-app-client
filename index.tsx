@@ -1,18 +1,27 @@
 import React from 'react';
-import { AppRegistry } from 'react-native';
+import { AppRegistry, Platform } from 'react-native';
 import { useState, useEffect } from 'react';
-import { View, BackHandler, StatusBar, StyleSheet } from 'react-native';
+import { View, BackHandler, StatusBar, StyleSheet, Text } from 'react-native';
 import 'expo-router/entry';
 import CollectionBottomSheet from './src/components/CollectionBottomSheet';
-import type { ShareIntentData } from './src/types/shareIntent';
-import type { ShareIntent } from 'expo-share-intent';
+import type {
+  ShareIntentData,
+  IOSShareExtensionData,
+} from './src/types/shareIntent';
+
+import { close as closeShareExtension } from 'expo-share-extension';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { KeyboardProvider } from 'react-native-keyboard-controller';
+
+// 이거 하니까 안 깨진다..
+// IOSShareIntentRoot가 있는 파일 최상단
+import './src/styles/global.css';
+import './src/lib/nativewind-setup';
 
 // Android ShareActivity용 wrapper 컴포넌트
 function ShareIntentRoot(props: ShareIntentData) {
   const [modalVisible, setModalVisible] = useState(false);
-  const [shareIntent, setShareIntent] = useState<ShareIntent | null>(null);
+  const [shareIntent, setShareIntent] = useState<ShareIntentData | null>(null);
   const [selectedCollections, setSelectedCollections] = useState<string[]>([]);
   const [lastSelectedId, setLastSelectedId] = useState<string | null>(null);
 
@@ -21,10 +30,10 @@ function ShareIntentRoot(props: ShareIntentData) {
       // TODO thunbnail 처리 백엔드와 협의 후 수정
       setShareIntent({
         text: props.text || null,
-        meta: props.title ? { title: props.title } : null,
         type: props.type || 'text',
-        files: null,
-        webUrl: props.url || null,
+        title: props.title || null,
+        url: props.url || null,
+        thumbnailUrl: props.thumbnailUrl || null,
       });
       setModalVisible(true);
     }
@@ -83,5 +92,77 @@ const styles = StyleSheet.create({
   },
 });
 
-// Android ShareActivity용 컴포넌트 등록
-AppRegistry.registerComponent('share-intent', () => ShareIntentRoot);
+// iOS Share Extension용 wrapper 컴포넌트
+function IOSShareIntentRoot(props: IOSShareExtensionData) {
+  const [modalVisible, setModalVisible] = useState(false);
+  const [shareIntent, setShareIntent] = useState<any>(null);
+  const [selectedCollections, setSelectedCollections] = useState<string[]>([]);
+  const [lastSelectedId, setLastSelectedId] = useState<string | null>(null);
+
+  useEffect(() => {
+    // iOS에서 전달받은 데이터를 ShareIntent 형식으로 변환
+    if (props.url || props.text || props.preprocessingResults) {
+      const webUrl = props.url || props.preprocessingResults?.baseURI || null;
+      const title = (props.preprocessingResults?.title as string) || null;
+
+      const data = {
+        text: props.text || null,
+        meta: title ? { title } : null,
+        type: props.url || props.preprocessingResults ? 'weburl' : 'text',
+        files: null,
+        webUrl,
+      };
+
+      setShareIntent(data);
+      console.log('iOS Share Intent Data:', data);
+      setModalVisible(true);
+    }
+  }, [props.url, props.text, props.preprocessingResults]);
+
+  const handleClose = () => {
+    setModalVisible(false);
+    closeShareExtension();
+  };
+
+  const handleConfirm = () => {
+    console.log('공유 데이터 저장:', shareIntent);
+    handleClose();
+  };
+
+  const handleSelectCollection = (collectionId: string) => {
+    console.log('선택된 컬렉션:', collectionId);
+    setLastSelectedId(collectionId);
+    if (selectedCollections.includes(collectionId)) {
+      setSelectedCollections(
+        selectedCollections.filter((id) => id !== collectionId),
+      );
+    } else {
+      setSelectedCollections([...selectedCollections, collectionId]);
+    }
+  };
+
+  return (
+    <View style={{ flex: 1, backgroundColor: 'transparent' }}>
+      <SafeAreaProvider>
+        <KeyboardProvider>
+          {/* 1. 최상위는 무조건 투명해야 뒤(사파리)가 보입니다. */}
+
+          {/* CollectionBottomSheet가 자체 overlay를 가지고 있으므로 여기서는 터치 차단하지 않음 */}
+          <CollectionBottomSheet
+            visible={modalVisible}
+            onClose={handleClose}
+            onSelect={handleSelectCollection}
+            shareIntent={shareIntent}
+            isShareMode={true}
+          />
+        </KeyboardProvider>
+      </SafeAreaProvider>
+    </View>
+  );
+}
+
+if (Platform.OS === 'android') {
+  AppRegistry.registerComponent('share-intent', () => ShareIntentRoot);
+} else {
+  AppRegistry.registerComponent('shareExtension', () => IOSShareIntentRoot);
+}

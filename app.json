@@ -39,21 +39,14 @@
     "plugins": [
       "expo-router",
       [
-        "expo-share-intent",
-        {
-          "disableAndroid": true
-        }
-      ],
-      [
         "expo-share-extension",
         {
           "backgroundColor": {
-            "red": 255,
-            "green": 255,
-            "blue": 255,
-            "alpha": 1
+            "red": 0,
+            "green": 0,
+            "blue": 0,
+            "alpha": 0
           },
-          "height": 300,
           "activationRules": [
             {
               "type": "url"

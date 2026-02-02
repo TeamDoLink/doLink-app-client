@@ -16,10 +16,10 @@ import {
   Platform,
 } from 'react-native';
 import { KeyboardStickyView } from 'react-native-keyboard-controller';
-import type { ShareIntent } from 'expo-share-intent';
 import ArchiveSocialMediaListItem from './common/list/ArchiveSocialMediaListItem';
 import { TodoBottomSheet } from './common/bottomSheet/todoBottomSheet';
 import SearchInputField from './common/inputField/searchInputField';
+import { ShareIntentData } from '../types/shareIntent';
 
 /** 컬렉션 아이템 타입 정의 */
 interface CollectionItem {
@@ -36,7 +36,7 @@ interface CollectionBottomSheetProps {
   onClose: () => void; // 닫기 콜백
   onSelect?: (collectionId: string) => void; // 컬렉션 선택 콜백
   selectedItems?: string[]; // 선택된 아이템 ID 목록
-  shareIntent?: ShareIntent | null; // 공유 인텐트 데이터
+  shareIntent?: ShareIntentData | null; // 공유 인텐트 데이터
   isShareMode?: boolean; // 공유 모드 여부
 }
 
@@ -231,7 +231,7 @@ export default function CollectionBottomSheet({
           onClose={onClose}
         >
           {/* 검색 */}
-          <SearchInputField />
+          <SearchInputField value={searchText} onChangeText={setSearchText} />
 
           {/* 컬렉션 목록 */}
           <ScrollView
@@ -288,6 +288,7 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     paddingBottom: Platform.OS === 'ios' ? 34 : 0,
+    backgroundColor: 'transparent',
   },
 
   // 핸들 바

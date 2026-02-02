@@ -1,5 +1,5 @@
-import { useState, useRef, useMemo } from 'react';
-import { View, TextInput, type TextInputProps } from 'react-native';
+import { useState, useRef } from 'react';
+import { TextInput, Pressable, type TextInputProps } from 'react-native';
 import SearchIcon from '@/src/assets/icons/common/search-24.svg';
 
 interface SearchInputFieldProps
@@ -25,8 +25,13 @@ export const SearchInputField = ({
     }
   };
 
+  const handleContainerPress = () => {
+    inputRef.current?.focus();
+  };
+
   return (
-    <View
+    <Pressable
+      onPress={handleContainerPress}
       className={`flex-row items-center gap-2.5 rounded-[10px] border bg-grey-50 px-4 py-2.5 ${borderClassName}`}
     >
       <SearchIcon width={24} height={24} />
@@ -45,7 +50,7 @@ export const SearchInputField = ({
         returnKeyType="search"
         {...props}
       />
-    </View>
+    </Pressable>
   );
 };
 
