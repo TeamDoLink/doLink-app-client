@@ -1,3 +1,10 @@
+/**
+ * CollectionBottomSheet
+ * 컬렉션 목록을 보여주고 선택할 수 있는 바텀시트 컴포넌트
+ * - 슬라이드 업/다운 애니메이션 지원
+ * - 검색 필터링 기능 포함
+ * - 키보드 위에 고정되는 하단 버튼 제공
+ */
 import { useEffect, useRef, useState } from 'react';
 import {
   View,
@@ -6,17 +13,15 @@ import {
   StyleSheet,
   ScrollView,
   Animated,
-  TextInput,
   Platform,
 } from 'react-native';
-import { AntDesign } from '@expo/vector-icons';
+import { KeyboardStickyView } from 'react-native-keyboard-controller';
 import type { ShareIntent } from 'expo-share-intent';
 import ArchiveSocialMediaListItem from './common/list/ArchiveSocialMediaListItem';
 import { TodoBottomSheet } from './common/bottomSheet/todoBottomSheet';
 import SearchInputField from './common/inputField/searchInputField';
 
-const BOTTOM_SHEET_HEIGHT = 500;
-
+/** 컬렉션 아이템 타입 정의 */
 interface CollectionItem {
   id: string;
   title: string;
@@ -25,13 +30,14 @@ interface CollectionItem {
   itemCount: number;
 }
 
+/** 바텀시트 Props 타입 정의 */
 interface CollectionBottomSheetProps {
-  visible: boolean;
-  onClose: () => void;
-  onSelect?: (collectionId: string) => void;
-  selectedItems?: string[];
-  shareIntent?: ShareIntent | null;
-  isShareMode?: boolean;
+  visible: boolean; // 바텀시트 표시 여부
+  onClose: () => void; // 닫기 콜백
+  onSelect?: (collectionId: string) => void; // 컬렉션 선택 콜백
+  selectedItems?: string[]; // 선택된 아이템 ID 목록
+  shareIntent?: ShareIntent | null; // 공유 인텐트 데이터
+  isShareMode?: boolean; // 공유 모드 여부
 }
 
 const DUMMY_COLLECTIONS: CollectionItem[] = [
@@ -146,17 +152,21 @@ export default function CollectionBottomSheet({
   visible,
   onClose,
   onSelect,
-  selectedItems = [],
-  shareIntent = null,
-  isShareMode = false,
+  selectedItems: initialSelectedItems = [],
 }: CollectionBottomSheetProps) {
-  const translateY = useRef(new Animated.Value(BOTTOM_SHEET_HEIGHT)).current;
+  // 오버레이 페이드 애니메이션
   const opacity = useRef(new Animated.Value(0)).current;
+
+  // 검색 상태 관리
   const [searchText, setSearchText] = useState('');
   const [filteredCollections, setFilteredCollections] =
     useState(DUMMY_COLLECTIONS);
 
-  // 검색 필터링
+  // 선택 상태 관리
+  const [selectedItems, setSelectedItems] =
+    useState<string[]>(initialSelectedItems);
+
+  // 검색어 변경 시 컬렉션 목록 필터링
   useEffect(() => {
     if (searchText.trim() === '') {
       setFilteredCollections(DUMMY_COLLECTIONS);
@@ -168,41 +178,33 @@ export default function CollectionBottomSheet({
     }
   }, [searchText]);
 
-  // 애니메이션
+  // visible 상태 변경 시 오버레이 페이드 애니메이션
   useEffect(() => {
     if (visible) {
-      Animated.parallel([
-        Animated.timing(translateY, {
-          toValue: 0,
-          duration: 300,
-          useNativeDriver: true,
-        }),
-        Animated.timing(opacity, {
-          toValue: 1,
-          duration: 300,
-          useNativeDriver: true,
-        }),
-      ]).start();
+      Animated.timing(opacity, {
+        toValue: 1,
+        duration: 300,
+        useNativeDriver: true,
+      }).start();
     } else {
-      Animated.parallel([
-        Animated.timing(translateY, {
-          toValue: BOTTOM_SHEET_HEIGHT,
-          duration: 250,
-          useNativeDriver: true,
-        }),
-        Animated.timing(opacity, {
-          toValue: 0,
-          duration: 250,
-          useNativeDriver: true,
-        }),
-      ]).start(() => {
-        setSearchText('');
+      Animated.timing(opacity, {
+        toValue: 0,
+        duration: 250,
+        useNativeDriver: true,
+      }).start(() => {
+        setSearchText(''); // 닫힐 때 검색어 초기화
       });
     }
-  }, [visible, translateY, opacity]);
+  }, [visible, opacity]);
 
+  /** 컬렉션 선택 핸들러 */
   const handleSelectCollection = (id: string) => {
-    console.log('선택된 컬렉션:', id);
+    setSelectedItems((prev) => {
+      if (prev.includes(id)) {
+        return prev.filter((item) => item !== id);
+      }
+      return [...prev, id];
+    });
     onSelect?.(id);
   };
 
@@ -222,15 +224,12 @@ export default function CollectionBottomSheet({
       />
 
       {/* BottomSheet */}
-      <Animated.View
-        style={[
-          styles.bottomSheet,
-          {
-            transform: [{ translateY }],
-          },
-        ]}
-      >
-        <TodoBottomSheet onClickAddCollection={() => {}} onClose={onClose}>
+      <View style={styles.bottomSheet}>
+        <TodoBottomSheet
+          expandable={true}
+          onClickAddCollection={() => {}}
+          onClose={onClose}
+        >
           {/* 검색 */}
           <SearchInputField />
 
@@ -239,6 +238,7 @@ export default function CollectionBottomSheet({
             style={styles.listContainer}
             contentContainerStyle={styles.listContent}
             showsVerticalScrollIndicator={false}
+            keyboardShouldPersistTaps="handled"
           >
             {filteredCollections.map((item, index) => {
               const isSelected = selectedItems.includes(item.id);
@@ -256,20 +256,19 @@ export default function CollectionBottomSheet({
               );
             })}
           </ScrollView>
-        </TodoBottomSheet>
 
-        {/* 닫기 버튼 */}
-        <View style={styles.footer}>
-          <TouchableOpacity
-            style={styles.closeButton}
-            onPress={onClose}
-            activeOpacity={0.8}
-          >
-            <Text style={styles.closeButtonText}>담기</Text>
-          </TouchableOpacity>
-          <View style={styles.footerHandle} />
-        </View>
-      </Animated.View>
+          {/* 하단 버튼 영역 - 키보드 위에 고정 */}
+          <KeyboardStickyView offset={{ closed: 0, opened: 0 }}>
+            <TouchableOpacity
+              style={styles.closeButton}
+              onPress={onClose}
+              activeOpacity={0.8}
+            >
+              <Text style={styles.closeButtonText}>담기</Text>
+            </TouchableOpacity>
+          </KeyboardStickyView>
+        </TodoBottomSheet>
+      </View>
     </View>
   );
 }

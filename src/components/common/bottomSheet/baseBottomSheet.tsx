@@ -1,10 +1,12 @@
-import { useRef, useState } from 'react';
+import { useRef, useState, useEffect } from 'react';
 import type { PropsWithChildren } from 'react';
 import {
   View,
   Animated,
   PanResponder,
   Dimensions,
+  Keyboard,
+  Platform,
   type GestureResponderEvent,
   type PanResponderGestureState,
 } from 'react-native';
@@ -78,6 +80,31 @@ export const BaseBottomSheet = ({
       useNativeDriver: false,
     }).start();
   };
+
+  /** 키보드 이벤트 리스너 - 키보드가 올라오면 시트 확장 */
+  useEffect(() => {
+    const showEvent =
+      Platform.OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow';
+    const hideEvent =
+      Platform.OS === 'ios' ? 'keyboardWillHide' : 'keyboardDidHide';
+
+    const keyboardShowListener = Keyboard.addListener(showEvent, () => {
+      if (expandable && !isExpanded) {
+        expandSheet();
+      }
+    });
+
+    const keyboardHideListener = Keyboard.addListener(hideEvent, () => {
+      if (isExpanded) {
+        // collapseSheet();
+      }
+    });
+
+    return () => {
+      keyboardShowListener.remove();
+      keyboardHideListener.remove();
+    };
+  }, [expandable, isExpanded]);
 
   /** 사용자 드래그 제스처 처리를 위한 PanResponder 설정 */
   const panResponder = useRef(

@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { View, BackHandler, Platform, StatusBar } from 'react-native';
 import { Stack } from 'expo-router';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { KeyboardProvider } from 'react-native-keyboard-controller';
 import type { ShareIntent } from 'expo-share-intent';
 import CollectionBottomSheet from '@/src/components/CollectionBottomSheet';
 
@@ -64,31 +65,35 @@ export default function RootLayout() {
   // iOS 공유 모드일 때는 모달만 렌더링 (투명 배경)
   if (isShareMode) {
     return (
-      <View style={{ flex: 1, backgroundColor: 'transparent' }}>
-        <StatusBar
-          translucent
-          backgroundColor="transparent"
-          barStyle="dark-content"
-        />
-        <CollectionBottomSheet
-          visible={modalVisible}
-          onClose={handleClose}
-          onSelect={handleSelectCollection}
-          shareIntent={currentIntent}
-          isShareMode={true}
-        />
-      </View>
+      <KeyboardProvider>
+        <View style={{ flex: 1, backgroundColor: 'transparent' }}>
+          <StatusBar
+            translucent
+            backgroundColor="transparent"
+            barStyle="dark-content"
+          />
+          <CollectionBottomSheet
+            visible={modalVisible}
+            onClose={handleClose}
+            onSelect={handleSelectCollection}
+            shareIntent={currentIntent}
+            isShareMode={true}
+          />
+        </View>
+      </KeyboardProvider>
     );
   }
 
   // 일반 모드일 때는 전체 앱 렌더링
   return (
-    <SafeAreaProvider>
-      <Stack
-        screenOptions={{
-          headerShown: false,
-        }}
-      />
-    </SafeAreaProvider>
+    <KeyboardProvider>
+      <SafeAreaProvider>
+        <Stack
+          screenOptions={{
+            headerShown: false,
+          }}
+        />
+      </SafeAreaProvider>
+    </KeyboardProvider>
   );
 }

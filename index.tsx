@@ -6,11 +6,15 @@ import 'expo-router/entry';
 import CollectionBottomSheet from './src/components/CollectionBottomSheet';
 import type { ShareIntentData } from './src/types/shareIntent';
 import type { ShareIntent } from 'expo-share-intent';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { KeyboardProvider } from 'react-native-keyboard-controller';
 
 // Android ShareActivity용 wrapper 컴포넌트
 function ShareIntentRoot(props: ShareIntentData) {
   const [modalVisible, setModalVisible] = useState(false);
   const [shareIntent, setShareIntent] = useState<ShareIntent | null>(null);
+  const [selectedCollections, setSelectedCollections] = useState<string[]>([]);
+  const [lastSelectedId, setLastSelectedId] = useState<string | null>(null);
 
   useEffect(() => {
     if (props.text || props.url || props.title) {
@@ -38,24 +42,37 @@ function ShareIntentRoot(props: ShareIntentData) {
 
   const handleSelectCollection = (collectionId: string) => {
     console.log('선택된 컬렉션:', collectionId);
-    handleConfirm();
+    setLastSelectedId(collectionId);
+    if (selectedCollections.includes(collectionId)) {
+      setSelectedCollections(
+        selectedCollections.filter((id) => id !== collectionId),
+      );
+    } else {
+      setSelectedCollections([...selectedCollections, collectionId]);
+    }
+    console.log('선택된 컬렉션:', collectionId);
   };
 
   return (
-    <View style={styles.container}>
-      <StatusBar
-        translucent
-        backgroundColor="transparent"
-        barStyle="light-content"
-      />
-      <CollectionBottomSheet
-        visible={modalVisible}
-        onClose={handleClose}
-        onSelect={handleSelectCollection}
-        shareIntent={shareIntent}
-        isShareMode={true}
-      />
-    </View>
+    <SafeAreaProvider>
+      <View style={styles.container}>
+        <KeyboardProvider>
+          <StatusBar
+            translucent
+            backgroundColor="transparent"
+            barStyle="light-content"
+          />
+
+          <CollectionBottomSheet
+            visible={modalVisible}
+            onClose={handleClose}
+            onSelect={handleSelectCollection}
+            shareIntent={shareIntent}
+            isShareMode={true}
+          />
+        </KeyboardProvider>
+      </View>
+    </SafeAreaProvider>
   );
 }
 
