@@ -9,7 +9,9 @@ import type {
   IOSShareExtensionData,
 } from './src/types/shareIntent';
 
-import { close as closeShareExtension } from 'expo-share-extension';
+// expo-share-extension은 iOS 전용이므로 조건부 import
+const closeShareExtension =
+  Platform.OS === 'ios' ? require('expo-share-extension').close : () => {};
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { KeyboardProvider } from 'react-native-keyboard-controller';
 

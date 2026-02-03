@@ -20,11 +20,18 @@ export type LinkMessageType =
   | 'link:response' // Native → WebView 성공 응답
   | 'link:error'; // Native → WebView 에러 응답
 
+// Share 메시지 타입
+export type ShareMessageType =
+  | 'share:open' // WebView → Native 요청 (공유 시트 열기)
+  | 'share:response' // Native → WebView 성공 응답
+  | 'share:error'; // Native → WebView 에러 응답
+
 // 모든 메시지 타입
 export type BridgeMessageType =
   | DraftMessageType
   | ClipboardMessageType
-  | LinkMessageType;
+  | LinkMessageType
+  | ShareMessageType;
 
 // WebView → Native App 메시지
 export interface BridgeMessage<T = any> {
@@ -74,6 +81,22 @@ export interface LinkErrorMessage {
 // Link 응답 타입
 export type LinkResponse = LinkResponseMessage | LinkErrorMessage;
 
+// Share 성공 응답
+export interface ShareResponseMessage {
+  type: 'share:response';
+  success: boolean;
+  activityType?: string; // iOS에서 사용자가 선택한 공유 대상
+}
+
+// Share 에러 응답
+export interface ShareErrorMessage {
+  type: 'share:error';
+  error: string;
+}
+
+// Share 응답 타입
+export type ShareResponse = ShareResponseMessage | ShareErrorMessage;
+
 // Bridge 범용 에러 응답 (알 수 없는 메시지 타입 등)
 export interface BridgeErrorMessage {
   type: 'bridge:error';
@@ -86,6 +109,7 @@ export type BridgeResponse<T = any> =
   | DraftResponse<T>
   | ClipboardResponse
   | LinkResponse
+  | ShareResponse
   | BridgeErrorMessage;
 
 // Handler 함수 타입
@@ -102,4 +126,11 @@ export interface DraftPayload {
 // Link Payload 타입
 export interface LinkPayload {
   url: string;
+}
+
+// Share Payload 타입
+export interface SharePayload {
+  url: string;
+  title?: string;
+  message?: string;
 }
