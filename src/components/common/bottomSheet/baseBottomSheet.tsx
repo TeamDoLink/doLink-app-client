@@ -43,7 +43,7 @@ export const BaseBottomSheet = ({
   contentClassName = '',
   children,
 }: BaseBottomSheetProps) => {
-  const { top: statusBarHeight } = useSafeAreaInsets(); // 기기별 실제 노치/상단 바 높이
+  const { top: statusBarHeight, bottom: safeAreaBottom } = useSafeAreaInsets();
   const screenHeight = Dimensions.get('window').height;
 
   const defaultInitialHeight = initialHeight ?? screenHeight * 0.6;
@@ -175,10 +175,11 @@ export const BaseBottomSheet = ({
 
   return (
     <Animated.View
-      className={`w-full rounded-t-3xl bg-white px-5 pb-6 pt-5 ${className}`}
+      className={`w-full rounded-t-3xl bg-white px-5 pt-5 ${className}`}
       style={{
         height: heightAnim, // 동적 높이 적용
         transform: [{ translateY }], // 드래그에 따른 위치 이동
+        paddingBottom: safeAreaBottom + 24, // safe area + 기본 패딩(24px = pb-6)
         shadowColor: '#000',
         shadowOffset: { width: 0, height: -10 },
         shadowOpacity: 0.08,

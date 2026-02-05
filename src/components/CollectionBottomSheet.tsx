@@ -10,12 +10,13 @@ import {
   View,
   Text,
   TouchableOpacity,
-  StyleSheet,
   ScrollView,
   Animated,
+  Keyboard,
   Platform,
 } from 'react-native';
 import { KeyboardStickyView } from 'react-native-keyboard-controller';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import ArchiveSocialMediaListItem from './common/list/ArchiveSocialMediaListItem';
 import { TodoBottomSheet } from './common/bottomSheet/todoBottomSheet';
 import SearchInputField from './common/inputField/searchInputField';
@@ -154,8 +155,13 @@ export default function CollectionBottomSheet({
   onSelect,
   selectedItems: initialSelectedItems = [],
 }: CollectionBottomSheetProps) {
+  const { bottom: safeAreaBottom } = useSafeAreaInsets();
+
   // 오버레이 페이드 애니메이션
   const opacity = useRef(new Animated.Value(0)).current;
+
+  // 키보드 상태 관리
+  const [isKeyboardVisible, setIsKeyboardVisible] = useState(false);
 
   // 검색 상태 관리
   const [searchText, setSearchText] = useState('');
@@ -165,6 +171,26 @@ export default function CollectionBottomSheet({
   // 선택 상태 관리
   const [selectedItems, setSelectedItems] =
     useState<string[]>(initialSelectedItems);
+
+  // 키보드 이벤트 리스너
+  useEffect(() => {
+    const showEvent =
+      Platform.OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow';
+    const hideEvent =
+      Platform.OS === 'ios' ? 'keyboardWillHide' : 'keyboardDidHide';
+
+    const showListener = Keyboard.addListener(showEvent, () => {
+      setIsKeyboardVisible(true);
+    });
+    const hideListener = Keyboard.addListener(hideEvent, () => {
+      setIsKeyboardVisible(false);
+    });
+
+    return () => {
+      showListener.remove();
+      hideListener.remove();
+    };
+  }, []);
 
   // 검색어 변경 시 컬렉션 목록 필터링
   useEffect(() => {
@@ -211,20 +237,16 @@ export default function CollectionBottomSheet({
   if (!visible) return null;
 
   return (
-    <View style={styles.fullScreen} pointerEvents="auto">
+    <View className="absolute inset-0 z-[9999]" pointerEvents="auto">
       {/* 오버레이 */}
       <Animated.View
-        style={[
-          styles.overlay,
-          {
-            opacity,
-          },
-        ]}
+        className="absolute inset-0 bg-black/50"
+        style={{ opacity }}
         onTouchEnd={onClose}
       />
 
       {/* BottomSheet */}
-      <View style={styles.bottomSheet}>
+      <View className="absolute bottom-0 left-0 right-0 bg-transparent">
         <TodoBottomSheet
           expandable={true}
           onClickAddCollection={() => {}}
@@ -235,8 +257,8 @@ export default function CollectionBottomSheet({
 
           {/* 컬렉션 목록 */}
           <ScrollView
-            style={styles.listContainer}
-            contentContainerStyle={styles.listContent}
+            className="flex-1"
+            contentContainerClassName="py-1.5"
             showsVerticalScrollIndicator={false}
             keyboardShouldPersistTaps="handled"
           >
@@ -256,150 +278,34 @@ export default function CollectionBottomSheet({
               );
             })}
           </ScrollView>
+        </TodoBottomSheet>
+      </View>
 
-          {/* 하단 버튼 영역 - 키보드 위에 고정 */}
-          <KeyboardStickyView offset={{ closed: 0, opened: 0 }}>
+      {/* 하단 버튼 영역 - 키보드 위에 고정 */}
+      <View
+        className="absolute left-0 right-0"
+        style={{ bottom: isKeyboardVisible ? 0 : safeAreaBottom }}
+      >
+        <KeyboardStickyView offset={{ closed: 0, opened: 0 }}>
+          <View className="bg-black px-5 py-4">
             <TouchableOpacity
-              style={styles.closeButton}
+              className={`items-center justify-center rounded-[12px] py-[14px] ${
+                selectedItems.length > 0 ? 'bg-point' : 'bg-grey-50'
+              }`}
               onPress={onClose}
               activeOpacity={0.8}
             >
-              <Text style={styles.closeButtonText}>담기</Text>
+              <Text
+                className={`text-center text-body-xl ${
+                  selectedItems.length > 0 ? 'text-white' : 'text-grey-400'
+                }`}
+              >
+                담기
+              </Text>
             </TouchableOpacity>
-          </KeyboardStickyView>
-        </TodoBottomSheet>
+          </View>
+        </KeyboardStickyView>
       </View>
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  fullScreen: {
-    ...StyleSheet.absoluteFillObject,
-    zIndex: 9999,
-  },
-  overlay: {
-    ...StyleSheet.absoluteFillObject,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-  },
-  bottomSheet: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-    paddingBottom: Platform.OS === 'ios' ? 34 : 0,
-    backgroundColor: 'transparent',
-  },
-
-  // 핸들 바
-  handleContainer: {
-    alignItems: 'center',
-    paddingVertical: 8,
-  },
-  handle: {
-    width: 36,
-    height: 4,
-    backgroundColor: '#D0D0D0',
-    borderRadius: 2,
-  },
-
-  // 헤더
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 16,
-    paddingVertical: 14,
-    borderBottomWidth: 0,
-    borderBottomColor: '#F0F0F0',
-  },
-  headerTitle: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: '#1a1a1a',
-  },
-  addButton: {
-    fontSize: 14,
-    fontWeight: '500',
-    color: '#666666',
-  },
-
-  // 검색
-  searchContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginHorizontal: 16,
-    marginTop: 0,
-    marginBottom: 16,
-    paddingHorizontal: 12,
-    paddingVertical: 10,
-    backgroundColor: '#efefef',
-    borderRadius: 10,
-  },
-  searchIcon: {
-    marginRight: 8,
-  },
-  searchInput: {
-    flex: 1,
-    fontSize: 14,
-    color: '#1a1a1a',
-    paddingVertical: 0,
-  },
-
-  // 공유 정보
-  shareInfoContainer: {
-    marginHorizontal: 16,
-    marginVertical: 8,
-    paddingHorizontal: 12,
-    paddingVertical: 10,
-    backgroundColor: '#F0F8FF',
-    borderRadius: 8,
-    borderLeftWidth: 3,
-    borderLeftColor: '#007AFF',
-  },
-  shareUrl: {
-    fontSize: 12,
-    color: '#007AFF',
-    fontWeight: '500',
-    marginBottom: 4,
-  },
-  shareText: {
-    fontSize: 13,
-    color: '#666',
-    lineHeight: 18,
-  },
-
-  // 리스트
-  listContainer: {
-    flex: 1,
-  },
-  listContent: {
-    paddingVertical: 6,
-  },
-
-  // 푸터
-  footer: {
-    backgroundColor: '#f5f5f5',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-  },
-  closeButton: {
-    backgroundColor: '#f5f5f5',
-    paddingVertical: 12,
-    marginBottom: 8,
-    alignItems: 'center',
-    borderRadius: 0,
-  },
-  closeButtonText: {
-    fontSize: 14,
-    color: '#999999',
-    fontWeight: '500',
-  },
-  footerHandle: {
-    width: 100,
-    height: 3,
-    backgroundColor: '#000000',
-    borderRadius: 1.5,
-    alignSelf: 'center',
-  },
-});
