@@ -26,11 +26,11 @@ export default function ArchiveSocialMediaListItem({
     <Pressable onPress={onPress} className="w-full">
       <View
         className={`w-full flex-col items-center ${
-          isSelected ? 'bg-grey-50 py-[12px]' : 'pt-[12px]'
+          isSelected ? 'bg-grey-50 py-3' : 'pt-3'
         }`}
       >
         {/* Info */}
-        <View className="w-full flex-row items-center gap-[16px] px-[20px]">
+        <View className="w-full flex-row items-center gap-4 px-5">
           {/* Thumbnail */}
           <View className="h-[44px] w-[44px] overflow-hidden rounded-[10px]">
             {thumbnail ? (
@@ -100,7 +100,7 @@ export default function ArchiveSocialMediaListItem({
 
         {/* Divider */}
         {showDivider && !isSelected && (
-          <View className="mt-[11px] w-full px-[20px]">
+          <View className="mt-3 w-full px-5">
             <View className="h-px w-full bg-grey-100" />
           </View>
         )}

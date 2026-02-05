@@ -253,12 +253,13 @@ export default function CollectionBottomSheet({
           onClose={onClose}
         >
           {/* 검색 */}
-          <SearchInputField value={searchText} onChangeText={setSearchText} />
+          <View className="px-5 pb-3">
+            <SearchInputField value={searchText} onChangeText={setSearchText} />
+          </View>
 
           {/* 컬렉션 목록 */}
           <ScrollView
             className="flex-1"
-            contentContainerClassName="py-1.5"
             showsVerticalScrollIndicator={false}
             keyboardShouldPersistTaps="handled"
           >
@@ -287,7 +288,7 @@ export default function CollectionBottomSheet({
         style={{ bottom: isKeyboardVisible ? 0 : safeAreaBottom }}
       >
         <KeyboardStickyView offset={{ closed: 0, opened: 0 }}>
-          <View className="bg-black px-5 py-4">
+          <View className="bg-white px-5 py-4">
             <TouchableOpacity
               className={`items-center justify-center rounded-[12px] py-[14px] ${
                 selectedItems.length > 0 ? 'bg-point' : 'bg-grey-50'

@@ -46,9 +46,9 @@ export const BaseBottomSheet = ({
   const { top: statusBarHeight, bottom: safeAreaBottom } = useSafeAreaInsets();
   const screenHeight = Dimensions.get('window').height;
 
-  const defaultInitialHeight = initialHeight ?? screenHeight * 0.6;
+  const defaultInitialHeight = initialHeight ?? screenHeight * 0.7;
 
-  const GAP = 100;
+  const GAP = 30;
   const defaultExpandedHeight =
     expandedHeight ?? screenHeight - statusBarHeight - GAP;
 
@@ -175,7 +175,7 @@ export const BaseBottomSheet = ({
 
   return (
     <Animated.View
-      className={`w-full rounded-t-3xl bg-white px-5 pt-5 ${className}`}
+      className={`w-full rounded-t-3xl bg-white pt-3 ${className}`}
       style={{
         height: heightAnim, // 동적 높이 적용
         transform: [{ translateY }], // 드래그에 따른 위치 이동
@@ -188,7 +188,7 @@ export const BaseBottomSheet = ({
       }}
     >
       {/* 바텀시트 상단 핸들 (드래그 가능 영역) */}
-      <View className="mb-4 flex items-center justify-center">
+      <View className="mb-6 flex items-center justify-center">
         <View
           {...panResponder.panHandlers} // 제스처 핸들러 연결
           className="h-1 w-12 rounded-[2px] bg-[#D2D9DD]"

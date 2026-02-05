@@ -18,7 +18,7 @@ export const TodoBottomSheet = ({
   onClickAddCollection,
   onClose,
   dismissThreshold = 80,
-  initialHeight = 500,
+  initialHeight,
   expandable = true,
   children,
 }: TodoBottomSheetProps) => {
@@ -31,7 +31,7 @@ export const TodoBottomSheet = ({
       className="gap-4"
     >
       {/* Header 영역 */}
-      <View className="flex-row items-center justify-between pb-[20px]">
+      <View className="flex-row items-center justify-between px-5 pb-6">
         <Text className="text-heading-xl text-black">할 일 담기</Text>
 
         <TouchableOpacity
