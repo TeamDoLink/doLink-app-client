@@ -51,6 +51,11 @@ export function ShareIntentRoot(props: ShareIntentData) {
     console.log('선택된 컬렉션:', collectionId);
   };
 
+  const handleAddCollection = () => {
+    console.log('모음 추가 버튼 클릭');
+    // TODO: 모음 추가 로직 구현
+  };
+
   return (
     <SafeAreaProvider>
       <View className="flex-1 bg-transparent">
@@ -61,9 +66,11 @@ export function ShareIntentRoot(props: ShareIntentData) {
             barStyle="light-content"
           />
 
+          {/* TODO 여기가 dim이면 되는거 아닌가? */}
           <CollectionBottomSheet
             visible={modalVisible}
             onClose={handleClose}
+            onClickAddCollection={handleAddCollection}
             onSelect={handleSelectCollection}
             shareIntent={shareIntent}
             isShareMode={true}

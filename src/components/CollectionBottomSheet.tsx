@@ -6,6 +6,7 @@
  * - 키보드 위에 고정되는 하단 버튼 제공
  */
 import { useEffect, useRef, useState } from 'react';
+import PlusIcon from '@/src/assets/icons/common/plus.svg';
 import {
   View,
   Text,
@@ -21,6 +22,7 @@ import ArchiveSocialMediaListItem from './common/list/ArchiveSocialMediaListItem
 import { TodoBottomSheet } from './common/bottomSheet/todoBottomSheet';
 import SearchInputField from './common/inputField/searchInputField';
 import { ShareIntentData } from '../types/shareIntent';
+import { BaseBottomSheet } from './common/bottomSheet/baseBottomSheet';
 
 /** 컬렉션 아이템 타입 정의 */
 interface CollectionItem {
@@ -35,10 +37,14 @@ interface CollectionItem {
 interface CollectionBottomSheetProps {
   visible: boolean; // 바텀시트 표시 여부
   onClose: () => void; // 닫기 콜백
+  onClickAddCollection: () => void; // 모음 추가 콜백
   onSelect?: (collectionId: string) => void; // 컬렉션 선택 콜백
   selectedItems?: string[]; // 선택된 아이템 ID 목록
   shareIntent?: ShareIntentData | null; // 공유 인텐트 데이터
   isShareMode?: boolean; // 공유 모드 여부
+  dismissThreshold?: number; // 닫기 임계값
+  initialHeight?: number; // 초기 높이
+  expandable?: boolean; // 확장 가능 여부
 }
 
 const DUMMY_COLLECTIONS: CollectionItem[] = [
@@ -152,8 +158,12 @@ const DUMMY_COLLECTIONS: CollectionItem[] = [
 export default function CollectionBottomSheet({
   visible,
   onClose,
+  onClickAddCollection,
   onSelect,
   selectedItems: initialSelectedItems = [],
+  dismissThreshold = 80,
+  initialHeight,
+  expandable = true,
 }: CollectionBottomSheetProps) {
   const { bottom: safeAreaBottom } = useSafeAreaInsets();
 
@@ -247,39 +257,61 @@ export default function CollectionBottomSheet({
 
       {/* BottomSheet */}
       <View className="absolute bottom-0 left-0 right-0 bg-transparent">
-        <TodoBottomSheet
-          expandable={true}
-          onClickAddCollection={() => {}}
+        <BaseBottomSheet
           onClose={onClose}
+          dismissThreshold={dismissThreshold}
+          initialHeight={initialHeight}
+          expandable={expandable}
+          className="gap-4"
         >
-          {/* 검색 */}
-          <View className="px-5 pb-3">
-            <SearchInputField value={searchText} onChangeText={setSearchText} />
+          {/* Header 영역 */}
+          <View className="flex-row items-center justify-between px-5 pb-6">
+            <Text className="text-heading-xl text-black">할 일 담기</Text>
+
+            <TouchableOpacity
+              activeOpacity={0.7}
+              onPress={onClickAddCollection}
+              className="flex-row items-center gap-0.5"
+            >
+              <PlusIcon width={16} height={16} color="#4E5968" />
+              <Text className="text-caption-md text-grey-700">모음 추가</Text>
+            </TouchableOpacity>
           </View>
 
-          {/* 컬렉션 목록 */}
-          <ScrollView
-            className="flex-1"
-            showsVerticalScrollIndicator={false}
-            keyboardShouldPersistTaps="handled"
-          >
-            {filteredCollections.map((item, index) => {
-              const isSelected = selectedItems.includes(item.id);
-              return (
-                <ArchiveSocialMediaListItem
-                  key={item.id}
-                  title={item.title}
-                  category="카테고리"
-                  itemCount={item.itemCount}
-                  thumbnail={item.thumbnail}
-                  isSelected={isSelected}
-                  onPress={() => handleSelectCollection(item.id)}
-                  showDivider={index < filteredCollections.length - 1}
-                />
-              );
-            })}
-          </ScrollView>
-        </TodoBottomSheet>
+          {/* Content 영역 */}
+          <View className="flex-1">
+            {/* 검색 */}
+            <View className="px-5 pb-3">
+              <SearchInputField
+                value={searchText}
+                onChangeText={setSearchText}
+              />
+            </View>
+
+            {/* 컬렉션 목록 */}
+            <ScrollView
+              className="flex-1"
+              showsVerticalScrollIndicator={false}
+              keyboardShouldPersistTaps="handled"
+            >
+              {filteredCollections.map((item, index) => {
+                const isSelected = selectedItems.includes(item.id);
+                return (
+                  <ArchiveSocialMediaListItem
+                    key={item.id}
+                    title={item.title}
+                    category="카테고리"
+                    itemCount={item.itemCount}
+                    thumbnail={item.thumbnail}
+                    isSelected={isSelected}
+                    onPress={() => handleSelectCollection(item.id)}
+                    showDivider={index < filteredCollections.length - 1}
+                  />
+                );
+              })}
+            </ScrollView>
+          </View>
+        </BaseBottomSheet>
       </View>
 
       {/* 하단 버튼 영역 - 키보드 위에 고정 */}
