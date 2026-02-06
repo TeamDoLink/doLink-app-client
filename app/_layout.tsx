@@ -9,10 +9,6 @@ import type { ShareIntent } from 'expo-share-intent';
 import CollectionBottomSheet from '@/src/components/CollectionBottomSheet';
 
 export default function RootLayout() {
-  const [modalVisible, setModalVisible] = useState(false);
-  const [currentIntent, setCurrentIntent] = useState<ShareIntent | null>(null);
-  const [isShareMode, setIsShareMode] = useState(false);
-
   return (
     <KeyboardProvider>
       <SafeAreaProvider>

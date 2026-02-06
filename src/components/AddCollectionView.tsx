@@ -5,61 +5,39 @@
  * - 모음 이름 입력 및 카테고리 선택 기능
  */
 import { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity } from 'react-native';
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  ScrollView,
+} from 'react-native';
 import BackIcon from '@/src/assets/icons/common/back.svg';
-import FoodIcon from '@/src/assets/icons/category/food.svg';
-import HobbyIcon from '@/src/assets/icons/category/hobby.svg';
-import TravelIcon from '@/src/assets/icons/category/travel.svg';
-import MoneyIcon from '@/src/assets/icons/category/money.svg';
-import ShoppingIcon from '@/src/assets/icons/category/shopping.svg';
-import ExerciseIcon from '@/src/assets/icons/category/exercise.svg';
-import CareerIcon from '@/src/assets/icons/category/career.svg';
-import StudyIcon from '@/src/assets/icons/category/study.svg';
-import TipsIcon from '@/src/assets/icons/category/tips.svg';
-import EtcIcon from '@/src/assets/icons/category/etc.svg';
+import { ArchiveCategory, ARCHIVE_CATEGORY_LABEL } from '../constants/category';
+import { CategoryEditorIconImage } from '../constants/images';
 
-/** 카테고리 타입 정의 */
-export type CategoryType =
-  | 'food'
-  | 'hobby'
-  | 'travel'
-  | 'money'
-  | 'shopping'
-  | 'exercise'
-  | 'career'
-  | 'study'
-  | 'tips'
-  | 'etc';
-
-/** 카테고리 아이템 정의 */
-interface CategoryItem {
-  id: CategoryType;
-  label: string;
-  Icon: React.FC<{ width: number; height: number }>;
-}
-
-/** 카테고리 목록 */
-const CATEGORIES: CategoryItem[] = [
-  { id: 'food', label: '맛집', Icon: FoodIcon },
-  { id: 'hobby', label: '취미', Icon: HobbyIcon },
-  { id: 'travel', label: '여행', Icon: TravelIcon },
-  { id: 'money', label: '재테크', Icon: MoneyIcon },
-  { id: 'shopping', label: '쇼핑', Icon: ShoppingIcon },
-  { id: 'exercise', label: '운동', Icon: ExerciseIcon },
-  { id: 'career', label: '커리어', Icon: CareerIcon },
-  { id: 'study', label: '자기계발', Icon: StudyIcon },
-  { id: 'tips', label: '꿀팁', Icon: TipsIcon },
-  { id: 'etc', label: '기타', Icon: EtcIcon },
+/** 카테고리 목록 (표시 순서) */
+const CATEGORY_ORDER: ArchiveCategory[] = [
+  'restaurant',
+  'hobby',
+  'travel',
+  'money',
+  'shopping',
+  'exercise',
+  'career',
+  'study',
+  'tips',
+  'etc',
 ];
 
 /** Props 타입 정의 */
 interface AddCollectionViewProps {
   onBack: () => void;
-  onAdd?: (name: string, category: CategoryType) => void;
+  onAdd?: (name: string, category: ArchiveCategory) => void;
   name: string;
   onNameChange: (name: string) => void;
-  selectedCategory: CategoryType | null;
-  onCategoryChange: (category: CategoryType) => void;
+  selectedCategory: ArchiveCategory | null;
+  onCategoryChange: (category: ArchiveCategory) => void;
   hideButton?: boolean;
 }
 
@@ -86,7 +64,7 @@ export default function AddCollectionView({
   };
 
   /** 카테고리 선택 핸들러 */
-  const handleCategorySelect = (categoryId: CategoryType) => {
+  const handleCategorySelect = (categoryId: ArchiveCategory) => {
     onCategoryChange(categoryId);
   };
 
@@ -101,7 +79,7 @@ export default function AddCollectionView({
   };
 
   return (
-    <View className="flex-1">
+    <ScrollView className="flex-1" showsVerticalScrollIndicator={false}>
       {/* Header */}
       <View className="flex-row items-center gap-2 px-5 pb-5">
         <TouchableOpacity onPress={onBack} activeOpacity={0.7}>
@@ -147,28 +125,38 @@ export default function AddCollectionView({
           </Text>
 
           {/* 첫 번째 줄: 맛집, 취미, 여행, 재테크, 쇼핑 */}
-          <View className="mb-4 flex-row justify-between">
-            {CATEGORIES.slice(0, 5).map((category) => (
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            className="mb-4"
+            contentContainerStyle={{ gap: 16 }}
+            keyboardShouldPersistTaps="handled"
+          >
+            {CATEGORY_ORDER.slice(0, 5).map((categoryId) => (
               <CategoryButton
-                key={category.id}
-                category={category}
-                isSelected={selectedCategory === category.id}
-                onPress={() => handleCategorySelect(category.id)}
+                key={categoryId}
+                categoryId={categoryId}
+                isSelected={selectedCategory === categoryId}
+                onPress={() => handleCategorySelect(categoryId)}
               />
             ))}
-          </View>
+          </ScrollView>
 
           {/* 두 번째 줄: 운동, 커리어, 자기계발, 꿀팁, 기타 */}
-          <View className="flex-row justify-between">
-            {CATEGORIES.slice(5, 10).map((category) => (
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={{ gap: 16 }}
+          >
+            {CATEGORY_ORDER.slice(5, 10).map((categoryId) => (
               <CategoryButton
-                key={category.id}
-                category={category}
-                isSelected={selectedCategory === category.id}
-                onPress={() => handleCategorySelect(category.id)}
+                key={categoryId}
+                categoryId={categoryId}
+                isSelected={selectedCategory === categoryId}
+                onPress={() => handleCategorySelect(categoryId)}
               />
             ))}
-          </View>
+          </ScrollView>
         </View>
       </View>
 
@@ -193,23 +181,25 @@ export default function AddCollectionView({
           </TouchableOpacity>
         </View>
       )}
-    </View>
+    </ScrollView>
   );
 }
 
 /** 카테고리 버튼 컴포넌트 */
 interface CategoryButtonProps {
-  category: CategoryItem;
+  categoryId: ArchiveCategory;
   isSelected: boolean;
   onPress: () => void;
 }
 
 function CategoryButton({
-  category,
+  categoryId,
   isSelected,
   onPress,
 }: CategoryButtonProps) {
-  const { Icon, label } = category;
+  const icons = CategoryEditorIconImage[categoryId];
+  const Icon = isSelected ? icons.selected : icons.unselected;
+  const label = ARCHIVE_CATEGORY_LABEL[categoryId];
 
   return (
     <TouchableOpacity
@@ -217,11 +207,7 @@ function CategoryButton({
       onPress={onPress}
       activeOpacity={0.7}
     >
-      <View
-        className={`mb-1.5 overflow-hidden rounded-full ${
-          isSelected ? 'border-2 border-point' : ''
-        }`}
-      >
+      <View className="mb-1.5 overflow-hidden rounded-full">
         <Icon width={40} height={40} />
       </View>
       <Text

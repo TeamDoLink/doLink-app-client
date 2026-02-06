@@ -19,11 +19,11 @@ import {
 import { KeyboardStickyView } from 'react-native-keyboard-controller';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import ArchiveSocialMediaListItem from './common/list/ArchiveSocialMediaListItem';
-import { TodoBottomSheet } from './common/bottomSheet/todoBottomSheet';
 import SearchInputField from './common/inputField/searchInputField';
 import { ShareIntentData } from '../types/shareIntent';
 import { BaseBottomSheet } from './common/bottomSheet/baseBottomSheet';
 import AddCollectionView from './AddCollectionView';
+import { ArchiveCategory } from '../constants/category';
 
 /** 컬렉션 아이템 타입 정의 */
 interface CollectionItem {
@@ -186,6 +186,11 @@ export default function CollectionBottomSheet({
   // AddCollectionView 표시 상태 관리
   const [showAddView, setShowAddView] = useState(false);
 
+  // AddCollectionView 입력 상태 관리
+  const [addCollectionName, setAddCollectionName] = useState('');
+  const [addCollectionCategory, setAddCollectionCategory] =
+    useState<ArchiveCategory | null>(null);
+
   // 키보드 이벤트 리스너
   useEffect(() => {
     const showEvent =
@@ -256,13 +261,26 @@ export default function CollectionBottomSheet({
   /** 모음 추가 뷰 닫기 핸들러 */
   const handleCloseAddView = () => {
     setShowAddView(false);
+    setAddCollectionName('');
+    setAddCollectionCategory(null);
   };
 
+  /** 추가하기 버튼 활성화 여부 */
+  const isAddEnabled =
+    addCollectionName.trim().length > 0 && addCollectionCategory !== null;
+
   /** 모음 추가 완료 핸들러 */
-  const handleAddCollection = (name: string, category: string) => {
-    console.log('모음 추가:', { name, category });
-    // TODO: 백엔드 API 연동
-    setShowAddView(false);
+  const handleAddCollection = () => {
+    if (isAddEnabled && addCollectionCategory) {
+      console.log('모음 추가:', {
+        name: addCollectionName,
+        category: addCollectionCategory,
+      });
+      // TODO: 백엔드 API 연동
+      setShowAddView(false);
+      setAddCollectionName('');
+      setAddCollectionCategory(null);
+    }
   };
 
   if (!visible) return null;
@@ -290,6 +308,11 @@ export default function CollectionBottomSheet({
               <AddCollectionView
                 onBack={handleCloseAddView}
                 onAdd={handleAddCollection}
+                name={addCollectionName}
+                onNameChange={setAddCollectionName}
+                selectedCategory={addCollectionCategory}
+                onCategoryChange={setAddCollectionCategory}
+                hideButton={true}
               />
             ) : (
               // 할일 담기 View
@@ -345,14 +368,31 @@ export default function CollectionBottomSheet({
         </BaseBottomSheet>
       </View>
 
-      {/* 하단 버튼 영역 - 키보드 위에 고정 (AddView가 아닐 때만 표시) */}
-      {!showAddView && (
-        <View
-          className="absolute left-0 right-0"
-          style={{ bottom: isKeyboardVisible ? 0 : safeAreaBottom }}
-        >
-          <KeyboardStickyView offset={{ closed: 0, opened: 0 }}>
-            <View className="bg-white px-5 py-4">
+      {/* 하단 버튼 영역 - 키보드 위에 고정 */}
+      <View
+        className="absolute left-0 right-0"
+        style={{ bottom: isKeyboardVisible ? 0 : safeAreaBottom }}
+      >
+        <KeyboardStickyView offset={{ closed: 0, opened: 0 }}>
+          <View className="bg-white px-5 py-4">
+            {showAddView ? (
+              <TouchableOpacity
+                className={`items-center justify-center rounded-[12px] py-[14px] ${
+                  isAddEnabled ? 'bg-point' : 'bg-grey-50'
+                }`}
+                onPress={handleAddCollection}
+                activeOpacity={0.8}
+                disabled={!isAddEnabled}
+              >
+                <Text
+                  className={`text-center text-body-xl ${
+                    isAddEnabled ? 'text-white' : 'text-grey-400'
+                  }`}
+                >
+                  추가하기
+                </Text>
+              </TouchableOpacity>
+            ) : (
               <TouchableOpacity
                 className={`items-center justify-center rounded-[12px] py-[14px] ${
                   selectedItems.length > 0 ? 'bg-point' : 'bg-grey-50'
@@ -368,10 +408,10 @@ export default function CollectionBottomSheet({
                   담기
                 </Text>
               </TouchableOpacity>
-            </View>
-          </KeyboardStickyView>
-        </View>
-      )}
+            )}
+          </View>
+        </KeyboardStickyView>
+      </View>
     </View>
   );
 }
