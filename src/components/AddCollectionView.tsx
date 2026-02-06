@@ -125,13 +125,7 @@ export default function AddCollectionView({
           </Text>
 
           {/* 첫 번째 줄: 맛집, 취미, 여행, 재테크, 쇼핑 */}
-          <ScrollView
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            className="mb-4"
-            contentContainerStyle={{ gap: 16 }}
-            keyboardShouldPersistTaps="handled"
-          >
+          <View className="mb-4 flex-row justify-between">
             {CATEGORY_ORDER.slice(0, 5).map((categoryId) => (
               <CategoryButton
                 key={categoryId}
@@ -140,14 +134,10 @@ export default function AddCollectionView({
                 onPress={() => handleCategorySelect(categoryId)}
               />
             ))}
-          </ScrollView>
+          </View>
 
           {/* 두 번째 줄: 운동, 커리어, 자기계발, 꿀팁, 기타 */}
-          <ScrollView
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            contentContainerStyle={{ gap: 16 }}
-          >
+          <View className="flex-row justify-between">
             {CATEGORY_ORDER.slice(5, 10).map((categoryId) => (
               <CategoryButton
                 key={categoryId}
@@ -156,7 +146,7 @@ export default function AddCollectionView({
                 onPress={() => handleCategorySelect(categoryId)}
               />
             ))}
-          </ScrollView>
+          </View>
         </View>
       </View>
 
