@@ -223,7 +223,7 @@ export default function CollectionBottomSheet({
     }
   }, [searchText]);
 
-  // visible 상태 변경 시 오버레이 페이드 애니메이션
+  // visible 상태 변경 시 오버레이 페이드 애니메이션 및 상태 초기화
   useEffect(() => {
     if (visible) {
       Animated.timing(opacity, {
@@ -232,23 +232,29 @@ export default function CollectionBottomSheet({
         useNativeDriver: true,
       }).start();
     } else {
+      // 닫힐 때 모든 상태 초기화 (다음에 열릴 때 깜빡임 방지)
+      setSearchText('');
+      setShowAddView(false);
+      setAddCollectionName('');
+      setAddCollectionCategory(null);
+
       Animated.timing(opacity, {
         toValue: 0,
         duration: 250,
         useNativeDriver: true,
-      }).start(() => {
-        setSearchText(''); // 닫힐 때 검색어 초기화
-      });
+      }).start();
     }
   }, [visible, opacity]);
 
-  /** 컬렉션 선택 핸들러 */
+  /** 컬렉션 선택 핸들러 (단일 선택) */
   const handleSelectCollection = (id: string) => {
     setSelectedItems((prev) => {
+      // 이미 선택된 항목을 다시 클릭하면 선택 해제
       if (prev.includes(id)) {
-        return prev.filter((item) => item !== id);
+        return [];
       }
-      return [...prev, id];
+      // 새 항목 선택 시 기존 선택 대체
+      return [id];
     });
     onSelect?.(id);
   };
