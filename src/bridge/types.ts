@@ -26,6 +26,9 @@ export type ShareMessageType =
   | 'share:response' // Native → WebView 성공 응답
   | 'share:error'; // Native → WebView 에러 응답
 
+// ShareIntent 메시지 타입 (Native → WebView, 공유 인텐트 데이터 전달)
+export type ShareIntentMessageType = 'shareIntent:data';
+
 // 모든 메시지 타입
 export type BridgeMessageType =
   | DraftMessageType
@@ -96,6 +99,18 @@ export interface ShareErrorMessage {
 
 // Share 응답 타입
 export type ShareResponse = ShareResponseMessage | ShareErrorMessage;
+
+// ShareIntent 데이터 메시지 (Native → WebView)
+export interface ShareIntentDataMessage {
+  type: 'shareIntent:data';
+  payload: {
+    text?: string | null;
+    title?: string | null;
+    url?: string | null;
+    thumbnailUrl?: string | null;
+    contentType?: 'text' | 'media' | 'file' | 'weburl' | null;
+  };
+}
 
 // Bridge 범용 에러 응답 (알 수 없는 메시지 타입 등)
 export interface BridgeErrorMessage {
