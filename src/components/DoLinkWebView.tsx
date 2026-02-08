@@ -5,14 +5,19 @@ import WebView from 'react-native-webview';
 import { BaseBottomSheet } from './common/bottomSheet/baseBottomSheet';
 import type { ShareIntentData } from '../types/shareIntent';
 import type { ShareIntentDataMessage } from '../bridge/types';
+import { config } from '../utils/envConfig';
 
 interface DoLinkWebViewProps {
   shareIntent?: ShareIntentData | null;
 }
 
 export default function DoLinkWebView({ shareIntent }: DoLinkWebViewProps) {
+  const domain = config.domain;
   const [visible, setVisible] = useState(true);
   const webViewRef = useRef<WebView>(null);
+
+  const DEFAULT_PATH = '/share-intent';
+  const webViewUrl = `${domain}${DEFAULT_PATH}`;
 
   const handleClose = () => {
     setVisible(false);
@@ -57,10 +62,9 @@ export default function DoLinkWebView({ shareIntent }: DoLinkWebViewProps) {
         <View className="absolute bottom-0 left-0 right-0 bg-transparent">
           <BaseBottomSheet onClose={handleClose} expandable>
             <View className="flex-1 overflow-hidden rounded-xl">
-              {/* TODO dolinkWebView로 교체 예정 */}
               <WebView
                 ref={webViewRef}
-                source={{ uri: 'https://www.naver.com' }}
+                source={{ uri: webViewUrl }}
                 onLoadEnd={handleWebViewLoad}
               />
             </View>
