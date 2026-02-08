@@ -13,6 +13,9 @@ export type ClipboardMessageType =
   | 'clipboard:data' // Native → WebView 성공 응답
   | 'clipboard:error'; // Native → WebView 에러 응답
 
+// Auth 메시지 타입
+export type AuthMessageType = 'auth:status';
+
 // Link 메시지 타입
 export type LinkMessageType =
   | 'link:open' // WebView → Native 요청 (URL 열기)
@@ -31,10 +34,10 @@ export type ShareIntentMessageType = 'shareIntent:data';
 
 // 모든 메시지 타입
 export type BridgeMessageType =
-  | DraftMessageType
   | ClipboardMessageType
   | LinkMessageType
-  | ShareMessageType;
+  | ShareMessageType
+  | AuthMessageType;
 
 // WebView → Native App 메시지
 export interface BridgeMessage<T = any> {
@@ -109,6 +112,14 @@ export interface ShareIntentDataMessage {
     url?: string | null;
     thumbnailUrl?: string | null;
     contentType?: 'text' | 'media' | 'file' | 'weburl' | null;
+  };
+}
+
+// Auth 상태 메시지 (Web → Native)
+export interface AuthStatusMessage {
+  type: 'auth:status';
+  payload: {
+    isAuthenticated: boolean;
   };
 }
 

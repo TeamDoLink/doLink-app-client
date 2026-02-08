@@ -1,10 +1,14 @@
 import React, { useRef, useState } from 'react';
-import { View, BackHandler, StatusBar } from 'react-native';
+import { View, BackHandler, StatusBar, Linking } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import WebView from 'react-native-webview';
+import * as Clipboard from 'expo-clipboard';
 import { BaseBottomSheet } from './common/bottomSheet/baseBottomSheet';
 import type { ShareIntentData } from '../types/shareIntent';
-import type { ShareIntentDataMessage } from '../bridge/types';
+import type {
+  ShareIntentDataMessage,
+  AuthStatusMessage,
+} from '../bridge/types';
 import { config } from '../utils/envConfig';
 
 interface DoLinkWebViewProps {
@@ -41,6 +45,36 @@ export default function DoLinkWebView({ shareIntent }: DoLinkWebViewProps) {
     webViewRef.current.postMessage(JSON.stringify(message));
   };
 
+  const handleMessage = async (event: { nativeEvent: { data: string } }) => {
+    try {
+      const data = JSON.parse(event.nativeEvent.data);
+
+      if (data.type === 'auth:status') {
+        const { isAuthenticated } = (data as AuthStatusMessage).payload;
+
+        if (isAuthenticated) {
+          // 로그인 되어있다면 공유 데이터 내려줌
+          handleWebViewLoad();
+        } else {
+          // 로그인 되어있지 않다면
+          // 1. 공유하려는 URL을 클립보드에 저장
+          const sharedUrl = shareIntent?.url || shareIntent?.text || '';
+          if (sharedUrl) {
+            await Clipboard.setStringAsync(sharedUrl);
+          }
+
+          // 2. 딥링크로 메인 액티비티 연다 (/)
+          Linking.openURL('dolink://');
+
+          // 3. 현재 공유 액티비티 종료
+          handleClose();
+        }
+      }
+    } catch (error) {
+      console.error('[DoLinkWebView] 메시지 처리 에러:', error);
+    }
+  };
+
   if (!visible) return null;
 
   return (
@@ -65,7 +99,7 @@ export default function DoLinkWebView({ shareIntent }: DoLinkWebViewProps) {
               <WebView
                 ref={webViewRef}
                 source={{ uri: webViewUrl }}
-                onLoadEnd={handleWebViewLoad}
+                onMessage={handleMessage}
               />
             </View>
           </BaseBottomSheet>
