@@ -35,7 +35,8 @@ export default function Index() {
   const { handleMessage } = useWebViewBridge(webViewRef);
 
   const domain = config.domain;
-  const DEFAULT_PATH = '/archives/detail/1';
+  // const DEFAULT_PATH = '/archives/detail/1';
+  const DEFAULT_PATH = '/';
 
   // 딥링크로 인한 웹 경로 상태 관리
   const [webPath, setWebPath] = useState<string>(DEFAULT_PATH);
@@ -63,6 +64,12 @@ export default function Index() {
 
   const webUrl = `${domain}${webPath}`;
 
+  useEffect(() => {
+    console.log('🌐 WebView Loading URL:', webUrl);
+    console.log('📱 Platform:', Platform.OS);
+    console.log('🏠 Domain:', domain);
+  }, [webUrl]);
+
   return (
     <SafeAreaView
       style={{ flex: 1, backgroundColor: '#ffffff' }}
@@ -78,6 +85,16 @@ export default function Index() {
         style={{
           flex: 1,
         }}
+        onError={(syntheticEvent) => {
+          const { nativeEvent } = syntheticEvent;
+          console.warn('❌ WebView Error:', nativeEvent);
+        }}
+        onHttpError={(syntheticEvent) => {
+          const { nativeEvent } = syntheticEvent;
+          console.warn('❌ WebView HTTP Error:', nativeEvent);
+        }}
+        onLoadStart={() => console.log('⏳ WebView Start Loading')}
+        onLoad={() => console.log('✅ WebView Load Success')}
       />
 
       {/* ✅ 개발 모드(__DEV__)일 때만 테스트 버튼 렌더링 */}

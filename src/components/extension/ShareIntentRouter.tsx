@@ -21,7 +21,7 @@ export default function ShareIntentRouter(props: ShareIntentData) {
     // AsyncStorage.getItem(AUTH_KEY).then((value) => {
     //   setIsLoggedIn(value === 'true');
     // });
-    setIsLoggedIn(false);
+    setIsLoggedIn(true);
   }, []);
 
   useEffect(() => {
