@@ -13,6 +13,7 @@ import { useRouter } from 'expo-router';
 import * as Linking from 'expo-linking';
 import { config } from '@/src/utils/envConfig';
 import { useWebViewBridge } from '@/src/hooks/useWebViewBridge';
+import useWebViewBackHandler from '@/src/hooks/useWebViewBackHandler';
 
 /**
  * 딥링크 URL에서 웹 경로 추출
@@ -33,6 +34,7 @@ export default function Index() {
   const router = useRouter();
   const webViewRef = useRef<WebView>(null);
   const { handleMessage } = useWebViewBridge(webViewRef);
+  const { navStateHandler } = useWebViewBackHandler(webViewRef);
 
   const domain = config.domain;
   // const DEFAULT_PATH = '/archives/detail/1';
@@ -82,6 +84,7 @@ export default function Index() {
           uri: webUrl,
         }}
         onMessage={handleMessage}
+        onNavigationStateChange={navStateHandler}
         style={{
           flex: 1,
         }}
