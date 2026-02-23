@@ -31,7 +31,7 @@ export default function DoLinkShareIntentView({
   const [isError, setIsError] = useState(false);
   const webViewRef = useRef<WebView>(null);
 
-  const DEFAULT_PATH = '/share-intent';
+  const DEFAULT_PATH = '/';
   const webViewUrl = `${domain}${DEFAULT_PATH}`;
 
   // console.log('isError', isError);
