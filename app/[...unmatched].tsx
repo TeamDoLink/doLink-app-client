@@ -6,6 +6,7 @@ import { useLocalSearchParams } from 'expo-router';
 import { config } from '@/src/utils/envConfig';
 import { useWebViewBridge } from '@/src/hooks/useWebViewBridge';
 import useWebViewBackHandler from '@/src/hooks/useWebViewBackHandler';
+import DoLinkWebView from '@/src/components/DoLinkWebView';
 
 /**
  * Catch-all 라우트
@@ -13,10 +14,6 @@ import useWebViewBackHandler from '@/src/hooks/useWebViewBackHandler';
  * 예: dolink://task/detail/101 → /task/detail/101
  */
 export default function UnmatchedRoute() {
-  const webViewRef = useRef<WebView>(null);
-  const { handleMessage } = useWebViewBridge(webViewRef);
-  const { navStateHandler } = useWebViewBackHandler(webViewRef);
-
   const { unmatched } = useLocalSearchParams<{ unmatched: string[] }>();
 
   const domain = config.domain;
@@ -32,13 +29,7 @@ export default function UnmatchedRoute() {
       edges={Platform.OS === 'ios' ? ['top'] : ['top', 'bottom']}
     >
       <StatusBar barStyle="dark-content" backgroundColor="#ffffff" />
-      <WebView
-        ref={webViewRef}
-        source={{ uri: webUrl }}
-        onMessage={handleMessage}
-        onNavigationStateChange={navStateHandler}
-        style={styles.webview}
-      />
+      <DoLinkWebView source={{ uri: webUrl }} />
     </SafeAreaView>
   );
 }

@@ -14,6 +14,8 @@ import * as Linking from 'expo-linking';
 import { config } from '@/src/utils/envConfig';
 import { useWebViewBridge } from '@/src/hooks/useWebViewBridge';
 import useWebViewBackHandler from '@/src/hooks/useWebViewBackHandler';
+import DebugButton from '@/src/components/DebugButton';
+import DoLinkWebView from '@/src/components/DoLinkWebView';
 
 /**
  * 딥링크 URL에서 웹 경로 추출
@@ -78,38 +80,8 @@ export default function Index() {
       edges={Platform.OS === 'ios' ? ['top'] : ['top', 'bottom']}
     >
       <StatusBar barStyle="dark-content" backgroundColor="#ffffff" />
-      <WebView
-        ref={webViewRef}
-        source={{
-          uri: webUrl,
-        }}
-        onMessage={handleMessage}
-        onNavigationStateChange={navStateHandler}
-        style={{
-          flex: 1,
-        }}
-        onError={(syntheticEvent) => {
-          const { nativeEvent } = syntheticEvent;
-          console.warn('❌ WebView Error:', nativeEvent);
-        }}
-        onHttpError={(syntheticEvent) => {
-          const { nativeEvent } = syntheticEvent;
-          console.warn('❌ WebView HTTP Error:', nativeEvent);
-        }}
-        onLoadStart={() => console.log('⏳ WebView Start Loading')}
-        onLoad={() => console.log('✅ WebView Load Success')}
-      />
-
-      {/* ✅ 개발 모드(__DEV__)일 때만 테스트 버튼 렌더링 */}
-      {__DEV__ && (
-        <TouchableOpacity
-          style={styles.testButton}
-          onPress={() => router.push('/test')}
-          activeOpacity={0.8}
-        >
-          <Text style={styles.testButtonText}>🧪</Text>
-        </TouchableOpacity>
-      )}
+      <DoLinkWebView source={{ uri: webUrl }} />
+      <DebugButton />
     </SafeAreaView>
   );
 }
