@@ -1,7 +1,9 @@
 import { createContext, PropsWithChildren, useContext, useState } from 'react';
 import {
   SharedValue,
+  useDerivedValue,
   useSharedValue,
+  withSpring,
   withTiming,
 } from 'react-native-reanimated';
 import { useWindowDimensions } from 'react-native';
@@ -20,9 +22,15 @@ interface InboxBottomSheetContextType {
 
   // 바텀시트 높이의 SharedValue입니다
   bottomSheetHeight?: SharedValue<number>;
+
+  // 푸터 높이의 SharedValue입니다
   footerHeight?: SharedValue<number>;
 
+  // 핸들 높이의 SharedValue입니다
   handleHeight?: SharedValue<number>;
+
+  // 바텀시트 최대 높이의 SharedValue입니다
+  bottomSheetMaxHeight?: SharedValue<number>;
 }
 
 const InboxBottomSheetContext = createContext<InboxBottomSheetContextType>({
@@ -64,11 +72,15 @@ export const InboxBottomSheetProvider = ({
   const footerHeight = useSharedValue<number>(0);
   const handleHeight = useSharedValue<number>(0);
 
+  const bottomSheetMaxHeight = useDerivedValue(() => {
+    return height - (top + bottom);
+  });
+
   const [step, setStep] = useState<number>(initialStep ?? 0);
 
   const handleStepChange = (step: number) => {
-    bottomSheetHeight.value = withTiming(
-      (height - (top + bottom) - handleHeight.value) * (steps[step] / 100),
+    bottomSheetHeight.value = withSpring(
+      bottomSheetMaxHeight.value * (steps[step] / 100) || 0,
     );
     setStep(step);
   };
@@ -83,6 +95,7 @@ export const InboxBottomSheetProvider = ({
         bottomSheetHeight,
         footerHeight,
         handleHeight,
+        bottomSheetMaxHeight,
       }}
     >
       {children}

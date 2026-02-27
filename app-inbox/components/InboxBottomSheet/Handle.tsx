@@ -3,12 +3,18 @@ import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import { useInboxBottomSheet } from './context';
 import { steps, useSharedValue } from 'react-native-reanimated';
 import { scheduleOnRN } from 'react-native-worklets';
-import { getNearestStep } from './utils';
+import { getNearestStepIndex } from './utils';
 
 const Handle = () => {
-  const { bottomSheetHeight, steps, setStep, handleHeight } =
-    useInboxBottomSheet();
+  const {
+    bottomSheetHeight,
+    steps,
+    setStep,
+    handleHeight,
+    bottomSheetMaxHeight,
+  } = useInboxBottomSheet();
   const { height } = useWindowDimensions();
+
   if (!bottomSheetHeight || !handleHeight) {
     throw new Error('isPressHandle is not defined');
   }
@@ -16,7 +22,13 @@ const Handle = () => {
   const startY = useSharedValue<number>(0);
 
   const onHandleFinish = () => {
-    setStep(getNearestStep(steps, bottomSheetHeight.value));
+    setStep(
+      getNearestStepIndex(
+        steps,
+        bottomSheetMaxHeight!.value,
+        bottomSheetHeight.value,
+      ),
+    );
   };
 
   const pan = Gesture.Pan()

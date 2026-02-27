@@ -34,6 +34,9 @@ export default function Inbox() {
                 initialRouteName="Inbox"
                 screenOptions={{
                   headerShown: false,
+                  contentStyle: {
+                    backgroundColor: 'transparent',
+                  },
                 }}
               >
                 <Stack.Screen
