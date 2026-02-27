@@ -57,7 +57,13 @@
           ]
         }
       ],
-      "./plugins/withShareNative"
+      "./plugins/withShareNative",
+      [
+        "expo-dev-client",
+        {
+          "launchMode": "most-recent"
+        }
+      ]
     ]
   }
 }
