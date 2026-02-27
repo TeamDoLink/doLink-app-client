@@ -80,14 +80,6 @@ export default function AddCollectionView({
 
   return (
     <ScrollView className="flex-1" showsVerticalScrollIndicator={false}>
-      {/* Header */}
-      <View className="flex-row items-center gap-2 px-5 pb-5">
-        <TouchableOpacity onPress={onBack} activeOpacity={0.7}>
-          <BackIcon width={36} height={36} />
-        </TouchableOpacity>
-        <Text className="text-heading-xl text-black">모음 추가</Text>
-      </View>
-
       <View className="mx-[20px]">
         {/* 모음 이름 섹션 */}
         <View className="mb-6">

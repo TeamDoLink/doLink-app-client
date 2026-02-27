@@ -19,12 +19,11 @@ AXIOS_INSTANCE.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
     const { accessToken, refreshToken } = useAuthStore.getState();
 
-    console.log('accessToken', accessToken);
-    console.log('refreshToken', refreshToken);
-    console.log('config', config.url, config.baseURL);
-
     if (accessToken) {
       config.headers.Authorization = `Bearer ${accessToken}`;
+    }
+
+    if (refreshToken) {
       config.headers.Cookie = `${refreshToken}`;
     }
     return config;

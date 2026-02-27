@@ -36,16 +36,9 @@ interface CollectionItem {
 
 /** 바텀시트 Props 타입 정의 */
 interface CollectionBottomSheetProps {
-  visible: boolean; // 바텀시트 표시 여부
   onClose: () => void; // 닫기 콜백
-  onClickAddCollection: () => void; // 모음 추가 콜백
   onSelect?: (collectionId: string) => void; // 컬렉션 선택 콜백
   selectedItems?: string[]; // 선택된 아이템 ID 목록
-  shareIntent?: ShareIntentData | null; // 공유 인텐트 데이터
-  isShareMode?: boolean; // 공유 모드 여부
-  dismissThreshold?: number; // 닫기 임계값
-  initialHeight?: number; // 초기 높이
-  expandable?: boolean; // 확장 가능 여부
 }
 
 const DUMMY_COLLECTIONS: CollectionItem[] = [
@@ -157,14 +150,9 @@ const DUMMY_COLLECTIONS: CollectionItem[] = [
 ];
 
 export default function CollectionBottomSheet({
-  visible,
   onClose,
-  onClickAddCollection,
   onSelect,
   selectedItems: initialSelectedItems = [],
-  dismissThreshold = 80,
-  initialHeight,
-  expandable = true,
 }: CollectionBottomSheetProps) {
   const { bottom: safeAreaBottom } = useSafeAreaInsets();
 
@@ -223,29 +211,6 @@ export default function CollectionBottomSheet({
     }
   }, [searchText]);
 
-  // visible 상태 변경 시 오버레이 페이드 애니메이션 및 상태 초기화
-  useEffect(() => {
-    if (visible) {
-      Animated.timing(opacity, {
-        toValue: 1,
-        duration: 300,
-        useNativeDriver: true,
-      }).start();
-    } else {
-      // 닫힐 때 모든 상태 초기화 (다음에 열릴 때 깜빡임 방지)
-      setSearchText('');
-      setShowAddView(false);
-      setAddCollectionName('');
-      setAddCollectionCategory(null);
-
-      Animated.timing(opacity, {
-        toValue: 0,
-        duration: 250,
-        useNativeDriver: true,
-      }).start();
-    }
-  }, [visible, opacity]);
-
   /** 컬렉션 선택 핸들러 (단일 선택) */
   const handleSelectCollection = (id: string) => {
     setSelectedItems((prev) => {
@@ -289,95 +254,60 @@ export default function CollectionBottomSheet({
     }
   };
 
-  if (!visible) return null;
-
   return (
-    <View className="absolute inset-0 z-[9999]" pointerEvents="auto">
-      {/* 오버레이 */}
-      <Animated.View
-        className="absolute inset-0 bg-black/50"
-        style={{ opacity }}
-        onTouchEnd={onClose}
-      />
-
+    <View pointerEvents="auto" className="flex-1">
       {/* BottomSheet */}
-      <View className="absolute bottom-0 left-0 right-0 bg-transparent">
-        <BaseBottomSheet
-          onClose={onClose}
-          dismissThreshold={dismissThreshold}
-          initialHeight={initialHeight}
-          expandable={expandable}
-          className="gap-4"
-        >
+      <View className="flex-1">
+        {showAddView ? (
+          <AddCollectionView
+            onBack={handleCloseAddView}
+            onAdd={handleAddCollection}
+            name={addCollectionName}
+            onNameChange={setAddCollectionName}
+            selectedCategory={addCollectionCategory}
+            onCategoryChange={setAddCollectionCategory}
+            hideButton={true}
+          />
+        ) : (
+          // 할일 담기 View
           <View className="flex-1">
-            {showAddView ? (
-              <AddCollectionView
-                onBack={handleCloseAddView}
-                onAdd={handleAddCollection}
-                name={addCollectionName}
-                onNameChange={setAddCollectionName}
-                selectedCategory={addCollectionCategory}
-                onCategoryChange={setAddCollectionCategory}
-                hideButton={true}
+            <View className="px-5 pb-3">
+              <SearchInputField
+                value={searchText}
+                onChangeText={setSearchText}
               />
-            ) : (
-              // 할일 담기 View
-              <>
-                {/* Header 영역 */}
-                <View className="flex-row items-center justify-between px-5 pb-6">
-                  <Text className="text-heading-xl text-black">할 일 담기</Text>
+            </View>
 
-                  <TouchableOpacity
-                    activeOpacity={0.7}
-                    onPress={handleOpenAddView}
-                    className="flex-row items-center gap-0.5"
-                  >
-                    <PlusIcon width={16} height={16} color="#4E5968" />
-                    <Text className="text-caption-md text-grey-700">
-                      모음 추가
-                    </Text>
-                  </TouchableOpacity>
-                </View>
-
-                <View className="px-5 pb-3">
-                  <SearchInputField
-                    value={searchText}
-                    onChangeText={setSearchText}
+            {/* 컬렉션 목록 */}
+            <ScrollView
+              className="flex-1"
+              showsVerticalScrollIndicator={false}
+              keyboardShouldPersistTaps="handled"
+            >
+              {filteredCollections.map((item, index) => {
+                const isSelected = selectedItems.includes(item.id);
+                return (
+                  <ArchiveSocialMediaListItem
+                    key={item.id}
+                    title={item.title}
+                    category="카테고리"
+                    itemCount={item.itemCount}
+                    thumbnail={item.thumbnail}
+                    isSelected={isSelected}
+                    onPress={() => handleSelectCollection(item.id)}
+                    showDivider={index < filteredCollections.length - 1}
                   />
-                </View>
-
-                {/* 컬렉션 목록 */}
-                <ScrollView
-                  className="flex-1"
-                  showsVerticalScrollIndicator={false}
-                  keyboardShouldPersistTaps="handled"
-                >
-                  {filteredCollections.map((item, index) => {
-                    const isSelected = selectedItems.includes(item.id);
-                    return (
-                      <ArchiveSocialMediaListItem
-                        key={item.id}
-                        title={item.title}
-                        category="카테고리"
-                        itemCount={item.itemCount}
-                        thumbnail={item.thumbnail}
-                        isSelected={isSelected}
-                        onPress={() => handleSelectCollection(item.id)}
-                        showDivider={index < filteredCollections.length - 1}
-                      />
-                    );
-                  })}
-                </ScrollView>
-              </>
-            )}
+                );
+              })}
+            </ScrollView>
           </View>
-        </BaseBottomSheet>
+        )}
       </View>
 
       {/* 하단 버튼 영역 - 키보드 위에 고정 */}
       <View
-        className="absolute left-0 right-0"
-        style={{ bottom: isKeyboardVisible ? 0 : safeAreaBottom }}
+        className="absolute bottom-0 left-0 right-0"
+        // style={{ bottom: isKeyboardVisible ? 0 : safeAreaBottom }}
       >
         <KeyboardStickyView offset={{ closed: 0, opened: 0 }}>
           <View className="bg-white px-5 py-4">
