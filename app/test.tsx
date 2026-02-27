@@ -155,6 +155,7 @@ export default function TestBottomSheet() {
 
       {/* CollectionBottomSheet 컴포넌트 */}
       <CollectionBottomSheet
+        onClickAddCollection={() => console.log('add collection')}
         visible={visible}
         onClose={() => setVisible(false)}
         onSelect={handleSelectCollection}

@@ -1,0 +1,48 @@
+import { useWindowDimensions, View } from 'react-native';
+import { Gesture, GestureDetector } from 'react-native-gesture-handler';
+import { useInboxBottomSheet } from './context';
+import { steps, useSharedValue } from 'react-native-reanimated';
+import { scheduleOnRN } from 'react-native-worklets';
+import { getNearestStep } from './utils';
+
+const Handle = () => {
+  const { bottomSheetHeight, steps, setStep, handleHeight } =
+    useInboxBottomSheet();
+  const { height } = useWindowDimensions();
+  if (!bottomSheetHeight || !handleHeight) {
+    throw new Error('isPressHandle is not defined');
+  }
+
+  const startY = useSharedValue<number>(0);
+
+  const onHandleFinish = () => {
+    setStep(getNearestStep(steps, bottomSheetHeight.value));
+  };
+
+  const pan = Gesture.Pan()
+    .onBegin((event) => {
+      startY.value = event.y;
+    })
+    .onUpdate((event) => {
+      bottomSheetHeight.value =
+        height - event.absoluteY - startY.value - handleHeight?.value || 0;
+    })
+    .onFinalize((event) => {
+      scheduleOnRN(onHandleFinish);
+    });
+
+  return (
+    <GestureDetector gesture={pan}>
+      <View
+        className="items-center justify-center pt-3"
+        onLayout={(event) => {
+          handleHeight.value = event.nativeEvent.layout.height;
+        }}
+      >
+        <View className="h-1 w-12 rounded-[2px] bg-[#D2D9DD]" />
+      </View>
+    </GestureDetector>
+  );
+};
+
+export default Handle;
