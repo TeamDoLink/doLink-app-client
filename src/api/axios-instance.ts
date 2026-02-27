@@ -5,7 +5,7 @@ import useAuthStore from '@/src/stores/useAuthStore';
 // ==============================
 // Axios 기본 인스턴스 생성
 // ==============================
-export const API_BASE_URL = process.env.API_BASE_URL;
+export const API_BASE_URL = process.env.EXPO_PUBLIC_API_URL;
 
 export const AXIOS_INSTANCE = axios.create({
   baseURL: API_BASE_URL,
@@ -18,10 +18,14 @@ export const AXIOS_INSTANCE = axios.create({
 AXIOS_INSTANCE.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
     const { accessToken, refreshToken } = useAuthStore.getState();
+
+    console.log('accessToken', accessToken);
+    console.log('refreshToken', refreshToken);
+    console.log('config', config.url, config.baseURL);
+
     if (accessToken) {
       config.headers.Authorization = `Bearer ${accessToken}`;
-      // cookie에 refresh= 로 추가
-      config.headers.Cookie = `refresh=${refreshToken}`;
+      config.headers.Cookie = `${refreshToken}`;
     }
     return config;
   },

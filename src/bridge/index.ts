@@ -9,12 +9,15 @@ import type {
   DraftPayload,
   LinkPayload,
   SharePayload,
+  AuthMessageType,
+  AuthPayload,
 } from './types';
 import { sendToWebView, createBridgeErrorResponse } from './sender';
 import { draftHandler } from './handlers/draftHandler';
 import { clipboardHandler } from './handlers/clipboardHandler';
 import { linkHandler } from './handlers/linkHandler';
 import { shareHandler } from './handlers/shareHandler';
+import { authHandler } from './handlers/authHandler';
 
 /**
  * 메시지 타입이 Draft 관련인지 확인 (Type Guard)
@@ -51,6 +54,10 @@ const isShareMessage = (type: BridgeMessageType): type is ShareMessageType => {
   return type === 'share:open';
 };
 
+const isAuthMessage = (type: BridgeMessageType): type is AuthMessageType => {
+  return type === 'auth:login' || type === 'auth:logout';
+};
+
 /**
  * WebView에서 받은 메시지를 처리하고 적절한 Handler로 라우팅
  */
@@ -85,6 +92,13 @@ export const handleBridgeMessage = async (
     // Share 메시지 처리
     if (isShareMessage(type)) {
       const response = await shareHandler(type, payload as SharePayload);
+      sendToWebView(webViewRef, response);
+      return;
+    }
+
+    // Auth 메시지 처리
+    if (isAuthMessage(type)) {
+      const response = await authHandler(type, payload as AuthPayload);
       sendToWebView(webViewRef, response);
       return;
     }

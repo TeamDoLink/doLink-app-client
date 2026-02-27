@@ -6,6 +6,7 @@ type AuthStoreState = {
   isAuthenticated: boolean;
   isAuthInitialized: boolean;
   setAccessToken: (token: string) => void;
+  setRefreshToken: (token: string) => void;
   clearAuth: () => void;
   setAuthInitialized: () => void;
 };
@@ -17,6 +18,7 @@ const useAuthStore = create<AuthStoreState>((set) => ({
   isAuthInitialized: false,
   setAccessToken: (token: string) =>
     set({ accessToken: token, isAuthenticated: true }),
+  setRefreshToken: (token: string) => set({ refreshToken: token }),
   clearAuth: () => set({ accessToken: null, isAuthenticated: false }),
   setAuthInitialized: () => set({ isAuthInitialized: true }),
 }));

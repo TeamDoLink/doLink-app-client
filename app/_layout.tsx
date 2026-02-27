@@ -3,17 +3,22 @@ import '../src/lib/nativewind-setup';
 import { Stack } from 'expo-router';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { KeyboardProvider } from 'react-native-keyboard-controller';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+
+const queryClient = new QueryClient();
 
 export default function RootLayout() {
   return (
-    <KeyboardProvider>
-      <SafeAreaProvider>
-        <Stack
-          screenOptions={{
-            headerShown: false,
-          }}
-        />
-      </SafeAreaProvider>
-    </KeyboardProvider>
+    <QueryClientProvider client={queryClient}>
+      <KeyboardProvider>
+        <SafeAreaProvider>
+          <Stack
+            screenOptions={{
+              headerShown: false,
+            }}
+          />
+        </SafeAreaProvider>
+      </KeyboardProvider>
+    </QueryClientProvider>
   );
 }
