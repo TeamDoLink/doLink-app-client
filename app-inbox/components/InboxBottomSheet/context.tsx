@@ -1,11 +1,24 @@
-import { createContext, PropsWithChildren, useContext, useState } from 'react';
+import {
+  createContext,
+  PropsWithChildren,
+  useCallback,
+  useContext,
+  useEffect,
+  useState,
+} from 'react';
 import {
   SharedValue,
   useDerivedValue,
   useSharedValue,
   withSpring,
   withTiming,
+  useAnimatedKeyboard,
 } from 'react-native-reanimated';
+import {
+  useKeyboardAnimation,
+  useKeyboardState,
+  useReanimatedKeyboardAnimation,
+} from 'react-native-keyboard-controller';
 import { useWindowDimensions } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { PortalProvider } from '../protal';
@@ -68,6 +81,8 @@ export const InboxBottomSheetProvider = ({
 }: InboxBottomSheetProviderProps) => {
   const { height } = useWindowDimensions();
   const { top, bottom } = useSafeAreaInsets();
+  const keyboardState = useKeyboardState();
+  const { height: keyboardHeight } = useReanimatedKeyboardAnimation();
 
   const initialPercent = steps.at(initialStep ?? 0);
   if (!initialPercent) {
@@ -88,16 +103,23 @@ export const InboxBottomSheetProvider = ({
 
   const handleStepChange = (step: number) => {
     bottomSheetHeight.value = withSpring(
-      bottomSheetMaxHeight.value * (steps[step] / 100) || 0,
+      bottomSheetMaxHeight.value * (steps[step] / 100) - footerHeight.value ||
+        0,
     );
     setStep(step);
   };
 
-  const setFitHeight = () => {
+  const setFitHeight = useCallback(() => {
     bottomSheetHeight.value = withSpring(
-      contentHeight.value + footerHeight.value + handleHeight.value,
+      contentHeight.value + handleHeight.value + footerHeight.value,
     );
-  };
+  }, []);
+
+  useEffect(() => {
+    if (keyboardState.isVisible) {
+      handleStepChange(steps.length - 1);
+    }
+  }, [keyboardState.isVisible]);
 
   return (
     <InboxBottomSheetContext.Provider

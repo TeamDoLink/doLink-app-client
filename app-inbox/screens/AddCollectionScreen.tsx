@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useState } from 'react';
 import { AppInboxAddCollectionStackScreenProps } from '../types';
 import InboxBottomSheet from 'app-inbox/components/InboxBottomSheet';
 import Button from '../components/Button';
@@ -7,7 +7,9 @@ import { useCreateCollect } from '@/src/api/generated/endpoints/collection/colle
 import { CollectionCreateRequestCategory } from '@/src/api/generated/models/collectionCreateRequestCategory';
 import { ArchiveCategory } from '@/src/constants/category';
 import { useInboxBottomSheet } from 'app-inbox/components/InboxBottomSheet/context';
-import { useFocusEffect } from 'expo-router';
+import { useFocusEffect, useIsFocused } from '@react-navigation/native';
+import { useFrameCallback } from 'react-native-reanimated';
+import { scheduleOnRN } from 'react-native-worklets';
 
 export default function AddCollectionScreen({
   navigation,
@@ -35,19 +37,25 @@ export default function AddCollectionScreen({
 
   useFocusEffect(
     useCallback(() => {
-      setFitHeight();
+      const timeout = setTimeout(() => {
+        setFitHeight();
+      }, 100);
+      return () => clearTimeout(timeout);
     }, []),
   );
 
   return (
     <InboxBottomSheet.Layout>
-      <AddCollectionView
-        selectedCategory={category}
-        onCategoryChange={setCategory}
-        name={name}
-        onNameChange={setName}
-        onAdd={handleAdd}
-      />
+      <InboxBottomSheet.Content>
+        <AddCollectionView
+          selectedCategory={category}
+          onCategoryChange={setCategory}
+          name={name}
+          onNameChange={setName}
+          onAdd={handleAdd}
+          hideButton
+        />
+      </InboxBottomSheet.Content>
       <InboxBottomSheet.Footer>
         <Button>
           <Button.Text>추가</Button.Text>

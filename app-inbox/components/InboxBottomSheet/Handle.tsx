@@ -12,10 +12,11 @@ const Handle = () => {
     setStep,
     handleHeight,
     bottomSheetMaxHeight,
+    footerHeight,
   } = useInboxBottomSheet();
   const { height } = useWindowDimensions();
 
-  if (!bottomSheetHeight || !handleHeight) {
+  if (!bottomSheetHeight || !handleHeight || !footerHeight) {
     throw new Error('isPressHandle is not defined');
   }
 
@@ -37,7 +38,11 @@ const Handle = () => {
     })
     .onUpdate((event) => {
       bottomSheetHeight.value =
-        height - event.absoluteY - startY.value - handleHeight?.value || 0;
+        height -
+          event.absoluteY -
+          startY.value -
+          handleHeight?.value -
+          footerHeight?.value || 0;
     })
     .onFinalize((event) => {
       scheduleOnRN(onHandleFinish);

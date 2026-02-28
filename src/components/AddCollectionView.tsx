@@ -82,7 +82,7 @@ export default function AddCollectionView({
   };
 
   return (
-    <ScrollView className="flex-1" showsVerticalScrollIndicator={false}>
+    <View>
       <View className="mx-[20px]">
         {/* 모음 이름 섹션 (showOnlyCategory가 true면 숨김) */}
         {!showOnlyCategory && (
@@ -168,7 +168,7 @@ export default function AddCollectionView({
           </TouchableOpacity>
         </View>
       )}
-    </ScrollView>
+    </View>
   );
 }
 

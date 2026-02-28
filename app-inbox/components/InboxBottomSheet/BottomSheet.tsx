@@ -12,10 +12,10 @@ interface BottomSheetProps {
 }
 
 const BottomSheet = ({ children }: BottomSheetProps) => {
-  const { bottomSheetHeight } = useInboxBottomSheet();
+  const { bottomSheetHeight, footerHeight } = useInboxBottomSheet();
   const { bottom } = useSafeAreaInsets();
 
-  if (!bottomSheetHeight) {
+  if (!bottomSheetHeight || !footerHeight) {
     throw new Error('bottomSheetHeight is not defined');
   }
 

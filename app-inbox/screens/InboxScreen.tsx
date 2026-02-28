@@ -1,4 +1,4 @@
-import { AppInboxAddCollectionStackScreenProps } from '../types';
+import { AppInboxStackScreenProps } from '../types';
 import { useState } from 'react';
 import InboxBottomSheet from 'app-inbox/components/InboxBottomSheet';
 import { FlatList, View } from 'react-native';
@@ -150,9 +150,7 @@ const MOCK_COLLECTIONS = [
   },
 ];
 
-export default function InboxScreen({
-  navigation,
-}: AppInboxAddCollectionStackScreenProps) {
+export default function InboxScreen({}: AppInboxStackScreenProps<'Inbox'>) {
   const [selectedCollectionId, setSelectedCollectionId] = useState<
     number | null
   >(null);
@@ -166,23 +164,25 @@ export default function InboxScreen({
 
   return (
     <InboxBottomSheet.Layout>
-      <View className="px-5 pb-3">
-        <SearchInputField value={searchText} onChangeText={setSearchText} />
-      </View>
-      <FlatList
-        className="flex-1"
-        data={MOCK_COLLECTIONS}
-        renderItem={({ item }) => (
-          <ArchiveSocialMediaListItem
-            title={item.name ?? ''}
-            category={item.category ?? ''}
-            itemCount={item.taskCount ?? 0}
-            thumbnail={item.thumbnails?.[0] ?? ''}
-            isSelected={selectedCollectionId === item.collectionId}
-            onPress={() => handleSelect(item.collectionId)}
-          />
-        )}
-      />
+      <InboxBottomSheet.Content className="flex-1">
+        <View className="px-5 pb-3">
+          <SearchInputField value={searchText} onChangeText={setSearchText} />
+        </View>
+        <FlatList
+          className="flex-1"
+          data={MOCK_COLLECTIONS}
+          renderItem={({ item }) => (
+            <ArchiveSocialMediaListItem
+              title={item.name ?? ''}
+              category={item.category ?? ''}
+              itemCount={item.taskCount ?? 0}
+              thumbnail={item.thumbnails?.[0] ?? ''}
+              isSelected={selectedCollectionId === item.collectionId}
+              onPress={() => handleSelect(item.collectionId)}
+            />
+          )}
+        />
+      </InboxBottomSheet.Content>
       <InboxBottomSheet.Footer>
         <Button>
           <Button.Text>할일 담기</Button.Text>
