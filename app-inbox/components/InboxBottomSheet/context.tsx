@@ -8,6 +8,7 @@ import {
 } from 'react-native-reanimated';
 import { useWindowDimensions } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { PortalProvider } from '../protal';
 
 interface InboxBottomSheetContextType {
   // %단위의 높이로, 가장 가까운 step으로 이동합니다
@@ -31,12 +32,18 @@ interface InboxBottomSheetContextType {
 
   // 바텀시트 최대 높이의 SharedValue입니다
   bottomSheetMaxHeight?: SharedValue<number>;
+
+  // 컨텐츠의 높이값 입니다.
+  contentHeight?: SharedValue<number>;
+
+  setFitHeight: () => void;
 }
 
 const InboxBottomSheetContext = createContext<InboxBottomSheetContextType>({
   steps: [],
   step: 0,
   setStep: () => {},
+  setFitHeight: () => {},
 });
 
 export const useInboxBottomSheet = () => {
@@ -71,6 +78,7 @@ export const InboxBottomSheetProvider = ({
   const bottomSheetHeight = useSharedValue<number>(initialHeight);
   const footerHeight = useSharedValue<number>(0);
   const handleHeight = useSharedValue<number>(0);
+  const contentHeight = useSharedValue<number>(0);
 
   const bottomSheetMaxHeight = useDerivedValue(() => {
     return height - (top + bottom);
@@ -85,6 +93,12 @@ export const InboxBottomSheetProvider = ({
     setStep(step);
   };
 
+  const setFitHeight = () => {
+    bottomSheetHeight.value = withSpring(
+      contentHeight.value + footerHeight.value + handleHeight.value,
+    );
+  };
+
   return (
     <InboxBottomSheetContext.Provider
       value={{
@@ -96,9 +110,11 @@ export const InboxBottomSheetProvider = ({
         footerHeight,
         handleHeight,
         bottomSheetMaxHeight,
+        contentHeight,
+        setFitHeight,
       }}
     >
-      {children}
+      <PortalProvider rootKey="inboxBottomSheet">{children}</PortalProvider>
     </InboxBottomSheetContext.Provider>
   );
 };

@@ -12,9 +12,8 @@ interface BottomSheetProps {
 }
 
 const BottomSheet = ({ children }: BottomSheetProps) => {
-  const { bottomSheetHeight, footerHeight, steps } = useInboxBottomSheet();
+  const { bottomSheetHeight } = useInboxBottomSheet();
   const { bottom } = useSafeAreaInsets();
-  const { height } = useWindowDimensions();
 
   if (!bottomSheetHeight) {
     throw new Error('bottomSheetHeight is not defined');
@@ -22,8 +21,7 @@ const BottomSheet = ({ children }: BottomSheetProps) => {
 
   const style = useAnimatedStyle(() => {
     return {
-      height:
-        bottomSheetHeight?.value - (footerHeight?.value || 0) || 0 - bottom,
+      height: bottomSheetHeight?.value + bottom,
       paddingBottom: bottom,
     };
   });
