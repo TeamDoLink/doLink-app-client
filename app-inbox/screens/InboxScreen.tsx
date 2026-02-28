@@ -5,6 +5,8 @@ import { FlatList, View } from 'react-native';
 import ArchiveSocialMediaListItem from '@/src/components/common/list/ArchiveSocialMediaListItem';
 import SearchInputField from '@/src/components/common/inputField/searchInputField';
 import Button from 'app-inbox/components/Button';
+import useSyncLoginCookie from '@/src/hooks/useSyncLoginCookie';
+import { useListAll1 } from '@/src/api/generated/endpoints/collection/collection';
 
 /** ArchiveSocialMediaListItem 테스트용 모킹 데이터 */
 const MOCK_COLLECTIONS = [
@@ -162,6 +164,8 @@ export default function InboxScreen({}: AppInboxStackScreenProps<'Inbox'>) {
     );
   };
 
+  const addTodo = useSyncLoginCookie();
+
   return (
     <InboxBottomSheet.Layout>
       <InboxBottomSheet.Content className="flex-1">
@@ -184,7 +188,7 @@ export default function InboxScreen({}: AppInboxStackScreenProps<'Inbox'>) {
         />
       </InboxBottomSheet.Content>
       <InboxBottomSheet.Footer>
-        <Button>
+        <Button onPress={addTodo}>
           <Button.Text>할일 담기</Button.Text>
         </Button>
       </InboxBottomSheet.Footer>

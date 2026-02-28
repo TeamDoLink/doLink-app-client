@@ -52,12 +52,11 @@ export default function AddCollectionScreen({
           onCategoryChange={setCategory}
           name={name}
           onNameChange={setName}
-          onAdd={handleAdd}
           hideButton
         />
       </InboxBottomSheet.Content>
       <InboxBottomSheet.Footer>
-        <Button>
+        <Button onPress={handleAdd}>
           <Button.Text>추가</Button.Text>
         </Button>
       </InboxBottomSheet.Footer>

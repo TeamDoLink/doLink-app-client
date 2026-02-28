@@ -11,14 +11,13 @@ const useSyncLoginCookie = () => {
 
   return useCallback(async () => {
     const cookies = await NitroCookies.get(config.domain);
-
     if (cookies) {
       const refreshToken = cookies['refresh']?.value;
       if (refreshToken) {
         setRefreshToken(refreshToken);
       }
 
-      const response = await fetch(`${config.domain}/v1/auth/reissue`, {
+      const response = await fetch(`${config.apiUrl}/v1/auth/reissue`, {
         method: 'POST',
         headers: {
           Cookie: `refresh=${refreshToken}`,
@@ -26,19 +25,12 @@ const useSyncLoginCookie = () => {
       });
 
       // const reissueResponseJson = await response.json();
-      const reissueResponseText = await response.text();
+      const reissueResponseJson = await response.json();
 
-      // TODO: access token 이 제대로 적용되지 않는것으로 보임
-      console.log(
-        'reissueResponseText',
-        response,
-        'reissueResponseText',
-        reissueResponseText,
-      );
-      // const accessToken = requestAccessTokenResponse?.code;
-      // if (accessToken) {
-      //   setAccessToken(accessToken);
-      // }
+      const accessToken = reissueResponseJson?.code;
+      if (accessToken) {
+        setAccessToken(accessToken);
+      }
     }
   }, []);
 };
