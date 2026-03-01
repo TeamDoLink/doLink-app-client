@@ -1,6 +1,7 @@
 import { ViewProps } from 'react-native';
 import Animated, {
   interpolate,
+  KeyboardState,
   useAnimatedKeyboard,
   useAnimatedStyle,
   useSharedValue,
@@ -8,13 +9,17 @@ import Animated, {
 
 import { useInboxBottomSheet } from './context';
 import { PortalIn } from '../protal';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import {
+  SafeAreaView,
+  useSafeAreaInsets,
+} from 'react-native-safe-area-context';
 
 interface FooterProps extends ViewProps {}
 
 const Footer = ({ className, ...props }: FooterProps) => {
   const { footerHeight } = useInboxBottomSheet();
-  const { height: keyboardHeight } = useAnimatedKeyboard();
+  const { height: keyboardHeight, state } = useAnimatedKeyboard();
+  const { bottom } = useSafeAreaInsets();
 
   if (!footerHeight) {
     throw new Error('footerHeight is not defined');
@@ -22,8 +27,13 @@ const Footer = ({ className, ...props }: FooterProps) => {
 
   // progress 0→1 에 맞춰 keyboardHeight만큼 위로 이동 (Animated만 사용)
   const animatedStyle = useAnimatedStyle(() => {
+    let translateY = keyboardHeight.value * -1;
+    if ([KeyboardState.OPENING, KeyboardState.OPEN].includes(state.value)) {
+      translateY += bottom;
+    }
+
     return {
-      transform: [{ translateY: keyboardHeight.value * -1 }],
+      transform: [{ translateY }],
     };
   });
 
@@ -31,13 +41,14 @@ const Footer = ({ className, ...props }: FooterProps) => {
     <PortalIn portalKey="footer">
       <SafeAreaView
         edges={['bottom']}
+        className="bg-white"
         onLayout={(event) => {
           footerHeight.value = event.nativeEvent.layout.height;
         }}
       >
         <Animated.View
           style={animatedStyle}
-          className={`bg-white px-5 pb-6 ${className}`}
+          className={`px-5 py-2 ${className}`}
           {...props}
         />
       </SafeAreaView>
