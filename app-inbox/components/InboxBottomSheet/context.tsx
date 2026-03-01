@@ -50,6 +50,8 @@ interface InboxBottomSheetContextType {
   contentHeight?: SharedValue<number>;
 
   setFitHeight: () => void;
+
+  onClose?: () => void;
 }
 
 const InboxBottomSheetContext = createContext<InboxBottomSheetContextType>({
@@ -72,12 +74,14 @@ export const useInboxBottomSheet = () => {
 type InboxBottomSheetProviderProps = PropsWithChildren<{
   steps: number[];
   initialStep?: number;
+  onClose?: () => void;
 }>;
 
 export const InboxBottomSheetProvider = ({
   children,
   steps,
   initialStep,
+  onClose,
 }: InboxBottomSheetProviderProps) => {
   const { height } = useWindowDimensions();
   const { top, bottom } = useSafeAreaInsets();
@@ -134,6 +138,7 @@ export const InboxBottomSheetProvider = ({
         bottomSheetMaxHeight,
         contentHeight,
         setFitHeight,
+        onClose,
       }}
     >
       <PortalProvider rootKey="inboxBottomSheet">{children}</PortalProvider>

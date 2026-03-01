@@ -8,6 +8,7 @@ import Animated, {
 
 import { useInboxBottomSheet } from './context';
 import { PortalIn } from '../protal';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 interface FooterProps extends ViewProps {}
 
@@ -28,14 +29,18 @@ const Footer = ({ className, ...props }: FooterProps) => {
 
   return (
     <PortalIn portalKey="footer">
-      <Animated.View
+      <SafeAreaView
+        edges={['bottom']}
         onLayout={(event) => {
           footerHeight.value = event.nativeEvent.layout.height;
         }}
-        style={animatedStyle}
-        className={`bg-white px-5 pb-6 ${className}`}
-        {...props}
-      />
+      >
+        <Animated.View
+          style={animatedStyle}
+          className={`bg-white px-5 pb-6 ${className}`}
+          {...props}
+        />
+      </SafeAreaView>
     </PortalIn>
   );
 };

@@ -12,15 +12,21 @@ interface InboxBottomSheetProps {
   steps: number[];
   initialStep?: number;
   children: React.ReactNode;
+  onClose?: () => void;
 }
 
 const InboxBottomSheet = ({
   steps,
   initialStep = 0,
   children,
+  onClose,
 }: InboxBottomSheetProps) => {
   return (
-    <InboxBottomSheetProvider steps={steps} initialStep={initialStep}>
+    <InboxBottomSheetProvider
+      steps={steps}
+      initialStep={initialStep}
+      onClose={onClose}
+    >
       <View className="flex-1 justify-end">
         <Overlay />
         {children}
