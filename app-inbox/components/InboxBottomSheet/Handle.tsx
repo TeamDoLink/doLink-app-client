@@ -51,7 +51,7 @@ const Handle = () => {
   return (
     <GestureDetector gesture={pan}>
       <View
-        className="items-center justify-center pt-3"
+        className="items-center justify-center py-3"
         onLayout={(event) => {
           handleHeight.value = event.nativeEvent.layout.height;
         }}

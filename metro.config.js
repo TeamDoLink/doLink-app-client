@@ -14,4 +14,7 @@ config.resolver = {
   sourceExts: [...config.resolver.sourceExts, 'svg'],
 };
 
-module.exports = withNativeWind(config, { input: './src/styles/global.css' });
+module.exports = withNativeWind(config, {
+  input: './src/styles/global.css',
+  inlineRem: 16,
+});

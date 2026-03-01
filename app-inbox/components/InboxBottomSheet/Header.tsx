@@ -18,7 +18,7 @@ const Header = ({ title, RightContent }: HeaderProps) => {
   }, [navigation.canGoBack]);
 
   return (
-    <View className="flex-row items-center justify-between px-5 pb-6">
+    <View className="flex-row items-center justify-between px-5 pb-6 pt-3">
       <View className="flex-row items-center gap-2">
         {canBack && <BackButton onPress={() => navigation.goBack()} />}
         <Text className="text-heading-xl text-black">{title}</Text>
