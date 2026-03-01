@@ -17,7 +17,7 @@ export const authHandler = async (
 };
 
 const handleLogin = async (): Promise<AuthResponse> => {
-  const { setAccessToken, setRefreshToken } = useAuthStore();
+  const { setAccessToken, setRefreshToken } = useAuthStore.getState();
 
   const cookies = await NitroCookies.get(config.domain);
 
@@ -27,9 +27,8 @@ const handleLogin = async (): Promise<AuthResponse> => {
       setRefreshToken(refreshToken);
     }
 
-    const { data: requestAccessTokenResponse } = await issueAccessToken();
-
-    const accessToken = await requestAccessTokenResponse.text();
+    const response = await issueAccessToken();
+    const accessToken = (response as any)?.result;
     if (accessToken) {
       setAccessToken(accessToken);
     }
@@ -42,9 +41,7 @@ const handleLogin = async (): Promise<AuthResponse> => {
 };
 
 const handleLogout = async (): Promise<AuthResponse> => {
-  const { clearAuth } = useAuthStore();
-
-  clearAuth();
+  useAuthStore.getState().clearAuth();
 
   return {
     type: 'auth:logout',

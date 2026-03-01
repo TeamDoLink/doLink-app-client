@@ -98,6 +98,7 @@ export const handleBridgeMessage = async (
 
     // Auth 메시지 처리
     if (isAuthMessage(type)) {
+      console.log('[Bridge] auth 메시지 수신:', { type, payload });
       const response = await authHandler(type, payload as AuthPayload);
       sendToWebView(webViewRef, response);
       return;
