@@ -25,9 +25,10 @@ const useSyncLoginCookie = () => {
       });
 
       // const reissueResponseJson = await response.json();
+
       const reissueResponseJson = await response.json();
 
-      const accessToken = reissueResponseJson?.code;
+      const accessToken = reissueResponseJson?.result;
       if (accessToken) {
         setAccessToken(accessToken);
       }
