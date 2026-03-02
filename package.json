@@ -11,7 +11,10 @@
     "lint:fix": "eslint . --fix",
     "format": "prettier --write \"app/**/*.{js,jsx,ts,tsx,json}\"",
     "prepare": "husky",
-    "orval": "orval --config orval.config.js"
+    "orval": "orval --config orval.config.js",
+    "build:android": "bundle exec fastlane build",
+    "deploy": "bundle exec fastlane playstore",
+    "build:deploy": "bundle exec fastlane build_and_deploy"
   },
   "lint-staged": {
     "*.{js,jsx,ts,tsx}": [
@@ -23,6 +26,7 @@
     ]
   },
   "dependencies": {
+    "@dexical/expo-store-signing": "^1.0.14",
     "@react-native-async-storage/async-storage": "2.2.0",
     "@tanstack/react-query": "^5.90.20",
     "axios": "^1.13.4",
