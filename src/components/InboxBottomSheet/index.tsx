@@ -5,7 +5,7 @@ import { InboxBottomSheetProvider } from './context';
 import Overlay from './Overlay';
 import Footer from './Footer';
 import Layout from './Layout';
-import { PortalOut } from '../protal';
+import { PortalOut } from '../Portal';
 import Content from './Content';
 
 interface InboxBottomSheetProps {

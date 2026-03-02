@@ -8,7 +8,7 @@ import Animated, {
 } from 'react-native-reanimated';
 
 import { useInboxBottomSheet } from './context';
-import { PortalIn } from '../protal';
+import { PortalIn } from '../Portal';
 import {
   SafeAreaView,
   useSafeAreaInsets,

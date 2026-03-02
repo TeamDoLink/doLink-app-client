@@ -1,14 +1,14 @@
 import { AppInboxStackScreenProps } from '../types';
 import { useState } from 'react';
-import InboxBottomSheet from 'app-inbox/components/InboxBottomSheet';
+import InboxBottomSheet from '@/src/components/InboxBottomSheet';
 import { BackHandler, FlatList, View } from 'react-native';
-import ArchiveSocialMediaListItem from '@/src/components/common/list/ArchiveSocialMediaListItem';
+import ArchiveSocialMediaListItem from '@/src/components/ArchiveSocialMediaListItem';
 import SearchInputField from '@/src/components/common/inputField/searchInputField';
-import Button from 'app-inbox/components/Button';
+import Button from '@/src/components/common/Button';
 import { useListAll1 } from '@/src/api/generated/endpoints/collection/collection';
 import { useCreate } from '@/src/api/generated/endpoints/task/task';
 import { ApiResponseSliceCollectionResponse } from '@/src/api/generated/models';
-import { useShareIntent } from '@/src/components/shared-intent';
+import { useShareIntent } from '@/src/components/SharedIntent';
 
 export default function InboxScreen({
   navigation,

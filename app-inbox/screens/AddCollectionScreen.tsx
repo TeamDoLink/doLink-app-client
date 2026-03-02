@@ -1,15 +1,13 @@
-import { useCallback, useEffect, useLayoutEffect, useState } from 'react';
+import { useCallback, useState } from 'react';
 import { AppInboxAddCollectionStackScreenProps } from '../types';
-import InboxBottomSheet from 'app-inbox/components/InboxBottomSheet';
-import Button from '../components/Button';
+import InboxBottomSheet from '@/src/components/InboxBottomSheet';
+import Button from '@/src/components/common/Button';
 import AddCollectionView from '@/src/components/AddCollectionView';
 import { useCreateCollect } from '@/src/api/generated/endpoints/collection/collection';
 import { CollectionCreateRequestCategory } from '@/src/api/generated/models/collectionCreateRequestCategory';
 import { ArchiveCategory } from '@/src/constants/category';
-import { useInboxBottomSheet } from 'app-inbox/components/InboxBottomSheet/context';
-import { useFocusEffect, useIsFocused } from '@react-navigation/native';
-import { useFrameCallback } from 'react-native-reanimated';
-import { scheduleOnRN } from 'react-native-worklets';
+import { useInboxBottomSheet } from '@/src/components/InboxBottomSheet/context';
+import { useFocusEffect } from '@react-navigation/native';
 
 export default function AddCollectionScreen({
   navigation,

@@ -10,14 +10,21 @@ import { NavigationContainerRef } from '@react-navigation/native';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import useSyncLoginCookie from '@/src/hooks/useSyncLoginCookie';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
-import InboxBottomSheet from './components/InboxBottomSheet';
+import InboxBottomSheet from '@/src/components/InboxBottomSheet';
 import { TouchableOpacity, Text, BackHandler } from 'react-native';
 import PlusIcon from '@/src/assets/icons/common/plus.svg';
 import { ShareIntentData } from '@/src/types/shareIntent';
-import { ShareIntentProvider } from '@/src/components/shared-intent';
+import { ShareIntentProvider } from '@/src/components/SharedIntent';
 import { StatusBar } from 'expo-status-bar';
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      refetchOnWindowFocus: false,
+      retry: false,
+    },
+  },
+});
 
 const Stack = createNativeStackNavigator<AppInboxStackParamList>();
 

@@ -7,8 +7,7 @@ import {
   ScrollView,
 } from 'react-native';
 import { useRouter } from 'expo-router';
-import CollectionBottomSheet from '@/src/components/CollectionBottomSheet';
-import ArchiveSocialMediaListItem from '@/src/components/common/list/ArchiveSocialMediaListItem';
+import ArchiveSocialMediaListItem from '@/src/components/ArchiveSocialMediaListItem';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 /**
@@ -152,16 +151,6 @@ export default function TestBottomSheet() {
           </TouchableOpacity>
         )}
       </View>
-
-      {/* CollectionBottomSheet 컴포넌트 */}
-      <CollectionBottomSheet
-        onClickAddCollection={() => console.log('add collection')}
-        visible={visible}
-        onClose={() => setVisible(false)}
-        onSelect={handleSelectCollection}
-        selectedItems={selectedCollections}
-        isShareMode={false}
-      />
     </SafeAreaView>
   );
 }
