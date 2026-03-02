@@ -7,13 +7,18 @@ import { WebViewNavigation } from 'react-native-webview/lib/WebViewTypes';
 
 interface DoLinkWebViewProps extends WebViewProps {}
 
-export default function DoLinkWebView({ style, ...props }: DoLinkWebViewProps) {
+export default function DoLinkWebView({
+  style,
+  onNavigationStateChange: onNavChange,
+  ...props
+}: DoLinkWebViewProps) {
   const webViewRef = useRef<WebView>(null);
   const { handleMessage } = useWebViewBridge(webViewRef);
   const { navStateHandler } = useWebViewBackHandler(webViewRef);
 
   const handleNavigationStateChange = (event: WebViewNavigation) => {
     navStateHandler(event);
+    onNavChange?.(event);
   };
 
   return (
