@@ -1,5 +1,49 @@
 import { Share, Platform } from 'react-native';
-import type { ShareMessageType, SharePayload, ShareResponse } from '../types';
+import type {
+  ShareMessageType,
+  SharePayload,
+  ShareResponse,
+  OsSharePayload,
+  OsShareResponse,
+} from '../types';
+
+/**
+ * OS 공유 시트 핸들러
+ * 딥링크 무관, OS 기본 공유 시트를 통해 URL/텍스트 공유
+ */
+export const osShareHandler = async (
+  payload: OsSharePayload,
+): Promise<OsShareResponse> => {
+  const { url } = payload;
+
+  if (!url || typeof url !== 'string') {
+    return { type: 'os:share:error', error: 'URL이 필요합니다' };
+  }
+
+  try {
+    const result = await Share.share({
+      url, // iOS: URL 공유
+      message: url, // Android: URL 텍스트
+    });
+
+    if (result.action === Share.sharedAction) {
+      return {
+        type: 'os:share:response',
+        success: true,
+        activityType: result.activityType ?? undefined,
+      };
+    }
+
+    return { type: 'os:share:response', success: false };
+  } catch (error) {
+    console.error('[OsShareHandler] 공유 실패:', error);
+    return {
+      type: 'os:share:error',
+      error:
+        error instanceof Error ? error.message : '공유 중 오류가 발생했습니다',
+    };
+  }
+};
 
 /**
  * Share 관련 메시지 처리 핸들러
@@ -49,7 +93,7 @@ export const shareHandler = async (
       return {
         type: 'share:response',
         success: true,
-        activityType: result.activityType,
+        activityType: result.activityType ?? undefined,
       };
     } else if (result.action === Share.dismissedAction) {
       // 사용자가 공유 시트를 닫음

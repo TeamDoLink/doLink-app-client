@@ -6,15 +6,17 @@ import type {
   ClipboardMessageType,
   LinkMessageType,
   ShareMessageType,
+  OsShareMessageType,
   DraftPayload,
   LinkPayload,
   SharePayload,
+  OsSharePayload,
 } from './types';
 import { sendToWebView, createBridgeErrorResponse } from './sender';
 import { draftHandler } from './handlers/draftHandler';
 import { clipboardHandler } from './handlers/clipboardHandler';
 import { linkHandler } from './handlers/linkHandler';
-import { shareHandler } from './handlers/shareHandler';
+import { shareHandler, osShareHandler } from './handlers/shareHandler';
 
 /**
  * 메시지 타입이 Draft 관련인지 확인 (Type Guard)
@@ -52,6 +54,15 @@ const isShareMessage = (type: BridgeMessageType): type is ShareMessageType => {
 };
 
 /**
+ * 메시지 타입이 OsShare 관련인지 확인 (Type Guard)
+ */
+const isOsShareMessage = (
+  type: BridgeMessageType,
+): type is OsShareMessageType => {
+  return type === 'os:share';
+};
+
+/**
  * WebView에서 받은 메시지를 처리하고 적절한 Handler로 라우팅
  */
 export const handleBridgeMessage = async (
@@ -85,6 +96,13 @@ export const handleBridgeMessage = async (
     // Share 메시지 처리
     if (isShareMessage(type)) {
       const response = await shareHandler(type, payload as SharePayload);
+      sendToWebView(webViewRef, response);
+      return;
+    }
+
+    // OS Share 메시지 처리
+    if (isOsShareMessage(type)) {
+      const response = await osShareHandler(payload as OsSharePayload);
       sendToWebView(webViewRef, response);
       return;
     }
