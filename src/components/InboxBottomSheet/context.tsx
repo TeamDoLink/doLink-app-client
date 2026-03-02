@@ -11,17 +11,14 @@ import {
   useDerivedValue,
   useSharedValue,
   withSpring,
-  withTiming,
-  useAnimatedKeyboard,
 } from 'react-native-reanimated';
 import {
-  useKeyboardAnimation,
   useKeyboardState,
   useReanimatedKeyboardAnimation,
 } from 'react-native-keyboard-controller';
 import { useWindowDimensions } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { PortalProvider } from '../protal';
+import { PortalProvider } from '../Portal';
 
 interface InboxBottomSheetContextType {
   // %단위의 높이로, 가장 가까운 step으로 이동합니다
