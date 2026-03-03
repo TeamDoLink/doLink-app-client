@@ -53,6 +53,10 @@ const isShareMessage = (type: BridgeMessageType): type is ShareMessageType => {
   return type === 'share:open';
 };
 
+const isAuthMessage = (type: BridgeMessageType): type is AuthMessageType => {
+  return type === 'auth:login' || type === 'auth:logout';
+};
+
 /**
  * 메시지 타입이 OsShare 관련인지 확인 (Type Guard)
  */

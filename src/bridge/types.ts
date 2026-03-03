@@ -14,7 +14,7 @@ export type ClipboardMessageType =
   | 'clipboard:error'; // Native → WebView 에러 응답
 
 // Auth 메시지 타입
-export type AuthMessageType = 'auth:status';
+export type AuthMessageType = 'auth:login' | 'auth:logout';
 
 // Link 메시지 타입
 export type LinkMessageType =

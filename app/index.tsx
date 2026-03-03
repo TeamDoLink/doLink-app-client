@@ -16,6 +16,7 @@ import { useWebViewBridge } from '@/src/hooks/useWebViewBridge';
 import useWebViewBackHandler from '@/src/hooks/useWebViewBackHandler';
 import DebugButton from '@/src/components/DebugButton';
 import DoLinkWebView from '@/src/components/DoLinkWebView';
+import { useGetUser } from '@/src/api/generated/endpoints/user/user';
 
 /**
  * 딥링크 URL에서 웹 경로 추출
@@ -33,10 +34,10 @@ const parseDeepLinkPath = (url: string | null): string | null => {
 };
 
 export default function Index() {
-  const router = useRouter();
-  const webViewRef = useRef<WebView>(null);
-  const { handleMessage } = useWebViewBridge(webViewRef);
-  const { navStateHandler } = useWebViewBackHandler(webViewRef);
+  const { data: user, error } = useGetUser();
+
+  console.log('user', user);
+  console.log('error', error);
 
   const domain = config.domain;
   // const DEFAULT_PATH = '/archives/detail/1';

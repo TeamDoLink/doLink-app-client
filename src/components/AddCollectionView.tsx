@@ -32,13 +32,15 @@ const CATEGORY_ORDER: ArchiveCategory[] = [
 
 /** Props 타입 정의 */
 interface AddCollectionViewProps {
-  onBack: () => void;
+  onBack?: () => void;
   onAdd?: (name: string, category: ArchiveCategory) => void;
-  name: string;
-  onNameChange: (name: string) => void;
+  name?: string;
+  onNameChange?: (name: string) => void;
   selectedCategory: ArchiveCategory | null;
   onCategoryChange: (category: ArchiveCategory) => void;
   hideButton?: boolean;
+  /** true이면 카테고리 리스트만 표시 (모음 이름 입력 영역 숨김) */
+  showOnlyCategory?: boolean;
 }
 
 /** 최대 이름 길이 */
@@ -47,11 +49,12 @@ const MAX_NAME_LENGTH = 20;
 export default function AddCollectionView({
   onBack,
   onAdd,
-  name,
+  name = '',
   onNameChange,
   selectedCategory,
   onCategoryChange,
   hideButton = false,
+  showOnlyCategory = false,
 }: AddCollectionViewProps) {
   /** Input focus 상태 */
   const [isFocused, setIsFocused] = useState(false);
@@ -59,7 +62,7 @@ export default function AddCollectionView({
   /** 이름 변경 핸들러 */
   const handleNameChange = (text: string) => {
     if (text.length <= MAX_NAME_LENGTH) {
-      onNameChange(text);
+      onNameChange?.(text);
     }
   };
 
@@ -79,44 +82,38 @@ export default function AddCollectionView({
   };
 
   return (
-    <ScrollView className="flex-1" showsVerticalScrollIndicator={false}>
-      {/* Header */}
-      <View className="flex-row items-center gap-2 px-5 pb-5">
-        <TouchableOpacity onPress={onBack} activeOpacity={0.7}>
-          <BackIcon width={36} height={36} />
-        </TouchableOpacity>
-        <Text className="text-heading-xl text-black">모음 추가</Text>
-      </View>
-
+    <View>
       <View className="mx-[20px]">
-        {/* 모음 이름 섹션 */}
-        <View className="mb-6">
-          <View className="mb-2 flex-row items-center justify-between">
-            <Text className="text-[14px] font-semibold leading-[20px] text-black">
-              모음 이름
-            </Text>
-            <Text className="text-caption-sm text-grey-500">
-              {name.length}/{MAX_NAME_LENGTH}
-            </Text>
+        {/* 모음 이름 섹션 (showOnlyCategory가 true면 숨김) */}
+        {!showOnlyCategory && (
+          <View className="mb-6">
+            <View className="mb-2 flex-row items-center justify-between">
+              <Text className="text-[14px] font-semibold leading-[20px] text-black">
+                모음 이름
+              </Text>
+              <Text className="text-caption-sm text-grey-500">
+                {name.length}/{MAX_NAME_LENGTH}
+              </Text>
+            </View>
+            <View
+              className={`rounded-[10px] border bg-white px-4 py-4 ${
+                isFocused ? 'border-grey-800' : 'border-grey-200'
+              }`}
+            >
+              <TextInput
+                value={name}
+                onChangeText={handleNameChange}
+                onFocus={() => setIsFocused(true)}
+                onBlur={() => setIsFocused(false)}
+                placeholder="모음명을 입력해주세요."
+                placeholderTextColor="#9C9FAE"
+                className="text-body-md text-grey-900"
+                style={{ padding: 0 }}
+                maxLength={MAX_NAME_LENGTH}
+              />
+            </View>
           </View>
-          <View
-            className={`rounded-[10px] border bg-white px-4 py-4 ${
-              isFocused ? 'border-grey-800' : 'border-grey-200'
-            }`}
-          >
-            <TextInput
-              value={name}
-              onChangeText={handleNameChange}
-              onFocus={() => setIsFocused(true)}
-              onBlur={() => setIsFocused(false)}
-              placeholder="모음명을 입력해주세요."
-              placeholderTextColor="#9C9FAE"
-              className="text-body-md text-grey-900"
-              style={{ padding: 0 }}
-              maxLength={MAX_NAME_LENGTH}
-            />
-          </View>
-        </View>
+        )}
 
         {/* 카테고리 섹션 */}
         <View>
@@ -171,7 +168,7 @@ export default function AddCollectionView({
           </TouchableOpacity>
         </View>
       )}
-    </ScrollView>
+    </View>
   );
 }
 

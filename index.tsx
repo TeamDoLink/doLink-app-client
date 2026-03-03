@@ -1,17 +1,23 @@
 import { AppRegistry, Platform } from 'react-native';
-import 'expo-router/entry';
 import './src/styles/global.css';
 import './src/lib/nativewind-setup';
 
-// import NaverWebView from './src/components/NaverWebView';
-// import {
-//   ShareIntentRoot,
-//   IOSShareIntentRoot,
-// } from './src/components/extension';
-import ShareIntentRouter from './src/components/extension/ShareIntentRouter';
+import '@expo/metro-runtime';
+
+import { App } from 'expo-router/build/qualified-entry';
+import { renderRootComponent } from 'expo-router/build/renderRootComponent';
+
+import Inbox from './app-inbox';
+import { registerRootComponent } from 'expo';
+
+if (process.env.EXPO_PUBLIC_DEBUG_INBOX === 'true') {
+  registerRootComponent(Inbox);
+} else {
+  renderRootComponent(App);
+}
 
 if (Platform.OS === 'android') {
-  AppRegistry.registerComponent('share-intent', () => ShareIntentRouter);
-} else {
-  AppRegistry.registerComponent('shareExtension', () => ShareIntentRouter);
+  AppRegistry.registerComponent('share-intent', () => Inbox);
+} else if (Platform.OS === 'ios') {
+  AppRegistry.registerComponent('shareExtension', () => Inbox);
 }

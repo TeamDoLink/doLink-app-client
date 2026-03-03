@@ -7,6 +7,7 @@ import { config } from '@/src/utils/envConfig';
 import { useWebViewBridge } from '@/src/hooks/useWebViewBridge';
 import useWebViewBackHandler from '@/src/hooks/useWebViewBackHandler';
 import DoLinkWebView from '@/src/components/DoLinkWebView';
+import { useGetUser } from '@/src/api/generated/endpoints/user/user';
 
 /**
  * Catch-all 라우트

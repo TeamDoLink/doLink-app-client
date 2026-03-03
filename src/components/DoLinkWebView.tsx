@@ -1,10 +1,9 @@
-import { Platform, StatusBar } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { StyleSheet } from 'react-native';
 import WebView, { WebViewProps } from 'react-native-webview';
 import useWebViewBackHandler from '../hooks/useWebViewBackHandler';
 import { useWebViewBridge } from '../hooks/useWebViewBridge';
 import { useRef } from 'react';
+import { WebViewNavigation } from 'react-native-webview/lib/WebViewTypes';
 
 interface DoLinkWebViewProps extends WebViewProps {}
 
@@ -13,11 +12,15 @@ export default function DoLinkWebView({ style, ...props }: DoLinkWebViewProps) {
   const { handleMessage } = useWebViewBridge(webViewRef);
   const { navStateHandler } = useWebViewBackHandler(webViewRef);
 
+  const handleNavigationStateChange = (event: WebViewNavigation) => {
+    navStateHandler(event);
+  };
+
   return (
     <WebView
       ref={webViewRef}
       onMessage={handleMessage}
-      onNavigationStateChange={navStateHandler}
+      onNavigationStateChange={handleNavigationStateChange}
       style={[styles.webview, style]}
       sharedCookiesEnabled
       javaScriptEnabled

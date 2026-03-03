@@ -5,6 +5,7 @@
 module.exports = {
   content: [
     './app/**/*.{js,jsx,ts,tsx}',
+    './app-inbox/**/*.{js,jsx,ts,tsx}',
     './src/**/*.{js,jsx,ts,tsx}',
     './index.js',
   ],
