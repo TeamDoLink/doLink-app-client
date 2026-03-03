@@ -1,0 +1,66 @@
+# Fastlane configuration for Android build and Play Store deployment
+# Paths are based on project root (parent of fastlane/), not current working directory.
+
+def project_root
+  @project_root ||= File.expand_path("..", __dir__)
+end
+
+default_platform(:android)
+
+platform :android do
+  desc "Build Android AAB (release)"
+  lane :build do
+    gradle(
+      project_dir: File.join(project_root, "android"),
+      task: "bundleRelease",
+      properties: {}
+    )
+    aab_path = File.join(project_root, "android", "app", "build", "outputs", "bundle", "release", "app-release.aab")
+    UI.success("AAB built: #{aab_path}")
+    aab_path
+  end
+
+  desc "Upload AAB to Google Play Store"
+  lane :playstore do
+    aab_path = resolve_aab_path
+    UI.message("Uploading AAB: #{aab_path}")
+
+    upload_to_play_store(
+      aab: aab_path,
+      json_key_file: File.join(__dir__, "credentials", "playstore.json"),
+      track: ENV.fetch("PLAY_STORE_TRACK", "internal")
+    )
+  end
+
+  desc "Build and upload to Play Store"
+  lane :build_and_deploy do
+    build
+    playstore
+  end
+
+  desc "Alias for playstore (upload only)"
+  lane :deploy do
+    playstore
+  end
+end
+
+def resolve_aab_path
+  if ENV["AAB_PATH"] && !ENV["AAB_PATH"].empty?
+    path = File.expand_path(ENV["AAB_PATH"])
+    return path if File.exist?(path)
+  end
+
+  gradle_output = File.join(project_root, "android", "app", "build", "outputs", "bundle", "release", "*.aab")
+  candidates = Dir.glob(File.join(project_root, "build", "*.aab")) +
+               Dir.glob(File.join(project_root, "*.aab")) +
+               Dir.glob(gradle_output)
+  latest = candidates.max_by { |f| File.mtime(f) } if candidates.any?
+
+  if latest && File.exist?(latest)
+    latest
+  else
+    UI.user_error!(
+      "AAB file not found. Set AAB_PATH or place .aab in ./build/ or project root."
+    )
+  end
+end
