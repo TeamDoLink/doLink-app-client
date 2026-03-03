@@ -29,6 +29,12 @@ export type ShareMessageType =
   | 'share:response' // Native → WebView 성공 응답
   | 'share:error'; // Native → WebView 에러 응답
 
+// OS Share 메시지 타입 (딥링크 무관, OS 기본 공유 시트)
+export type OsShareMessageType =
+  | 'os:share' // WebView → Native 요청
+  | 'os:share:response' // Native → WebView 성공 응답
+  | 'os:share:error'; // Native → WebView 에러 응답
+
 // ShareIntent 메시지 타입 (Native → WebView, 공유 인텐트 데이터 전달)
 export type ShareIntentMessageType = 'shareIntent:data';
 
@@ -38,6 +44,7 @@ export type BridgeMessageType =
   | ClipboardMessageType
   | LinkMessageType
   | ShareMessageType
+  | OsShareMessageType
   | AuthMessageType;
 
 // WebView → Native App 메시지
@@ -137,11 +144,11 @@ export type BridgeResponse<T = any> =
   | ClipboardResponse
   | LinkResponse
   | ShareResponse
-  | AuthResponse
+  | OsShareResponse
   | BridgeErrorMessage;
 
 // Handler 함수 타입
-export type BridgeHandler<TPayload = any, TResult = any> = (
+export type BridgeHandler<TPayload = any> = (
   payload: TPayload,
 ) => Promise<BridgeResponse>;
 
@@ -163,14 +170,23 @@ export interface SharePayload {
   message?: string;
 }
 
-// Auth Payload 타입
-export interface AuthPayload {
-  accessToken: string;
-  refreshToken: string;
+// OsShare Payload 타입
+export interface OsSharePayload {
+  url: string;
 }
 
-// Auth Response 타입
-export interface AuthResponse {
-  type: AuthMessageType;
+// OsShare 성공 응답
+export interface OsShareResponseMessage {
+  type: 'os:share:response';
   success: boolean;
+  activityType?: string;
 }
+
+// OsShare 에러 응답
+export interface OsShareErrorMessage {
+  type: 'os:share:error';
+  error: string;
+}
+
+// OsShare 응답 타입
+export type OsShareResponse = OsShareResponseMessage | OsShareErrorMessage;
