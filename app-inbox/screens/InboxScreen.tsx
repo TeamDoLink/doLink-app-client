@@ -9,6 +9,7 @@ import { useListAll1 } from '@/src/api/generated/endpoints/collection/collection
 import { useCreate } from '@/src/api/generated/endpoints/task/task';
 import { ApiResponseSliceCollectionResponse } from '@/src/api/generated/models';
 import { useShareIntent } from '@/src/components/SharedIntent';
+import TextInput from '@/src/components/common/inputField/TextInput';
 
 export default function InboxScreen({
   navigation,
@@ -20,7 +21,7 @@ export default function InboxScreen({
     number | null
   >(null);
   const [searchText, setSearchText] = useState('');
-  const [memo, setMemo] = useState('');
+  const [memo, setMemo] = useState<string>('');
   const { mutate: createTask } = useCreate();
 
   const handleAddTask = () => {
@@ -57,6 +58,13 @@ export default function InboxScreen({
     <InboxBottomSheet.Layout>
       <InboxBottomSheet.Content className="flex-1">
         <View className="px-5 pb-3">
+          <TextInput className="mb-5">
+            <TextInput.Input
+              placeholder="메모를 입력해보세요."
+              value={memo}
+              onChangeText={setMemo}
+            />
+          </TextInput>
           <SearchInputField value={searchText} onChangeText={setSearchText} />
         </View>
         <FlatList

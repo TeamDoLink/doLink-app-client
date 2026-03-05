@@ -69,7 +69,7 @@ export default function Inbox(props: ShareIntentData) {
                           title: '할일 담기',
                           header: (props) => (
                             <InboxBottomSheet.Header
-                              title="할일 담기"
+                              title="할 일 담기"
                               RightContent={
                                 <TouchableOpacity
                                   activeOpacity={0.7}

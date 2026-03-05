@@ -1,5 +1,11 @@
 import { useState, useRef } from 'react';
-import { TextInput, Pressable, type TextInputProps } from 'react-native';
+import {
+  TextInput,
+  Pressable,
+  type TextInputProps,
+  View,
+  Text,
+} from 'react-native';
 import SearchIcon from '@/src/assets/icons/common/search-24.svg';
 
 interface SearchInputFieldProps
@@ -29,28 +35,40 @@ export const SearchInputField = ({
     inputRef.current?.focus();
   };
 
-  return (
-    <Pressable
-      onPress={handleContainerPress}
-      className={`flex-row items-center gap-2.5 rounded-[10px] border bg-grey-50 px-4 py-2.5 ${borderClassName}`}
-    >
-      <SearchIcon width={24} height={24} />
+  const handleCancelPress = () => {
+    inputRef.current?.blur();
+    onChangeText?.('');
+  };
 
-      <TextInput
-        ref={inputRef}
-        value={value}
-        onChangeText={onChangeText}
-        onFocus={() => setIsFocused(true)}
-        onBlur={() => setIsFocused(false)}
-        onSubmitEditing={handleSubmit}
-        placeholder={placeholder}
-        placeholderTextColor="#9C9FAE"
-        className="flex-1 text-body-md text-grey-900"
-        style={{ textAlignVertical: 'center', padding: 0 }}
-        returnKeyType="search"
-        {...props}
-      />
-    </Pressable>
+  return (
+    <View className="flex-row items-center gap-3">
+      <Pressable
+        onPress={handleContainerPress}
+        className={`flex-1 flex-row items-center gap-2.5 rounded-[10px] border bg-grey-50 px-4 py-2.5 ${borderClassName}`}
+      >
+        <SearchIcon width={24} height={24} />
+
+        <TextInput
+          ref={inputRef}
+          value={value}
+          onChangeText={onChangeText}
+          onFocus={() => setIsFocused(true)}
+          onBlur={() => setIsFocused(false)}
+          onSubmitEditing={handleSubmit}
+          placeholder={placeholder}
+          placeholderTextColor="#9C9FAE"
+          className="flex-1 text-body-md text-grey-900"
+          style={{ textAlignVertical: 'center', padding: 0 }}
+          returnKeyType="search"
+          {...props}
+        />
+      </Pressable>
+      {isFocused && (
+        <Pressable onPress={handleCancelPress}>
+          <Text className="text-body-lg text-grey-900">취소</Text>
+        </Pressable>
+      )}
+    </View>
   );
 };
 
