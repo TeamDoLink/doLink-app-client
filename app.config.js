@@ -75,6 +75,22 @@ export default {
         },
       ],
       [
+        'expo-font',
+        {
+          fonts: [
+            './assets/fonts/Pretendard-Black.otf',
+            './assets/fonts/Pretendard-Bold.otf',
+            './assets/fonts/Pretendard-ExtraBold.otf',
+            './assets/fonts/Pretendard-ExtraLight.otf',
+            './assets/fonts/Pretendard-Light.otf',
+            './assets/fonts/Pretendard-Medium.otf',
+            './assets/fonts/Pretendard-Regular.otf',
+            './assets/fonts/Pretendard-SemiBold.otf',
+            './assets/fonts/Pretendard-Thin.otf',
+          ],
+        },
+      ],
+      [
         '@dexical/expo-store-signing',
         {
           storeFile: path.resolve(
