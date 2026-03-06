@@ -1,12 +1,9 @@
-import { useRef, useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { StatusBar, Platform, StyleSheet } from 'react-native';
-import WebView from 'react-native-webview';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLocalSearchParams } from 'expo-router';
 import * as Linking from 'expo-linking';
 import { config } from '@/src/utils/envConfig';
-import { useWebViewBridge } from '@/src/hooks/useWebViewBridge';
-import useWebViewBackHandler from '@/src/hooks/useWebViewBackHandler';
 import DebugButton from '@/src/components/DebugButton';
 import DoLinkWebView from '@/src/components/DoLinkWebView';
 import { useGetUser } from '@/src/api/generated/endpoints/user/user';
@@ -34,17 +31,18 @@ export default function Index() {
   const { initialPath } = useLocalSearchParams<{ initialPath?: string }>();
 
   const domain = config.domain;
-  const DEFAULT_PATH = '/';
 
-  // 딥링크로 인한 웹 경로 상태 관리 ([...unmatched] redirect 시 initialPath로 초기화)
-  const [webPath, setWebPath] = useState<string>(initialPath ?? DEFAULT_PATH);
+  // WebView는 항상 루트('/')로 먼저 로드하고, 실제 이동은 postMessage(NAVIGATE)로 위임
+  const [pendingNavigatePath, setPendingNavigatePath] = useState<string | null>(
+    null,
+  );
 
   // 딥링크 수신 처리 (핫 스타트 - 앱이 백그라운드에서 포그라운드로)
   const url = Linking.useURL();
   useEffect(() => {
     const deepLinkPath = parseDeepLinkPath(url);
     if (deepLinkPath) {
-      setWebPath(deepLinkPath);
+      setPendingNavigatePath(deepLinkPath);
     }
   }, [url]);
 
@@ -55,19 +53,25 @@ export default function Index() {
       const initialUrl = await Linking.getInitialURL();
       const deepLinkPath = parseDeepLinkPath(initialUrl);
       if (deepLinkPath) {
-        setWebPath(deepLinkPath);
+        setPendingNavigatePath(deepLinkPath);
       }
     };
     handleInitialURL();
   }, []);
 
-  const webUrl = `${domain}${webPath}`;
+  const rootWebUrl = useMemo(() => {
+    const normalizedDomain = domain.endsWith('/')
+      ? domain.slice(0, -1)
+      : domain;
+    return `${normalizedDomain}/`;
+  }, [domain]);
 
   useEffect(() => {
-    console.log('🌐 WebView Loading URL:', webUrl);
+    console.log('🌐 WebView Loading URL:', rootWebUrl);
     console.log('📱 Platform:', Platform.OS);
     console.log('🏠 Domain:', domain);
-  }, [webUrl]);
+    console.log('🧭 Pending navigate path:', pendingNavigatePath);
+  }, [rootWebUrl, domain, pendingNavigatePath]);
 
   return (
     <SafeAreaView
@@ -75,7 +79,11 @@ export default function Index() {
       edges={Platform.OS === 'ios' ? ['top'] : ['top', 'bottom']}
     >
       <StatusBar barStyle="dark-content" backgroundColor="#ffffff" />
-      <DoLinkWebView source={{ uri: webUrl }} />
+      <DoLinkWebView
+        source={{ uri: domain }}
+        pendingNavigatePath={pendingNavigatePath}
+        onNavigateSent={() => setPendingNavigatePath(null)}
+      />
       <DebugButton />
     </SafeAreaView>
   );

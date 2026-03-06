@@ -38,6 +38,12 @@ export type OsShareMessageType =
 // ShareIntent 메시지 타입 (Native → WebView, 공유 인텐트 데이터 전달)
 export type ShareIntentMessageType = 'shareIntent:data';
 
+// Navigation 메시지 타입 (WebView → Native)
+export type NavigationMessageType = 'navigate:back:exit';
+
+// Deeplink 메시지 타입 (WebView → Native)
+export type DeeplinkMessageType = 'navigate:deeplink';
+
 // 모든 메시지 타입
 export type BridgeMessageType =
   | DraftMessageType
@@ -45,7 +51,9 @@ export type BridgeMessageType =
   | LinkMessageType
   | ShareMessageType
   | OsShareMessageType
-  | AuthMessageType;
+  | AuthMessageType
+  | NavigationMessageType
+  | DeeplinkMessageType;
 
 // WebView → Native App 메시지
 export interface BridgeMessage<T = any> {
@@ -190,3 +198,16 @@ export interface OsShareErrorMessage {
 
 // OsShare 응답 타입
 export type OsShareResponse = OsShareResponseMessage | OsShareErrorMessage;
+
+// Navigation 메시지 타입 (Native → WebView)
+export interface NavigationBackMessage {
+  type: 'navigate:back';
+}
+
+// Deeplink 메시지 타입 (Native → WebView)
+export interface DeeplinkMessage {
+  type: 'navigate:deeplink';
+  payload: {
+    path: string;
+  };
+}

@@ -12,6 +12,8 @@ import type {
   LinkResponseMessage,
   LinkErrorMessage,
   BridgeErrorMessage,
+  NavigationBackMessage,
+  DeeplinkMessage,
 } from './types';
 
 /**
@@ -110,4 +112,13 @@ export const createBridgeErrorResponse = (
   type: 'bridge:error',
   error,
   originalType,
+});
+
+export const createNavigationBackMessage = (): NavigationBackMessage => ({
+  type: 'navigate:back',
+});
+
+export const createDeeplinkMessage = (path: string): DeeplinkMessage => ({
+  type: 'navigate:deeplink',
+  payload: { path },
 });
