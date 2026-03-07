@@ -1,9 +1,10 @@
+import { useEffect, useMemo, useRef } from 'react';
 import { StyleSheet } from 'react-native';
 import WebView, { WebViewProps } from 'react-native-webview';
-import useWebViewBackHandler from '../hooks/useWebViewBackHandler';
-import { useWebViewBridge } from '../hooks/useWebViewBridge';
-import { useEffect, useMemo, useRef } from 'react';
 import { WebViewNavigation } from 'react-native-webview/lib/WebViewTypes';
+import useWebViewBackHandler from '../hooks/useWebViewBackHandler';
+import useLoginHandler from '../hooks/useLoginHandler';
+import { useWebViewBridge } from '../hooks/useWebViewBridge';
 import { createDeeplinkMessage } from '../bridge';
 
 interface DoLinkWebViewProps extends WebViewProps {
@@ -58,11 +59,13 @@ export default function DoLinkWebView({
   onNavigateSent,
   onLoadEnd,
   onNavigationStateChange,
+  onNavigationStateChange: onNavChange,
   ...props
 }: DoLinkWebViewProps) {
   const webViewRef = useRef<WebView>(null);
   const { handleMessage } = useWebViewBridge(webViewRef);
   const { navStateHandler } = useWebViewBackHandler(webViewRef);
+  const { onLoginNavigation } = useLoginHandler(webViewRef);
 
   const isLoadedRef = useRef(false);
   const lastSentPathRef = useRef<string | null>(null);
@@ -77,6 +80,8 @@ export default function DoLinkWebView({
   const handleNavigationStateChange = (event: WebViewNavigation) => {
     navStateHandler(event);
     onNavigationStateChange?.(event);
+    onNavChange?.(event);
+    onLoginNavigation(event);
   };
 
   const trySendNavigate = (path: string | null) => {
