@@ -1,4 +1,4 @@
-import { useRef, useState, useEffect } from 'react';
+import { useRef, useState, useEffect, useMemo } from 'react';
 import {
   StatusBar,
   Platform,
@@ -31,24 +31,21 @@ const parseDeepLinkPath = (url: string | null): string | null => {
 };
 
 export default function Index() {
-  const { data: user, error } = useGetUser();
-
-  console.log('user', user);
-  console.log('error', error);
   const { initialPath } = useLocalSearchParams<{ initialPath?: string }>();
 
   const domain = config.domain;
-  const DEFAULT_PATH = '/';
 
-  // 딥링크로 인한 웹 경로 상태 관리 ([...unmatched] redirect 시 initialPath로 초기화)
-  const [webPath, setWebPath] = useState<string>(initialPath ?? DEFAULT_PATH);
+  // WebView는 항상 루트('/')로 먼저 로드하고, 실제 이동은 postMessage(NAVIGATE)로 위임
+  const [pendingNavigatePath, setPendingNavigatePath] = useState<string | null>(
+    null,
+  );
 
   // 딥링크 수신 처리 (핫 스타트 - 앱이 백그라운드에서 포그라운드로)
   const url = Linking.useURL();
   useEffect(() => {
     const deepLinkPath = parseDeepLinkPath(url);
     if (deepLinkPath) {
-      setWebPath(deepLinkPath);
+      setPendingNavigatePath(deepLinkPath);
     }
   }, [url]);
 
@@ -59,15 +56,20 @@ export default function Index() {
       const initialUrl = await Linking.getInitialURL();
       const deepLinkPath = parseDeepLinkPath(initialUrl);
       if (deepLinkPath) {
-        setWebPath(deepLinkPath);
+        setPendingNavigatePath(deepLinkPath);
       }
     };
     handleInitialURL();
   }, []);
 
-  const webUrl = `${domain}${webPath}`;
+  const rootWebUrl = useMemo(() => {
+    const normalizedDomain = domain.endsWith('/')
+      ? domain.slice(0, -1)
+      : domain;
+    return `${normalizedDomain}/`;
+  }, [domain]);
 
-  const [currentUrl, setCurrentUrl] = useState(webUrl);
+  const [currentUrl, setCurrentUrl] = useState(rootWebUrl);
   const [keyboardVisible, setKeyboardVisible] = useState(false);
   const isTaskForm = /\/task\/(edit|create)/.test(currentUrl);
   const needsKeyboardAvoiding = isTaskForm && keyboardVisible;
@@ -93,10 +95,11 @@ export default function Index() {
   }, [currentUrl, isTaskForm]);
 
   useEffect(() => {
-    console.log('🌐 WebView Loading URL:', webUrl);
+    console.log('🌐 WebView Loading URL:', rootWebUrl);
     console.log('📱 Platform:', Platform.OS);
     console.log('🏠 Domain:', domain);
-  }, [webUrl]);
+    console.log('🧭 Pending navigate path:', pendingNavigatePath);
+  }, [rootWebUrl, domain, pendingNavigatePath]);
 
   return (
     <SafeAreaView
@@ -110,7 +113,7 @@ export default function Index() {
         enabled={needsKeyboardAvoiding}
       >
         <DoLinkWebView
-          source={{ uri: webUrl }}
+          source={{ uri: rootWebUrl }}
           onNavigationStateChange={(e) => setCurrentUrl(e.url)}
         />
       </KeyboardAvoidingView>

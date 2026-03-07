@@ -16,6 +16,14 @@ export type ClipboardMessageType =
 // Auth 메시지 타입
 export type AuthMessageType = 'auth:login' | 'auth:logout';
 
+// Auth Handler Payload/Response (웹→앱 auth 메시지 처리용)
+export type AuthPayload = Record<string, never>;
+
+export interface AuthResponse {
+  type: AuthMessageType;
+  success: boolean;
+}
+
 // Link 메시지 타입
 export type LinkMessageType =
   | 'link:open' // WebView → Native 요청 (URL 열기)
@@ -38,6 +46,12 @@ export type OsShareMessageType =
 // ShareIntent 메시지 타입 (Native → WebView, 공유 인텐트 데이터 전달)
 export type ShareIntentMessageType = 'shareIntent:data';
 
+// Navigation 메시지 타입 (WebView → Native)
+export type NavigationMessageType = 'navigate:back:exit';
+
+// Deeplink 메시지 타입 (WebView → Native)
+export type DeeplinkMessageType = 'navigate:deeplink';
+
 // 모든 메시지 타입
 export type BridgeMessageType =
   | DraftMessageType
@@ -45,7 +59,9 @@ export type BridgeMessageType =
   | LinkMessageType
   | ShareMessageType
   | OsShareMessageType
-  | AuthMessageType;
+  | AuthMessageType
+  | NavigationMessageType
+  | DeeplinkMessageType;
 
 // WebView → Native App 메시지
 export interface BridgeMessage<T = any> {
@@ -190,3 +206,16 @@ export interface OsShareErrorMessage {
 
 // OsShare 응답 타입
 export type OsShareResponse = OsShareResponseMessage | OsShareErrorMessage;
+
+// Navigation 메시지 타입 (Native → WebView)
+export interface NavigationBackMessage {
+  type: 'navigate:back';
+}
+
+// Deeplink 메시지 타입 (Native → WebView)
+export interface DeeplinkMessage {
+  type: 'navigate:deeplink';
+  payload: {
+    path: string;
+  };
+}

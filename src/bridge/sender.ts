@@ -12,6 +12,8 @@ import type {
   LinkResponseMessage,
   LinkErrorMessage,
   BridgeErrorMessage,
+  NavigationBackMessage,
+  DeeplinkMessage,
 } from './types';
 
 /**
@@ -28,6 +30,23 @@ export const sendToWebView = (
 
   console.log('[Bridge] 웹으로 응답 전송:', response);
   webViewRef.current.postMessage(JSON.stringify(response));
+};
+
+/**
+ * 로그인 성공 시 웹뷰에 auth:login 메시지로 access token 전달
+ */
+export const sendAuthLoginToWeb = (
+  webViewRef: React.RefObject<WebView | null>,
+  accessToken: string,
+): void => {
+  if (!webViewRef.current) {
+    console.warn('[Bridge] WebView ref is not available');
+    return;
+  }
+  const message = { type: 'auth:login' as const, payload: { accessToken } };
+  setTimeout(() => {
+    webViewRef.current?.postMessage(JSON.stringify(message));
+  }, 300);
 };
 
 /**
@@ -110,4 +129,13 @@ export const createBridgeErrorResponse = (
   type: 'bridge:error',
   error,
   originalType,
+});
+
+export const createNavigationBackMessage = (): NavigationBackMessage => ({
+  type: 'navigate:back',
+});
+
+export const createDeeplinkMessage = (path: string): DeeplinkMessage => ({
+  type: 'navigate:deeplink',
+  payload: { path },
 });
