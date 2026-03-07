@@ -13,11 +13,18 @@ import type {
   OsSharePayload,
   AuthMessageType,
 } from './types';
-import { sendToWebView, createBridgeErrorResponse } from './sender';
+import type { AuthPayload } from './types';
+import {
+  sendToWebView,
+  createBridgeErrorResponse,
+  sendAuthLoginToWeb,
+} from './sender';
 import { draftHandler } from './handlers/draftHandler';
 import { clipboardHandler } from './handlers/clipboardHandler';
 import { linkHandler } from './handlers/linkHandler';
 import { shareHandler, osShareHandler } from './handlers/shareHandler';
+import { authHandler } from './handlers/authHandler';
+import useAuthStore from '../stores/useAuthStore';
 
 /**
  * 메시지 타입이 Draft 관련인지 확인 (Type Guard)
@@ -109,6 +116,21 @@ export const handleBridgeMessage = async (
     if (isOsShareMessage(type)) {
       const response = await osShareHandler(payload as OsSharePayload);
       sendToWebView(webViewRef, response);
+      return;
+    }
+
+    // Auth: 로그아웃 시 스토어/Secure Storage 토큰 제거 (웹에 응답 없음)
+    if (type === 'auth:logout') {
+      await authHandler('auth:logout', (payload ?? {}) as AuthPayload);
+      return;
+    }
+
+    if (type == 'auth:login') {
+      await authHandler('auth:login', {});
+      const accessToken = useAuthStore.getState().accessToken;
+      if (accessToken) {
+        sendAuthLoginToWeb(webViewRef, accessToken);
+      }
       return;
     }
 

@@ -16,6 +16,14 @@ export type ClipboardMessageType =
 // Auth 메시지 타입
 export type AuthMessageType = 'auth:login' | 'auth:logout';
 
+// Auth Handler Payload/Response (웹→앱 auth 메시지 처리용)
+export type AuthPayload = Record<string, never>;
+
+export interface AuthResponse {
+  type: AuthMessageType;
+  success: boolean;
+}
+
 // Link 메시지 타입
 export type LinkMessageType =
   | 'link:open' // WebView → Native 요청 (URL 열기)

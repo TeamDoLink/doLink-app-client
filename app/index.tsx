@@ -31,10 +31,6 @@ const parseDeepLinkPath = (url: string | null): string | null => {
 };
 
 export default function Index() {
-  const { data: user, error } = useGetUser();
-
-  console.log('user', user);
-  console.log('error', error);
   const { initialPath } = useLocalSearchParams<{ initialPath?: string }>();
 
   const domain = config.domain;

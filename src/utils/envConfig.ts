@@ -12,29 +12,29 @@ function getDomain() {
 
   // DEV 모드
   // 1. Android 에뮬레이터 체크
-  if (isAndroid) {
-    const modelName = Constants.platform?.android?.modelName || '';
+  // if (isAndroid) {
+  //   const modelName = Constants.platform?.android?.modelName || '';
 
-    // 확실하게 에뮬레이터인 키워드가 포함된 경우에만 true (기본값을 false로)
-    const isEmulator =
-      modelName.includes('sdk') ||
-      modelName.includes('Emulator') ||
-      modelName.includes('google_sdk') ||
-      modelName.includes('generic') ||
-      modelName.includes('vbox');
+  //   // 확실하게 에뮬레이터인 키워드가 포함된 경우에만 true (기본값을 false로)
+  //   const isEmulator =
+  //     modelName.includes('sdk') ||
+  //     modelName.includes('Emulator') ||
+  //     modelName.includes('google_sdk') ||
+  //     modelName.includes('generic') ||
+  //     modelName.includes('vbox');
 
-    console.log(
-      '🤖 [Android] Detected modelName:',
-      modelName,
-      'isEmulator:',
-      isEmulator,
-    );
+  //   console.log(
+  //     '🤖 [Android] Detected modelName:',
+  //     modelName,
+  //     'isEmulator:',
+  //     isEmulator,
+  //   );
 
-    if (isEmulator) {
-      console.log('🚀 Using Emulator Domain (10.0.2.2)');
-      return process.env.EXPO_PUBLIC_ANDROID_EMULATOR_DOMAIN;
-    }
-  }
+  //   if (isEmulator) {
+  //     console.log('🚀 Using Emulator Domain (10.0.2.2)');
+  //     return process.env.EXPO_PUBLIC_ANDROID_EMULATOR_DOMAIN;
+  //   }
+  // }
 
   // 2. iOS 시뮬레이터 체크
   if (Platform.OS === 'ios' && !Constants.isDevice) {
