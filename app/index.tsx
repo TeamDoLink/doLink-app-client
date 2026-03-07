@@ -1,15 +1,8 @@
 import { useRef, useState, useEffect } from 'react';
-import {
-  StatusBar,
-  Platform,
-  Text,
-  View,
-  TouchableOpacity,
-  StyleSheet,
-} from 'react-native';
+import { StatusBar, Platform, StyleSheet } from 'react-native';
 import WebView from 'react-native-webview';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useRouter } from 'expo-router';
+import { useLocalSearchParams } from 'expo-router';
 import * as Linking from 'expo-linking';
 import { config } from '@/src/utils/envConfig';
 import { useWebViewBridge } from '@/src/hooks/useWebViewBridge';
@@ -38,13 +31,13 @@ export default function Index() {
 
   console.log('user', user);
   console.log('error', error);
+  const { initialPath } = useLocalSearchParams<{ initialPath?: string }>();
 
   const domain = config.domain;
-  // const DEFAULT_PATH = '/archives/detail/1';
   const DEFAULT_PATH = '/';
 
-  // 딥링크로 인한 웹 경로 상태 관리
-  const [webPath, setWebPath] = useState<string>(DEFAULT_PATH);
+  // 딥링크로 인한 웹 경로 상태 관리 ([...unmatched] redirect 시 initialPath로 초기화)
+  const [webPath, setWebPath] = useState<string>(initialPath ?? DEFAULT_PATH);
 
   // 딥링크 수신 처리 (핫 스타트 - 앱이 백그라운드에서 포그라운드로)
   const url = Linking.useURL();
@@ -57,6 +50,7 @@ export default function Index() {
 
   // 콜드 스타트 처리 (앱이 완전히 종료된 상태에서 딥링크로 실행)
   useEffect(() => {
+    console.log('deepLinking:', url);
     const handleInitialURL = async () => {
       const initialUrl = await Linking.getInitialURL();
       const deepLinkPath = parseDeepLinkPath(initialUrl);
