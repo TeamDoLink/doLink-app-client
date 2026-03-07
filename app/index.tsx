@@ -1,15 +1,19 @@
 import { useRef, useState, useEffect } from 'react';
-import { StatusBar, Platform, StyleSheet } from 'react-native';
-import WebView from 'react-native-webview';
+import {
+  StatusBar,
+  Platform,
+  StyleSheet,
+  Keyboard,
+  KeyboardAvoidingView,
+} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLocalSearchParams } from 'expo-router';
 import * as Linking from 'expo-linking';
 import { config } from '@/src/utils/envConfig';
-import { useWebViewBridge } from '@/src/hooks/useWebViewBridge';
-import useWebViewBackHandler from '@/src/hooks/useWebViewBackHandler';
 import DebugButton from '@/src/components/DebugButton';
 import DoLinkWebView from '@/src/components/DoLinkWebView';
 import { useGetUser } from '@/src/api/generated/endpoints/user/user';
+// use React Native's built-in KeyboardAvoidingView
 
 /**
  * 딥링크 URL에서 웹 경로 추출
@@ -63,6 +67,31 @@ export default function Index() {
 
   const webUrl = `${domain}${webPath}`;
 
+  const [currentUrl, setCurrentUrl] = useState(webUrl);
+  const [keyboardVisible, setKeyboardVisible] = useState(false);
+  const isTaskForm = /\/task\/(edit|create)/.test(currentUrl);
+  const needsKeyboardAvoiding = isTaskForm && keyboardVisible;
+
+  useEffect(() => {
+    const showSub = Keyboard.addListener('keyboardDidShow', () =>
+      setKeyboardVisible(true),
+    );
+    const hideSub = Keyboard.addListener('keyboardDidHide', () =>
+      setKeyboardVisible(false),
+    );
+    return () => {
+      showSub.remove();
+      hideSub.remove();
+    };
+  }, []);
+
+  // When navigating away from task edit/create, ensure keyboard is dismissed
+  useEffect(() => {
+    if (!isTaskForm) {
+      Keyboard.dismiss();
+    }
+  }, [currentUrl, isTaskForm]);
+
   useEffect(() => {
     console.log('🌐 WebView Loading URL:', webUrl);
     console.log('📱 Platform:', Platform.OS);
@@ -75,7 +104,16 @@ export default function Index() {
       edges={Platform.OS === 'ios' ? ['top'] : ['top', 'bottom']}
     >
       <StatusBar barStyle="dark-content" backgroundColor="#ffffff" />
-      <DoLinkWebView source={{ uri: webUrl }} />
+      <KeyboardAvoidingView
+        style={{ flex: 1 }}
+        behavior="padding"
+        enabled={needsKeyboardAvoiding}
+      >
+        <DoLinkWebView
+          source={{ uri: webUrl }}
+          onNavigationStateChange={(e) => setCurrentUrl(e.url)}
+        />
+      </KeyboardAvoidingView>
       <DebugButton />
     </SafeAreaView>
   );

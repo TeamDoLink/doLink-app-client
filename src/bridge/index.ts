@@ -11,6 +11,7 @@ import type {
   LinkPayload,
   SharePayload,
   OsSharePayload,
+  AuthMessageType,
 } from './types';
 import { sendToWebView, createBridgeErrorResponse } from './sender';
 import { draftHandler } from './handlers/draftHandler';
