@@ -20,13 +20,25 @@ export const performReissueFromCookies = async (): Promise<string | null> => {
   }
 
   try {
-    const { data: requestAccessTokenResponse } = await issueAccessToken();
-    const accessToken = await requestAccessTokenResponse.text();
+    const requestAccessTokenResponse = await fetch(
+      `${config.apiUrl}/v1/auth/reissue`,
+      {
+        method: 'POST',
+        headers: {
+          Cookie: `refresh=${refreshToken}`,
+        },
+      },
+    );
+
+    const requestAccessTokenResponseJson =
+      await requestAccessTokenResponse.json();
+    const accessToken = requestAccessTokenResponseJson?.result;
     if (accessToken) {
       setAccessToken(accessToken);
       return accessToken;
     }
-  } catch {
+  } catch (error) {
+    console.log('reissue 실패', error);
     // reissue 실패 시 null 반환
   }
   return null;
@@ -38,9 +50,9 @@ export const authHandler = async (
 ): Promise<AuthResponse> => {
   switch (type) {
     case 'auth:login':
-      return handleLogin();
+      return await handleLogin();
     case 'auth:logout':
-      return handleLogout();
+      return await handleLogout();
   }
 };
 
