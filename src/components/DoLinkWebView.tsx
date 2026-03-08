@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { StyleSheet } from 'react-native';
 import WebView, { WebViewProps } from 'react-native-webview';
 import { WebViewNavigation } from 'react-native-webview/lib/WebViewTypes';
@@ -6,6 +6,8 @@ import useWebViewBackHandler from '../hooks/useWebViewBackHandler';
 import useLoginHandler from '../hooks/useLoginHandler';
 import { useWebViewBridge } from '../hooks/useWebViewBridge';
 import { createDeeplinkMessage } from '../bridge';
+import { useLocalSearchParams } from 'expo-router';
+import { useAppState } from '../hooks/useAppState';
 
 interface DoLinkWebViewProps extends WebViewProps {
   /**
@@ -20,39 +22,6 @@ interface DoLinkWebViewProps extends WebViewProps {
   onNavigateSent?: () => void;
 }
 
-/**
- * 네비게이션 경로를 정규화합니다.
- * @param input 네비게이션 경로
- * @returns 정규화된 네비게이션 경로
- * @example
- * normalizeNavigatePath('') => null
- * normalizeNavigatePath('   ') => null
- * normalizeNavigatePath('home') => '/home'
- * normalizeNavigatePath('/home') => '/home'
- * normalizeNavigatePath('https://www.google.com') => '/'
- * normalizeNavigatePath('https://www.google.com/search?q=test')
- *   => '/search?q=test'
- * normalizeNavigatePath('https://www.google.com/search?q=test#hash')
- *   => '/search?q=test#hash'
- */
-function normalizeNavigatePath(input: string): string | null {
-  const trimmed = input.trim();
-  if (!trimmed) return null;
-
-  // Full URL이 들어올 가능성까지 방어
-  if (/^https?:\/\//i.test(trimmed)) {
-    try {
-      const url = new URL(trimmed);
-      const out = `${url.pathname}${url.search}${url.hash}`;
-      return out.startsWith('/') ? out : `/${out}`;
-    } catch {
-      // fallthrough
-    }
-  }
-
-  return trimmed.startsWith('/') ? trimmed : `/${trimmed}`;
-}
-
 export default function DoLinkWebView({
   style,
   pendingNavigatePath,
@@ -62,20 +31,13 @@ export default function DoLinkWebView({
   onNavigationStateChange: onNavChange,
   ...props
 }: DoLinkWebViewProps) {
-  const webViewRef = useRef<WebView>(null);
+  const { initialPath } = useLocalSearchParams<{ initialPath?: string }>();
+  const isInitialPathLoaded = useRef(false);
+  const webViewRef = useRef<WebView<WebViewProps>>(null);
   const { handleMessage } = useWebViewBridge(webViewRef);
   const { navStateHandler } = useWebViewBackHandler(webViewRef);
   const { onLoginNavigation } = useLoginHandler(webViewRef);
-
-  const isLoadedRef = useRef(false);
-  const lastSentPathRef = useRef<string | null>(null);
-
-  const normalizedPendingPath = useMemo(() => {
-    if (!pendingNavigatePath) return null;
-    const normalized = normalizeNavigatePath(pendingNavigatePath);
-    if (!normalized || normalized === '/') return null;
-    return normalized;
-  }, [pendingNavigatePath]);
+  const appState = useAppState();
 
   const handleNavigationStateChange = (event: WebViewNavigation) => {
     navStateHandler(event);
@@ -84,21 +46,20 @@ export default function DoLinkWebView({
     onLoginNavigation(event);
   };
 
-  const trySendNavigate = (path: string | null) => {
-    if (!path) return;
-    if (!webViewRef.current) return;
-    if (!isLoadedRef.current) return;
-    if (lastSentPathRef.current === path) return;
+  const trySendNavigate = () => {
+    if (!initialPath) return;
+    if (isInitialPathLoaded.current) return;
+    isInitialPathLoaded.current = true;
 
-    webViewRef.current.postMessage(JSON.stringify(createDeeplinkMessage(path)));
-    lastSentPathRef.current = path;
+    webViewRef.current?.postMessage(
+      JSON.stringify(createDeeplinkMessage(initialPath)),
+    );
     onNavigateSent?.();
   };
 
-  useEffect(() => {
-    // 이미 로드된 상태에서 pending이 새로 생기는 케이스(핫 스타트 딥링크 등)
-    trySendNavigate(normalizedPendingPath);
-  }, [normalizedPendingPath]);
+  if (appState != 'active') {
+    return null;
+  }
 
   return (
     <WebView
@@ -106,8 +67,7 @@ export default function DoLinkWebView({
       onMessage={handleMessage}
       onNavigationStateChange={handleNavigationStateChange}
       onLoadEnd={(e) => {
-        isLoadedRef.current = true;
-        trySendNavigate(normalizedPendingPath);
+        trySendNavigate();
         onLoadEnd?.(e);
       }}
       style={[styles.webview, style]}

@@ -31,36 +31,7 @@ const parseDeepLinkPath = (url: string | null): string | null => {
 };
 
 export default function Index() {
-  const { initialPath } = useLocalSearchParams<{ initialPath?: string }>();
-
   const domain = config.domain;
-
-  // WebView는 항상 루트('/')로 먼저 로드하고, 실제 이동은 postMessage(NAVIGATE)로 위임
-  const [pendingNavigatePath, setPendingNavigatePath] = useState<string | null>(
-    null,
-  );
-
-  // 딥링크 수신 처리 (핫 스타트 - 앱이 백그라운드에서 포그라운드로)
-  const url = Linking.useURL();
-  useEffect(() => {
-    const deepLinkPath = parseDeepLinkPath(url);
-    if (deepLinkPath) {
-      setPendingNavigatePath(deepLinkPath);
-    }
-  }, [url]);
-
-  // 콜드 스타트 처리 (앱이 완전히 종료된 상태에서 딥링크로 실행)
-  useEffect(() => {
-    console.log('deepLinking:', url);
-    const handleInitialURL = async () => {
-      const initialUrl = await Linking.getInitialURL();
-      const deepLinkPath = parseDeepLinkPath(initialUrl);
-      if (deepLinkPath) {
-        setPendingNavigatePath(deepLinkPath);
-      }
-    };
-    handleInitialURL();
-  }, []);
 
   const rootWebUrl = useMemo(() => {
     const normalizedDomain = domain.endsWith('/')
@@ -98,8 +69,7 @@ export default function Index() {
     console.log('🌐 WebView Loading URL:', rootWebUrl);
     console.log('📱 Platform:', Platform.OS);
     console.log('🏠 Domain:', domain);
-    console.log('🧭 Pending navigate path:', pendingNavigatePath);
-  }, [rootWebUrl, domain, pendingNavigatePath]);
+  }, [rootWebUrl, domain]);
 
   return (
     <SafeAreaView

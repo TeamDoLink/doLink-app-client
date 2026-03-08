@@ -14,7 +14,8 @@
     "orval": "orval --config orval.config.js",
     "build:android": "bundle exec fastlane build",
     "deploy": "bundle exec fastlane playstore",
-    "build:deploy": "bundle exec fastlane build_and_deploy"
+    "build:deploy": "bundle exec fastlane build_and_deploy",
+    "prebuild": "expo prebuild --clean --platform android"
   },
   "lint-staged": {
     "*.{js,jsx,ts,tsx}": [
@@ -31,6 +32,7 @@
     "@tanstack/react-query": "^5.90.20",
     "axios": "^1.13.4",
     "expo": "~54.0.33",
+    "expo-build-properties": "~1.0.10",
     "expo-clipboard": "~8.0.7",
     "expo-constants": "~18.0.10",
     "expo-font": "~14.0.11",

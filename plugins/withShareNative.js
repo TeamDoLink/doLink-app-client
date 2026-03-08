@@ -96,6 +96,78 @@ module.exports = function withShareNative(config) {
       console.log(
         `withShareNative: ShareActivity.kt 파일이 생성되었습니다: ${targetFile}`,
       );
+
+      // ShareActivityModule.kt, ShareActivityPackage.kt 주입
+      const nativeFiles = ['ShareActivityModule.kt', 'ShareActivityPackage.kt'];
+      for (const fileName of nativeFiles) {
+        const srcPath = path.join(
+          config.modRequest.projectRoot,
+          'plugins',
+          'native',
+          fileName,
+        );
+        if (!fs.existsSync(srcPath)) {
+          throw new Error(
+            `withShareNative: 원본 파일을 찾을 수 없습니다: ${srcPath}`,
+          );
+        }
+        let content = fs.readFileSync(srcPath, 'utf-8');
+        content = content.replace(/\{\{PACKAGE_NAME\}\}/g, packageName);
+        const destPath = path.join(targetDir, fileName);
+        fs.writeFileSync(destPath, content);
+        console.log(
+          `withShareNative: ${fileName} 파일이 생성되었습니다: ${destPath}`,
+        );
+      }
+
+      return config;
+    },
+  ]);
+
+  // 2-2. MainApplication.kt에 ShareActivityPackage 등록
+  config = withDangerousMod(config, [
+    'android',
+    async (config) => {
+      const packageName = config.android?.package;
+      if (!packageName) {
+        throw new Error('withShareNative: android.package 설정이 필요합니다.');
+      }
+      const packagePath = packageName.split('.').join('/');
+      const mainAppPath = path.join(
+        config.modRequest.platformProjectRoot,
+        'app',
+        'src',
+        'main',
+        'java',
+        packagePath,
+        'MainApplication.kt',
+      );
+      if (!fs.existsSync(mainAppPath)) {
+        console.warn(
+          `withShareNative: MainApplication.kt를 찾을 수 없습니다 (prebuild 후 적용됨): ${mainAppPath}`,
+        );
+        return config;
+      }
+      let mainAppContent = fs.readFileSync(mainAppPath, 'utf-8');
+      const addPackageLine = 'add(ShareActivityPackage())';
+      if (mainAppContent.includes(addPackageLine)) {
+        return config;
+      }
+      // PackageList(this).packages.apply { ... } 블록 안에 add(ShareActivityPackage()) 추가
+      const applyBlockRegex = /(\.apply\s*\{\s*)(\/\/.*\n)?/;
+      const match = mainAppContent.match(applyBlockRegex);
+      if (match) {
+        const insert = `${match[1]}${match[2] || ''}    ${addPackageLine}\n`;
+        mainAppContent = mainAppContent.replace(applyBlockRegex, insert);
+        fs.writeFileSync(mainAppPath, mainAppContent);
+        console.log(
+          'withShareNative: MainApplication.kt에 ShareActivityPackage가 등록되었습니다.',
+        );
+      } else {
+        console.warn(
+          'withShareNative: getPackages().apply 블록을 찾을 수 없어 ShareActivityPackage를 추가하지 못했습니다.',
+        );
+      }
       return config;
     },
   ]);
@@ -128,8 +200,8 @@ module.exports = function withShareNative(config) {
           'android:theme': '@style/Theme.Share.Transparent', // 1단계에서 만든 투명 테마 적용
           'android:exported': 'true', // 외부 앱에서 호출 가능하도록 설정
           'android:excludeFromRecents': 'true', // 최근 사용 앱 목록에 표시 안 함
-          'android:taskAffinity': '', // 별도의 작업 단위로 분리
-          'android:launchMode': 'singleInstance', // 항상 독립적인 인스턴스로 실행
+          'android:launchMode': 'singleTask', // 항상 독립적인 인스턴스로 실행
+          'android:taskAffinity': '.shareintent',
           'android:configChanges':
             'orientation|screenSize|keyboard|keyboardHidden',
         },

@@ -44,6 +44,9 @@ export const sendAuthLoginToWeb = (
     return;
   }
   const message = { type: 'auth:login' as const, payload: { accessToken } };
+  if (__DEV__) {
+    console.log('[Bridge] 웹으로 응답 전송:', message);
+  }
   setTimeout(() => {
     webViewRef.current?.postMessage(JSON.stringify(message));
   }, 300);
