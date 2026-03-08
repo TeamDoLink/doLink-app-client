@@ -11,7 +11,8 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import useSyncLoginCookie from '@/src/hooks/useSyncLoginCookie';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import InboxBottomSheet from '@/src/components/InboxBottomSheet';
-import { TouchableOpacity, Text, BackHandler } from 'react-native';
+import { TouchableOpacity, Text } from 'react-native';
+import { closeShareOrExitApp } from '@/src/utils/closeShareOrExitApp';
 import PlusIcon from '@/src/assets/icons/common/plus.svg';
 import { ShareIntentData } from '@/src/types/shareIntent';
 import { ShareIntentProvider } from '@/src/components/SharedIntent';
@@ -32,11 +33,6 @@ export default function Inbox(props: ShareIntentData) {
   const navigationRef =
     useRef<NavigationContainerRef<AppInboxStackParamList>>(null);
 
-  const syncLogin = useSyncLoginCookie();
-  useEffect(() => {
-    syncLogin();
-  }, [syncLogin]);
-
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <StatusBar backgroundColor="transparent" />
@@ -49,7 +45,7 @@ export default function Inbox(props: ShareIntentData) {
                   steps={[40, 70, 100]}
                   initialStep={0}
                   onClose={() => {
-                    BackHandler.exitApp();
+                    closeShareOrExitApp(!!(props?.url ?? props?.text));
                   }}
                 >
                   <InboxBottomSheet.BottomSheet>

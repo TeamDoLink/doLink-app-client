@@ -1,7 +1,8 @@
 import { AppInboxStackScreenProps } from '../types';
 import { useState } from 'react';
 import InboxBottomSheet from '@/src/components/InboxBottomSheet';
-import { BackHandler, FlatList, View } from 'react-native';
+import { FlatList, View } from 'react-native';
+import { closeShareOrExitApp } from '@/src/utils/closeShareOrExitApp';
 import ArchiveSocialMediaListItem from '@/src/components/ArchiveSocialMediaListItem';
 import SearchInputField from '@/src/components/common/inputField/searchInputField';
 import Button from '@/src/components/common/Button';
@@ -39,7 +40,7 @@ export default function InboxScreen({
       },
       {
         onSuccess: () => {
-          BackHandler.exitApp();
+          closeShareOrExitApp(!!shareIntent);
         },
         onError: (error) => {
           console.error(error);

@@ -91,6 +91,14 @@ export default {
         },
       ],
       [
+        'expo-build-properties',
+        {
+          android: {
+            hardwareAccelerated: true,
+          },
+        },
+      ],
+      [
         '@dexical/expo-store-signing',
         {
           storeFile: path.resolve(
