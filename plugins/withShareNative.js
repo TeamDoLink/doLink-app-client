@@ -201,6 +201,7 @@ module.exports = function withShareNative(config) {
           'android:exported': 'true', // 외부 앱에서 호출 가능하도록 설정
           'android:excludeFromRecents': 'true', // 최근 사용 앱 목록에 표시 안 함
           'android:launchMode': 'singleTask', // 항상 독립적인 인스턴스로 실행
+          'android:taskAffinity': '.shareintent',
           'android:configChanges':
             'orientation|screenSize|keyboard|keyboardHidden',
         },

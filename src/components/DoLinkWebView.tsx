@@ -1,4 +1,4 @@
-import { useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { StyleSheet } from 'react-native';
 import WebView, { WebViewProps } from 'react-native-webview';
 import { WebViewNavigation } from 'react-native-webview/lib/WebViewTypes';
@@ -7,6 +7,7 @@ import useLoginHandler from '../hooks/useLoginHandler';
 import { useWebViewBridge } from '../hooks/useWebViewBridge';
 import { createDeeplinkMessage } from '../bridge';
 import { useLocalSearchParams } from 'expo-router';
+import { useAppState } from '../hooks/useAppState';
 
 interface DoLinkWebViewProps extends WebViewProps {
   /**
@@ -36,6 +37,8 @@ export default function DoLinkWebView({
   const { handleMessage } = useWebViewBridge(webViewRef);
   const { navStateHandler } = useWebViewBackHandler(webViewRef);
   const { onLoginNavigation } = useLoginHandler(webViewRef);
+  const appState = useAppState();
+
   const handleNavigationStateChange = (event: WebViewNavigation) => {
     navStateHandler(event);
     onNavigationStateChange?.(event);
@@ -53,6 +56,11 @@ export default function DoLinkWebView({
     );
     onNavigateSent?.();
   };
+
+  if (appState != 'active') {
+    return null;
+  }
+
   return (
     <WebView
       ref={webViewRef}
