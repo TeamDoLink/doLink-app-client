@@ -27,8 +27,10 @@ platform :android do
 
     upload_to_play_store(
       aab: aab_path,
-      json_key_file: File.join(__dir__, "credentials", "playstore.json"),
-      track: ENV.fetch("PLAY_STORE_TRACK", "internal")
+      package_name: "com.teamdolink.dolink",
+      json_key: File.join(__dir__, "fastlane", "credentials", "playstore.json"),
+      track: ENV.fetch("PLAY_STORE_TRACK", "internal"),
+      release_status: "draft"
     )
   end
 
