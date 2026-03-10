@@ -31,6 +31,7 @@ export default {
         foregroundImage: './assets/adaptive-icon.png',
         backgroundColor: '#ffffff',
       },
+      googleServicesFile: './google-services.json',
       edgeToEdgeEnabled: true,
       predictiveBackGestureEnabled: false,
       package: 'com.teamdolink.dolink',
@@ -99,6 +100,8 @@ export default {
           },
         },
       ],
+      '@react-native-firebase/app',
+      '@react-native-firebase/crashlytics',
       [
         '@dexical/expo-store-signing',
         {

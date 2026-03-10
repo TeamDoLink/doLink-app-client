@@ -1,4 +1,4 @@
-import { useRef, useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import {
   StatusBar,
   Platform,
@@ -7,12 +7,10 @@ import {
   KeyboardAvoidingView,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useLocalSearchParams } from 'expo-router';
 import * as Linking from 'expo-linking';
 import { config } from '@/src/utils/envConfig';
 import DebugButton from '@/src/components/DebugButton';
 import DoLinkWebView from '@/src/components/DoLinkWebView';
-import { useGetUser } from '@/src/api/generated/endpoints/user/user';
 // use React Native's built-in KeyboardAvoidingView
 
 /**

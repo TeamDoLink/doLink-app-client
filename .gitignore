@@ -46,3 +46,6 @@ fastlane/credentials/
 /android
 .claude
 .vscode
+
+
+google-services.json
