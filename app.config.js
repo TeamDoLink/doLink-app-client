@@ -2,6 +2,7 @@ import path from 'path';
 
 export default {
   expo: {
+    owner: 'dolinkcore',
     scheme: 'dolink',
     name: 'dolink',
     slug: 'dolink',
@@ -39,6 +40,11 @@ export default {
     },
     web: {
       favicon: './assets/favicon.png',
+    },
+    extra: {
+      eas: {
+        projectId: '0a769e3d-3c00-416a-8acb-4c676425c6c1',
+      },
     },
     plugins: [
       'expo-router',
