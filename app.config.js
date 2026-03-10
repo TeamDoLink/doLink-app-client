@@ -7,6 +7,7 @@ export default {
     name: 'dolink',
     slug: 'dolink',
     version: '1.0.0',
+    runtimeVersion: '1.0.0',
     orientation: 'portrait',
     icon: './assets/icon.png',
     userInterfaceStyle: 'light',
@@ -36,7 +37,7 @@ export default {
       edgeToEdgeEnabled: true,
       predictiveBackGestureEnabled: false,
       package: 'com.teamdolink.dolink',
-      versionCode: 2,
+      versionCode: 4,
     },
     web: {
       favicon: './assets/favicon.png',
@@ -45,6 +46,9 @@ export default {
       eas: {
         projectId: '0a769e3d-3c00-416a-8acb-4c676425c6c1',
       },
+    },
+    updates: {
+      url: 'https://u.expo.dev/0a769e3d-3c00-416a-8acb-4c676425c6c1',
     },
     plugins: [
       'expo-router',

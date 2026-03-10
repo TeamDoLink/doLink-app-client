@@ -15,7 +15,8 @@
     "build:android": "bundle exec fastlane build",
     "deploy": "bundle exec fastlane playstore",
     "build:deploy": "npm run prebuild && bundle exec fastlane build_and_deploy",
-    "prebuild": "expo prebuild --clean --platform android"
+    "prebuild": "expo prebuild --clean --platform android",
+    "ota": "eas update --channel production"
   },
   "lint-staged": {
     "*.{js,jsx,ts,tsx}": [
@@ -44,6 +45,7 @@
     "expo-share-extension": "^5.0.5",
     "expo-share-intent": "^5.1.1",
     "expo-status-bar": "~3.0.9",
+    "expo-updates": "~29.0.16",
     "nativewind": "^4.2.1",
     "react": "19.1.0",
     "react-dom": "19.1.0",
