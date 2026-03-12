@@ -81,6 +81,8 @@ export default function DoLinkWebView({
         'https://*',
         'http://*',
         'intent://*',
+        'https://app.dolink.team',
+        'https://api.dolink.team',
       ]}
       {...props}
     />

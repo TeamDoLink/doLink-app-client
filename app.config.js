@@ -37,7 +37,7 @@ export default {
       edgeToEdgeEnabled: true,
       predictiveBackGestureEnabled: false,
       package: 'com.teamdolink.dolink',
-      versionCode: 4,
+      versionCode: 5,
     },
     web: {
       favicon: './assets/favicon.png',
