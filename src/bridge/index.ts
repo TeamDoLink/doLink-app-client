@@ -146,7 +146,7 @@ export const handleBridgeMessage = async (
       return;
     }
 
-    if (type == 'auth:login') {
+    if (type === 'auth:login') {
       await authHandler('auth:login', {});
       const accessToken = useAuthStore.getState().accessToken;
       if (accessToken) {

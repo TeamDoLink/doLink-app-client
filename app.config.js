@@ -2,10 +2,12 @@ import path from 'path';
 
 export default {
   expo: {
+    owner: 'dolinkcore',
     scheme: 'dolink',
     name: 'dolink',
     slug: 'dolink',
     version: '1.0.0',
+    runtimeVersion: '1.0.0',
     orientation: 'portrait',
     icon: './assets/icon.png',
     userInterfaceStyle: 'light',
@@ -31,12 +33,22 @@ export default {
         foregroundImage: './assets/adaptive-icon.png',
         backgroundColor: '#ffffff',
       },
+      googleServicesFile: './google-services.json',
       edgeToEdgeEnabled: true,
       predictiveBackGestureEnabled: false,
       package: 'com.teamdolink.dolink',
+      versionCode: 5,
     },
     web: {
       favicon: './assets/favicon.png',
+    },
+    extra: {
+      eas: {
+        projectId: '0a769e3d-3c00-416a-8acb-4c676425c6c1',
+      },
+    },
+    updates: {
+      url: 'https://u.expo.dev/0a769e3d-3c00-416a-8acb-4c676425c6c1',
     },
     plugins: [
       'expo-router',
@@ -90,6 +102,16 @@ export default {
           ],
         },
       ],
+      [
+        'expo-build-properties',
+        {
+          android: {
+            hardwareAccelerated: true,
+          },
+        },
+      ],
+      '@react-native-firebase/app',
+      '@react-native-firebase/crashlytics',
       [
         '@dexical/expo-store-signing',
         {
