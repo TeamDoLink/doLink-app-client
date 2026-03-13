@@ -7,6 +7,7 @@ import {
   GestureResponderEvent,
 } from 'react-native';
 import { createContext, useContext, useRef, useState } from 'react';
+import colors from 'tailwindcss/colors';
 
 interface ContextType {
   isFocused: boolean;
@@ -77,7 +78,7 @@ const Input = ({ className, ...props }: RNTextInputProps) => {
     <RNTextInput
       className={`py-0 text-body-xs ${className}`}
       multiline
-      placeholderClassName="text-grey-500 text-body-xs"
+      placeholderTextColor={colors.gray[500]}
       ref={inputRef}
       onFocus={handleFocus}
       onBlur={handleBlur}

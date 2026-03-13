@@ -59,13 +59,15 @@ export default function InboxScreen({
     <InboxBottomSheet.Layout>
       <InboxBottomSheet.Content className="flex-1">
         <View className="px-5 pb-3">
-          <TextInput className="mb-5">
-            <TextInput.Input
-              placeholder="메모를 입력해보세요."
-              value={memo}
-              onChangeText={setMemo}
-            />
-          </TextInput>
+          {selectedCollectionId && (
+            <TextInput className="mb-5">
+              <TextInput.Input
+                placeholder="메모를 입력해보세요."
+                value={memo}
+                onChangeText={setMemo}
+              />
+            </TextInput>
+          )}
           <SearchInputField value={searchText} onChangeText={setSearchText} />
         </View>
         <FlatList
