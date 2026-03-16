@@ -149,9 +149,7 @@ export const handleBridgeMessage = async (
     if (type === 'auth:login') {
       await authHandler('auth:login', {});
       const accessToken = useAuthStore.getState().accessToken;
-      if (accessToken) {
-        sendAuthLoginToWeb(webViewRef, accessToken);
-      }
+      sendAuthLoginToWeb(webViewRef, accessToken);
       return;
     }
 

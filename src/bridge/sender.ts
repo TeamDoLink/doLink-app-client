@@ -37,7 +37,7 @@ export const sendToWebView = (
  */
 export const sendAuthLoginToWeb = (
   webViewRef: React.RefObject<WebView | null>,
-  accessToken: string,
+  accessToken?: string | null,
 ): void => {
   if (!webViewRef.current) {
     console.warn('[Bridge] WebView ref is not available');
