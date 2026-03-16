@@ -17,6 +17,7 @@ import PlusIcon from '@/src/assets/icons/common/plus.svg';
 import { ShareIntentData } from '@/src/types/shareIntent';
 import { ShareIntentProvider } from '@/src/components/SharedIntent';
 import { StatusBar } from 'expo-status-bar';
+import AuthGuard from './components/AuthGuard';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -39,70 +40,74 @@ export default function Inbox(props: ShareIntentData) {
       <SafeAreaProvider>
         <KeyboardProvider>
           <QueryClientProvider client={queryClient}>
-            <NavigationContainer ref={navigationRef}>
-              <ShareIntentProvider shareIntent={props}>
-                <InboxBottomSheet
-                  steps={[40, 70, 100]}
-                  initialStep={0}
-                  onClose={() => {
-                    closeShareOrExitApp(!!(props?.url ?? props?.text));
-                  }}
-                >
-                  <InboxBottomSheet.BottomSheet>
-                    <Stack.Navigator
-                      initialRouteName="Inbox"
-                      screenOptions={{
-                        headerShown: true,
-                        contentStyle: {
-                          backgroundColor: '#FFFFFF',
-                        },
-                        presentation: 'modal',
-                      }}
-                    >
-                      <Stack.Screen
-                        name="Inbox"
-                        options={{
-                          title: '할일 담기',
-                          header: (props) => (
-                            <InboxBottomSheet.Header
-                              title="할 일 담기"
-                              RightContent={
-                                <TouchableOpacity
-                                  activeOpacity={0.7}
-                                  onPress={() => {
-                                    props.navigation.navigate('AddCollection');
-                                  }}
-                                  className="flex-row items-center gap-0.5"
-                                >
-                                  <PlusIcon
-                                    width={16}
-                                    height={16}
-                                    color="#4E5968"
-                                  />
-                                  <Text className="text-caption-md text-grey-700">
-                                    모음 추가
-                                  </Text>
-                                </TouchableOpacity>
-                              }
-                            />
-                          ),
+            <AuthGuard>
+              <NavigationContainer ref={navigationRef}>
+                <ShareIntentProvider shareIntent={props}>
+                  <InboxBottomSheet
+                    steps={[40, 70, 100]}
+                    initialStep={0}
+                    onClose={() => {
+                      closeShareOrExitApp(!!(props?.url ?? props?.text));
+                    }}
+                  >
+                    <InboxBottomSheet.BottomSheet>
+                      <Stack.Navigator
+                        initialRouteName="Inbox"
+                        screenOptions={{
+                          headerShown: true,
+                          contentStyle: {
+                            backgroundColor: '#FFFFFF',
+                          },
+                          presentation: 'modal',
                         }}
-                        component={InboxScreen}
-                      />
-                      <Stack.Screen
-                        name="AddCollection"
-                        options={{
-                          header: () => (
-                            <InboxBottomSheet.Header title="모음 추가" />
-                          ),
-                        }}
-                        component={AddCollectionScreen}
-                      />
-                    </Stack.Navigator>
-                  </InboxBottomSheet.BottomSheet>
-                </InboxBottomSheet>
-              </ShareIntentProvider>
-            </NavigationContainer>
+                      >
+                        <Stack.Screen
+                          name="Inbox"
+                          options={{
+                            title: '할일 담기',
+                            header: (props) => (
+                              <InboxBottomSheet.Header
+                                title="할 일 담기"
+                                RightContent={
+                                  <TouchableOpacity
+                                    activeOpacity={0.7}
+                                    onPress={() => {
+                                      props.navigation.navigate(
+                                        'AddCollection',
+                                      );
+                                    }}
+                                    className="flex-row items-center gap-0.5"
+                                  >
+                                    <PlusIcon
+                                      width={16}
+                                      height={16}
+                                      color="#4E5968"
+                                    />
+                                    <Text className="text-caption-md text-grey-700">
+                                      모음 추가
+                                    </Text>
+                                  </TouchableOpacity>
+                                }
+                              />
+                            ),
+                          }}
+                          component={InboxScreen}
+                        />
+                        <Stack.Screen
+                          name="AddCollection"
+                          options={{
+                            header: () => (
+                              <InboxBottomSheet.Header title="모음 추가" />
+                            ),
+                          }}
+                          component={AddCollectionScreen}
+                        />
+                      </Stack.Navigator>
+                    </InboxBottomSheet.BottomSheet>
+                  </InboxBottomSheet>
+                </ShareIntentProvider>
+              </NavigationContainer>
+            </AuthGuard>
           </QueryClientProvider>
         </KeyboardProvider>
       </SafeAreaProvider>

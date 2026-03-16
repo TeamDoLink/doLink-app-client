@@ -1,12 +1,14 @@
 package {{PACKAGE_NAME}}
 
+import android.content.Intent
 import com.facebook.react.bridge.ReactApplicationContext
 import com.facebook.react.bridge.ReactContextBaseJavaModule
 import com.facebook.react.bridge.ReactMethod
 
 /**
- * ShareActivity만 finish() 하기 위한 네이티브 모듈.
- * 현재 Activity가 ShareActivity일 때만 finish()를 호출하여 프로세스는 유지한다.
+ * ShareActivity 관련 제어를 위한 네이티브 모듈.
+ * - ShareActivity만 finish() 하거나
+ * - MainActivity를 Intent로 띄우는 기능을 제공한다.
  */
 class ShareActivityModule(reactContext: ReactApplicationContext) :
     ReactContextBaseJavaModule(reactContext) {
@@ -15,7 +17,22 @@ class ShareActivityModule(reactContext: ReactApplicationContext) :
 
     @ReactMethod
     fun finishShareActivity() {
-        val activity = getReactApplicationContext().getCurrentActivity() ?: return
+        val activity = reactApplicationContext.currentActivity ?: return
         (activity as? ShareActivity)?.finish()
+    }
+
+    @ReactMethod
+    fun openMainApp() {
+        val activity = reactApplicationContext.currentActivity ?: return
+
+        val intent = Intent(activity, MainActivity::class.java).apply {
+            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP)
+        }
+
+        activity.startActivity(intent)
+
+        if (activity is ShareActivity) {
+            activity.finish()
+        }
     }
 }

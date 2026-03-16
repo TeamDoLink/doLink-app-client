@@ -22,6 +22,18 @@ class ShareActivity : ReactActivity() {
     // MainActivity의 'main' 대신 'share-intent' 컴포넌트 사용
     override fun getMainComponentName(): String = "share-intent"
 
+  /**
+   * ReactActivityDelegate.onUserLeaveHint() 내부 NPE를 피하기 위해 오버라이드.
+   *
+   * 공유 전용 투명 액티비티에서는 사용자 이탈(onUserLeaveHint) 이벤트를
+   * RN 쪽에 전달할 필요가 없고, ShareActivity를 finish() 하는 타이밍에
+   * ReactActivityDelegate가 아직 완전히 초기화되지 않아 NPE가 발생하는
+   * RN 버그가 존재하여 super 호출을 의도적으로 생략한다.
+   */
+  override fun onUserLeaveHint() {
+    // no-op: super.onUserLeaveHint()를 호출하지 않는다.
+  }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         // 투명 배경 설정
         window.setBackgroundDrawableResource(android.R.color.transparent)

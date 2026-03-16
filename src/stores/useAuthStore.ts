@@ -7,6 +7,7 @@ type AuthStoreState = {
   refreshToken: string | null;
   isAuthenticated: boolean;
   isAuthInitialized: boolean;
+  rehydrate: 'pending' | 'fulfilled' | 'rejected';
   setAccessToken: (token: string) => void;
   setRefreshToken: (token: string) => void;
   clearAuth: () => void;
@@ -20,6 +21,7 @@ const useAuthStore = create<AuthStoreState>()(
       refreshToken: null,
       isAuthenticated: false,
       isAuthInitialized: false,
+      rehydrate: 'pending',
       setAccessToken: (token: string) =>
         set({ accessToken: token, isAuthenticated: true }),
       setRefreshToken: (token: string) => set({ refreshToken: token }),
@@ -43,6 +45,13 @@ const useAuthStore = create<AuthStoreState>()(
           ...currentState,
           ...(persisted ?? {}),
           isAuthenticated: !!persisted?.accessToken,
+        };
+      },
+      onRehydrateStorage: () => {
+        return () => {
+          useAuthStore.setState({
+            rehydrate: 'fulfilled',
+          });
         };
       },
     },
