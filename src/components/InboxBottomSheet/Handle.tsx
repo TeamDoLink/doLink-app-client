@@ -1,7 +1,7 @@
 import { useWindowDimensions, View } from 'react-native';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import { useInboxBottomSheet } from './context';
-import { steps, useSharedValue } from 'react-native-reanimated';
+import { useSharedValue } from 'react-native-reanimated';
 import { scheduleOnRN } from 'react-native-worklets';
 import { getNearestStepIndex } from './utils';
 

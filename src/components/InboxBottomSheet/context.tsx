@@ -89,16 +89,18 @@ export const InboxBottomSheetProvider = ({
   if (!initialPercent) {
     throw new Error('initialStep is out of range');
   }
-  const initialHeight = (height * initialPercent) / 100;
+
+  const calculateHeight = (height * initialPercent) / 100;
+
+  const bottomSheetMaxHeight = useDerivedValue(() => {
+    return height - (top + bottom);
+  });
+  const initialHeight = Math.min(calculateHeight, bottomSheetMaxHeight.value);
 
   const bottomSheetHeight = useSharedValue<number>(initialHeight);
   const footerHeight = useSharedValue<number>(0);
   const handleHeight = useSharedValue<number>(0);
   const contentHeight = useSharedValue<number>(0);
-
-  const bottomSheetMaxHeight = useDerivedValue(() => {
-    return height - (top + bottom);
-  });
 
   const [step, setStep] = useState<number>(initialStep ?? 0);
 

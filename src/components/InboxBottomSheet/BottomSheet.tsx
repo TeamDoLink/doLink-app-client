@@ -1,11 +1,8 @@
-import Animated, { useDerivedValue } from 'react-native-reanimated';
+import Animated from 'react-native-reanimated';
 import Handle from './Handle';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { useWindowDimensions } from 'react-native';
 import { useInboxBottomSheet } from './context';
 import { useAnimatedStyle } from 'react-native-reanimated';
-import { interpolate } from 'react-native-reanimated';
-import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 
 interface BottomSheetProps {
   children: React.ReactNode;
