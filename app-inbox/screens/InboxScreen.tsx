@@ -11,6 +11,10 @@ import { useCreate } from '@/src/api/generated/endpoints/task/task';
 import { ApiResponseSliceCollectionResponse } from '@/src/api/generated/models';
 import { useShareIntent } from '@/src/components/SharedIntent';
 import TextInput from '@/src/components/common/inputField/TextInput';
+import { useLinkingURL } from 'expo-linking';
+import InboxLoading, { InboxLoadingProps } from '@/src/components/InboxLoading';
+import useReactQueryStatus from '@/src/components/InboxLoading/useRQLoadingStatus';
+import useRQLoadingStatus from '@/src/components/InboxLoading/useRQLoadingStatus';
 
 export default function InboxScreen({
   navigation,
@@ -18,17 +22,21 @@ export default function InboxScreen({
   const { data: collections } =
     useListAll1<ApiResponseSliceCollectionResponse>();
   const { shareIntent } = useShareIntent();
+
   const [selectedCollectionId, setSelectedCollectionId] = useState<
     number | null
   >(null);
   const [searchText, setSearchText] = useState('');
   const [memo, setMemo] = useState<string>('');
-  const { mutate: createTask } = useCreate();
+  const { mutate: createTask, status, reset } = useCreate();
+
+  const loadingStatus = useRQLoadingStatus(status);
 
   const handleAddTask = () => {
     if (!shareIntent?.text || !selectedCollectionId) {
       return;
     }
+
     createTask(
       {
         data: {
@@ -47,6 +55,10 @@ export default function InboxScreen({
         },
       },
     );
+  };
+
+  const handleLoadingPress = (status: InboxLoadingProps['status']) => {
+    reset();
   };
 
   const handleSelect = (collectionId?: number) => {
@@ -90,6 +102,7 @@ export default function InboxScreen({
           <Button.Text>할일 담기</Button.Text>
         </Button>
       </InboxBottomSheet.Footer>
+      <InboxLoading status={loadingStatus} onPress={handleLoadingPress} />
     </InboxBottomSheet.Layout>
   );
 }

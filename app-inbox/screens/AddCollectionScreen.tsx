@@ -8,6 +8,10 @@ import { CollectionCreateRequestCategory } from '@/src/api/generated/models/coll
 import { ArchiveCategory } from '@/src/constants/category';
 import { useInboxBottomSheet } from '@/src/components/InboxBottomSheet/context';
 import { useFocusEffect } from '@react-navigation/native';
+import InboxLoading, { InboxLoadingProps } from '@/src/components/InboxLoading';
+import useRQLoadingStatus from '@/src/components/InboxLoading/useRQLoadingStatus';
+import { useQueryClient } from '@tanstack/react-query';
+import { getListAllQueryKey } from '@/src/api/generated/endpoints/task/task';
 
 export default function AddCollectionScreen({
   navigation,
@@ -15,7 +19,9 @@ export default function AddCollectionScreen({
   const { setFitHeight } = useInboxBottomSheet();
   const [category, setCategory] = useState<ArchiveCategory | null>(null);
   const [name, setName] = useState('');
-  const { mutate: createCollect } = useCreateCollect();
+  const { mutate: createCollect, status, reset } = useCreateCollect();
+
+  const queryClient = useQueryClient();
 
   const handleAdd = () => {
     if (!category) return;
@@ -27,7 +33,10 @@ export default function AddCollectionScreen({
         },
       },
       {
-        onSuccess: () => navigation.goBack(),
+        onSuccess: () => {
+          queryClient.invalidateQueries({ queryKey: getListAllQueryKey() });
+          navigation.goBack();
+        },
         onError: (error) => console.error(error),
       },
     );
@@ -41,6 +50,12 @@ export default function AddCollectionScreen({
       return () => clearTimeout(timeout);
     }, []),
   );
+
+  const loadingStatus = useRQLoadingStatus(status);
+
+  const handleLoadingPress = (status: InboxLoadingProps['status']) => {
+    reset();
+  };
 
   return (
     <InboxBottomSheet.Layout>
@@ -58,6 +73,7 @@ export default function AddCollectionScreen({
           <Button.Text>추가</Button.Text>
         </Button>
       </InboxBottomSheet.Footer>
+      <InboxLoading status={loadingStatus} onPress={handleLoadingPress} />
     </InboxBottomSheet.Layout>
   );
 }

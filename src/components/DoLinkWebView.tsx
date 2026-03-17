@@ -37,7 +37,6 @@ export default function DoLinkWebView({
   const { handleMessage } = useWebViewBridge(webViewRef);
   const { navStateHandler } = useWebViewBackHandler(webViewRef);
   const { onLoginNavigation } = useLoginHandler(webViewRef);
-  const appState = useAppState();
 
   const handleNavigationStateChange = (event: WebViewNavigation) => {
     navStateHandler(event);
@@ -57,10 +56,6 @@ export default function DoLinkWebView({
     onNavigateSent?.();
   };
 
-  if (appState != 'active') {
-    return null;
-  }
-
   return (
     <WebView
       ref={webViewRef}
@@ -75,14 +70,14 @@ export default function DoLinkWebView({
       javaScriptEnabled
       domStorageEnabled
       originWhitelist={[
-        'http://localhost:8081',
-        'http://127.0.0.1:8081',
-        'http://10.0.2.2:8081',
-        'https://*',
-        'http://*',
-        'intent://*',
+        'http://localhost:3000',
+        'http://10.0.2.2:3000',
+        'http://localhost:8080',
+        'http://10.0.2.2:8080',
         'https://app.dolink.team',
         'https://api.dolink.team',
+        'https://kauth.kakao.com',
+        'https://accounts.kakao.com',
       ]}
       {...props}
     />

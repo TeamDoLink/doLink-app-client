@@ -1,4 +1,4 @@
-import { AppRegistry, Platform } from 'react-native';
+import { AppRegistry } from 'react-native';
 import './src/styles/global.css';
 import './src/lib/nativewind-setup';
 
@@ -16,8 +16,4 @@ if (process.env.EXPO_PUBLIC_DEBUG_INBOX === 'true') {
   renderRootComponent(App);
 }
 
-if (Platform.OS === 'android') {
-  AppRegistry.registerComponent('share-intent', () => Inbox);
-} else if (Platform.OS === 'ios') {
-  AppRegistry.registerComponent('shareExtension', () => Inbox);
-}
+AppRegistry.registerComponent('share-intent', () => Inbox);
