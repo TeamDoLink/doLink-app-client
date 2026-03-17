@@ -6,7 +6,7 @@ export default {
     scheme: 'dolink',
     name: 'dolink',
     slug: 'dolink',
-    version: '1.0.0',
+    version: '1.0.1',
     runtimeVersion: '1.0.0',
     orientation: 'portrait',
     icon: './assets/icon.png',
