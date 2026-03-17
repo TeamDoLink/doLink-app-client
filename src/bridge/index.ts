@@ -1,5 +1,7 @@
 import type WebView from 'react-native-webview';
 import { BackHandler, Platform } from 'react-native';
+import Constants from 'expo-constants';
+import * as Updates from 'expo-updates';
 import type {
   BridgeMessage,
   BridgeMessageType,
@@ -14,6 +16,7 @@ import type {
   SharePayload,
   OsSharePayload,
   AuthMessageType,
+  AppInfoPayload,
 } from './types';
 import type { AuthPayload } from './types';
 import {
@@ -86,6 +89,48 @@ const isNavigationMessage = (
   return type === 'navigate:back:exit';
 };
 
+const isAppInfoMessage = (type: BridgeMessageType): type is 'app:getInfo' => {
+  return type === 'app:getInfo';
+};
+
+const getAppInfoPayload = (): AppInfoPayload => {
+  // Expo SDK 런타임에서 안전한 fallback 체인
+  const expoConfigAny = Constants.expoConfig as unknown as
+    | { version?: unknown; runtimeVersion?: unknown }
+    | undefined;
+
+  const manifestAny =
+    (Constants.manifest as unknown as { version?: unknown }) ?? undefined;
+
+  const manifest2Any = Constants.manifest2 as unknown as
+    | {
+        extra?: {
+          expoClient?: { version?: unknown; runtimeVersion?: unknown };
+        };
+      }
+    | undefined;
+
+  const version =
+    (typeof expoConfigAny?.version === 'string' && expoConfigAny.version) ||
+    (typeof manifest2Any?.extra?.expoClient?.version === 'string' &&
+      manifest2Any.extra.expoClient.version) ||
+    (typeof manifestAny?.version === 'string' && manifestAny.version) ||
+    'unknown';
+
+  const updatesRuntime = (Updates as unknown as { runtimeVersion?: unknown })
+    ?.runtimeVersion;
+
+  const runtimeVersion =
+    (typeof updatesRuntime === 'string' && updatesRuntime) ||
+    (typeof expoConfigAny?.runtimeVersion === 'string' &&
+      expoConfigAny.runtimeVersion) ||
+    (typeof manifest2Any?.extra?.expoClient?.runtimeVersion === 'string' &&
+      manifest2Any.extra.expoClient.runtimeVersion) ||
+    'unknown';
+
+  return { version, runtimeVersion };
+};
+
 /**
  * WebView에서 받은 메시지를 처리하고 적절한 Handler로 라우팅
  */
@@ -150,6 +195,12 @@ export const handleBridgeMessage = async (
       await authHandler('auth:login', {});
       const accessToken = useAuthStore.getState().accessToken;
       sendAuthLoginToWeb(webViewRef, accessToken);
+      return;
+    }
+
+    if (isAppInfoMessage(type)) {
+      const appInfo = getAppInfoPayload();
+      sendToWebView(webViewRef, { type: 'app:info', payload: appInfo });
       return;
     }
 

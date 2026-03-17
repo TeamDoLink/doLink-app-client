@@ -52,6 +52,9 @@ export type NavigationMessageType = 'navigate:back:exit';
 // Deeplink 메시지 타입 (WebView → Native)
 export type DeeplinkMessageType = 'navigate:deeplink';
 
+// AppInfo 메시지 타입 (WebView → Native / Native → WebView)
+export type AppInfoMessageType = 'app:getInfo' | 'app:info';
+
 // 모든 메시지 타입
 export type BridgeMessageType =
   | DraftMessageType
@@ -61,7 +64,8 @@ export type BridgeMessageType =
   | OsShareMessageType
   | AuthMessageType
   | NavigationMessageType
-  | DeeplinkMessageType;
+  | DeeplinkMessageType
+  | AppInfoMessageType;
 
 // WebView → Native App 메시지
 export interface BridgeMessage<T = any> {
@@ -147,6 +151,16 @@ export interface AuthStatusMessage {
   };
 }
 
+export interface AppInfoPayload {
+  version: string;
+  runtimeVersion: string;
+}
+
+export interface AppInfoResponseMessage {
+  type: 'app:info';
+  payload: AppInfoPayload;
+}
+
 // Bridge 범용 에러 응답 (알 수 없는 메시지 타입 등)
 export interface BridgeErrorMessage {
   type: 'bridge:error';
@@ -161,6 +175,7 @@ export type BridgeResponse<T = any> =
   | LinkResponse
   | ShareResponse
   | OsShareResponse
+  | AppInfoResponseMessage
   | BridgeErrorMessage;
 
 // Handler 함수 타입
