@@ -6,8 +6,8 @@ export default {
     scheme: 'dolink',
     name: 'dolink',
     slug: 'dolink',
-    version: '1.0.1',
-    runtimeVersion: '1.0.0',
+    version: '1.0.2',
+    runtimeVersion: '1.0.1',
     orientation: 'portrait',
     icon: './assets/icon.png',
     userInterfaceStyle: 'light',
@@ -37,7 +37,21 @@ export default {
       edgeToEdgeEnabled: true,
       predictiveBackGestureEnabled: false,
       package: 'com.teamdolink.dolink',
-      versionCode: 7,
+      versionCode: 8,
+      intentFilters: [
+        {
+          action: 'VIEW',
+          autoVerify: true,
+          data: [
+            {
+              scheme: 'https',
+              host: 'app.dolink.team',
+              pathPrefix: '/',
+            },
+          ],
+          category: ['BROWSABLE', 'DEFAULT'],
+        },
+      ],
     },
     web: {
       favicon: './assets/favicon.png',

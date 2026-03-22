@@ -161,6 +161,16 @@ export interface AppInfoResponseMessage {
   payload: AppInfoPayload;
 }
 
+/** Native → WebView 키보드 표시 상태 (react-native-keyboard-controller 이벤트 기반) */
+export interface KeyboardStateMessage {
+  type: 'keyboard:state';
+  payload: {
+    visible: boolean;
+    height: number;
+    duration?: number;
+  };
+}
+
 // Bridge 범용 에러 응답 (알 수 없는 메시지 타입 등)
 export interface BridgeErrorMessage {
   type: 'bridge:error';
@@ -176,6 +186,7 @@ export type BridgeResponse<T = any> =
   | ShareResponse
   | OsShareResponse
   | AppInfoResponseMessage
+  | KeyboardStateMessage
   | BridgeErrorMessage;
 
 // Handler 함수 타입

@@ -1,13 +1,13 @@
-import { useEffect, useRef, useState } from 'react';
+import { useRef } from 'react';
 import { StyleSheet } from 'react-native';
 import WebView, { WebViewProps } from 'react-native-webview';
 import { WebViewNavigation } from 'react-native-webview/lib/WebViewTypes';
 import useWebViewBackHandler from '../hooks/useWebViewBackHandler';
 import useLoginHandler from '../hooks/useLoginHandler';
 import { useWebViewBridge } from '../hooks/useWebViewBridge';
+import { useKeyboardWebViewBridge } from '../hooks/useKeyboardWebViewBridge';
 import { createDeeplinkMessage } from '../bridge';
 import { useLocalSearchParams } from 'expo-router';
-import { useAppState } from '../hooks/useAppState';
 
 interface DoLinkWebViewProps extends WebViewProps {
   /**
@@ -56,6 +56,8 @@ export default function DoLinkWebView({
     onNavigateSent?.();
   };
 
+  useKeyboardWebViewBridge(webViewRef);
+
   return (
     <WebView
       ref={webViewRef}
@@ -78,6 +80,7 @@ export default function DoLinkWebView({
         'https://api.dolink.team',
         'https://kauth.kakao.com',
         'https://accounts.kakao.com',
+        'http://img1.kakaocdn.net',
       ]}
       {...props}
     />
