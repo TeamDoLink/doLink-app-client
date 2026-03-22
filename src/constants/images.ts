@@ -1,3 +1,5 @@
+import type { FC } from 'react';
+
 // Category Editor Icons
 import CareerSelected from '@/assets/icons/category/editor/career-selected.svg';
 import CareerUnselected from '@/assets/icons/category/editor/career-unselected.svg';
@@ -20,9 +22,9 @@ import TipsUnselected from '@/assets/icons/category/editor/tips-unselected.svg';
 import TravelSelected from '@/assets/icons/category/editor/travel-selected.svg';
 import TravelUnselected from '@/assets/icons/category/editor/travel-unselected.svg';
 
-import { ArchiveCategory } from './category';
+import { ArchiveCategory, ARCHIVE_CATEGORY_EDITOR_KEYS } from './category';
 
-type SvgComponent = React.FC<{ width?: number; height?: number }>;
+type SvgComponent = FC<{ width?: number; height?: number }>;
 
 export const CategoryEditorIconImage: Record<
   ArchiveCategory,
@@ -69,3 +71,12 @@ export const CategoryEditorIconImage: Record<
     unselected: EtcUnselected,
   },
 } as const;
+
+/** doLink-web `archiveSelect.tsx` CATEGORY_ITEMS와 동일한 키 순서 + RN SVG 컴포넌트 */
+export const ARCHIVE_CATEGORY_EDITOR_ITEMS = ARCHIVE_CATEGORY_EDITOR_KEYS.map(
+  (key) => ({
+    key,
+    selected: CategoryEditorIconImage[key].selected,
+    unselected: CategoryEditorIconImage[key].unselected,
+  }),
+);
