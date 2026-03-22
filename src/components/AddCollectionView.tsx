@@ -6,8 +6,8 @@
  */
 import { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity } from 'react-native';
+import { ARCHIVE_CATEGORY_EDITOR_ITEMS } from '../constants/archiveCategoryEditor';
 import { ArchiveCategory, ARCHIVE_CATEGORY_LABEL } from '../constants/category';
-import { ARCHIVE_CATEGORY_EDITOR_ITEMS } from '../constants/images';
 
 /** doLink-web `archiveSelect` grid-cols-5 와 동일하게 한 줄에 5개 */
 const CATEGORY_ROW_SIZE = 5;
