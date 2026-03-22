@@ -27,3 +27,20 @@ export const ARCHIVE_CATEGORY_LABEL: Record<ArchiveCategoryKey, string> = {
   tips: '꿀팁',
   etc: '기타',
 } as const;
+
+/**
+ * 모음 추가/수정 에디터에서의 카테고리 표시 순서.
+ * doLink-web `archiveSelect.tsx`의 CATEGORY_ITEMS와 동일해야 합니다.
+ */
+export const ARCHIVE_CATEGORY_EDITOR_KEYS = [
+  'restaurant',
+  'hobby',
+  'travel',
+  'money',
+  'shopping',
+  'exercise',
+  'career',
+  'study',
+  'tips',
+  'etc',
+] as const satisfies readonly ArchiveCategory[];

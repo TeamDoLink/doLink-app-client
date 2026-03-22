@@ -5,30 +5,23 @@
  * - 모음 이름 입력 및 카테고리 선택 기능
  */
 import { useState } from 'react';
-import {
-  View,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  ScrollView,
-} from 'react-native';
-import BackIcon from '@/src/assets/icons/common/back.svg';
+import { View, Text, TextInput, TouchableOpacity } from 'react-native';
 import { ArchiveCategory, ARCHIVE_CATEGORY_LABEL } from '../constants/category';
-import { CategoryEditorIconImage } from '../constants/images';
+import { ARCHIVE_CATEGORY_EDITOR_ITEMS } from '../constants/images';
 
-/** 카테고리 목록 (표시 순서) */
-const CATEGORY_ORDER: ArchiveCategory[] = [
-  'restaurant',
-  'hobby',
-  'travel',
-  'money',
-  'shopping',
-  'exercise',
-  'career',
-  'study',
-  'tips',
-  'etc',
-];
+/** doLink-web `archiveSelect` grid-cols-5 와 동일하게 한 줄에 5개 */
+const CATEGORY_ROW_SIZE = 5;
+
+const CATEGORY_ROWS = Array.from(
+  {
+    length: Math.ceil(ARCHIVE_CATEGORY_EDITOR_ITEMS.length / CATEGORY_ROW_SIZE),
+  },
+  (_, rowIndex) =>
+    ARCHIVE_CATEGORY_EDITOR_ITEMS.slice(
+      rowIndex * CATEGORY_ROW_SIZE,
+      rowIndex * CATEGORY_ROW_SIZE + CATEGORY_ROW_SIZE,
+    ),
+);
 
 /** Props 타입 정의 */
 interface AddCollectionViewProps {
@@ -121,29 +114,21 @@ export default function AddCollectionView({
             카테고리
           </Text>
 
-          {/* 첫 번째 줄: 맛집, 취미, 여행, 재테크, 쇼핑 */}
-          <View className="mb-4 flex-row justify-between">
-            {CATEGORY_ORDER.slice(0, 5).map((categoryId) => (
-              <CategoryButton
-                key={categoryId}
-                categoryId={categoryId}
-                isSelected={selectedCategory === categoryId}
-                onPress={() => handleCategorySelect(categoryId)}
-              />
-            ))}
-          </View>
-
-          {/* 두 번째 줄: 운동, 커리어, 자기계발, 꿀팁, 기타 */}
-          <View className="flex-row justify-between">
-            {CATEGORY_ORDER.slice(5, 10).map((categoryId) => (
-              <CategoryButton
-                key={categoryId}
-                categoryId={categoryId}
-                isSelected={selectedCategory === categoryId}
-                onPress={() => handleCategorySelect(categoryId)}
-              />
-            ))}
-          </View>
+          {CATEGORY_ROWS.map((row, rowIndex) => (
+            <View
+              key={rowIndex}
+              className={`flex-row justify-between ${rowIndex < CATEGORY_ROWS.length - 1 ? 'mb-6' : ''}`}
+            >
+              {row.map((item) => (
+                <CategoryButton
+                  key={item.key}
+                  item={item}
+                  isSelected={selectedCategory === item.key}
+                  onPress={() => handleCategorySelect(item.key)}
+                />
+              ))}
+            </View>
+          ))}
         </View>
       </View>
 
@@ -172,21 +157,18 @@ export default function AddCollectionView({
   );
 }
 
+type ArchiveCategoryEditorItem = (typeof ARCHIVE_CATEGORY_EDITOR_ITEMS)[number];
+
 /** 카테고리 버튼 컴포넌트 */
 interface CategoryButtonProps {
-  categoryId: ArchiveCategory;
+  item: ArchiveCategoryEditorItem;
   isSelected: boolean;
   onPress: () => void;
 }
 
-function CategoryButton({
-  categoryId,
-  isSelected,
-  onPress,
-}: CategoryButtonProps) {
-  const icons = CategoryEditorIconImage[categoryId];
-  const Icon = isSelected ? icons.selected : icons.unselected;
-  const label = ARCHIVE_CATEGORY_LABEL[categoryId];
+function CategoryButton({ item, isSelected, onPress }: CategoryButtonProps) {
+  const Icon = isSelected ? item.selected : item.unselected;
+  const label = ARCHIVE_CATEGORY_LABEL[item.key];
 
   return (
     <TouchableOpacity

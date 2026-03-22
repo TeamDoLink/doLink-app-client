@@ -8,7 +8,10 @@ import {
   useCreateCollect,
 } from '@/src/api/generated/endpoints/collection/collection';
 import { CollectionCreateRequestCategory } from '@/src/api/generated/models/collectionCreateRequestCategory';
-import { ArchiveCategory } from '@/src/constants/category';
+import {
+  ArchiveCategory,
+  ARCHIVE_CATEGORY_LABEL,
+} from '@/src/constants/category';
 import { useInboxBottomSheet } from '@/src/components/InboxBottomSheet/context';
 import { useFocusEffect } from '@react-navigation/native';
 import InboxLoading, { InboxLoadingProps } from '@/src/components/InboxLoading';
@@ -32,7 +35,9 @@ export default function AddCollectionScreen({
       {
         data: {
           name: name,
-          category: category as CollectionCreateRequestCategory,
+          category: ARCHIVE_CATEGORY_LABEL[
+            category
+          ] as CollectionCreateRequestCategory,
         },
       },
       {
