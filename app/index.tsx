@@ -1,32 +1,10 @@
 import { useState, useEffect, useMemo } from 'react';
-import {
-  StatusBar,
-  Platform,
-  StyleSheet,
-  Keyboard,
-  KeyboardAvoidingView,
-} from 'react-native';
+import { StatusBar, Platform, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import * as Linking from 'expo-linking';
 import { config } from '@/src/utils/envConfig';
 import DebugButton from '@/src/components/DebugButton';
 import DoLinkWebView from '@/src/components/DoLinkWebView';
-// use React Native's built-in KeyboardAvoidingView
-
-/**
- * 딥링크 URL에서 웹 경로 추출
- * @param url 딥링크 URL (예: dolink://task/detail/123)
- * @returns 웹 경로 (예: /task/detail/123) 또는 null
- */
-const parseDeepLinkPath = (url: string | null): string | null => {
-  if (!url) return null;
-
-  const { path } = Linking.parse(url);
-  if (path?.startsWith('task/detail/')) {
-    return `/${path}`;
-  }
-  return null;
-};
+import { KeyboardAvoidingView } from 'react-native-keyboard-controller';
 
 export default function Index() {
   const domain = config.domain;
@@ -38,52 +16,14 @@ export default function Index() {
     return `${normalizedDomain}/`;
   }, [domain]);
 
-  const [currentUrl, setCurrentUrl] = useState(rootWebUrl);
-  const [keyboardVisible, setKeyboardVisible] = useState(false);
-  const isTaskForm = /\/task\/(edit|create)/.test(currentUrl);
-  const needsKeyboardAvoiding = isTaskForm && keyboardVisible;
-
-  useEffect(() => {
-    const showSub = Keyboard.addListener('keyboardDidShow', () =>
-      setKeyboardVisible(true),
-    );
-    const hideSub = Keyboard.addListener('keyboardDidHide', () =>
-      setKeyboardVisible(false),
-    );
-    return () => {
-      showSub.remove();
-      hideSub.remove();
-    };
-  }, []);
-
-  // When navigating away from task edit/create, ensure keyboard is dismissed
-  useEffect(() => {
-    if (!isTaskForm) {
-      Keyboard.dismiss();
-    }
-  }, [currentUrl, isTaskForm]);
-
-  useEffect(() => {
-    console.log('🌐 WebView Loading URL:', rootWebUrl);
-    console.log('📱 Platform:', Platform.OS);
-    console.log('🏠 Domain:', domain);
-  }, [rootWebUrl, domain]);
-
   return (
     <SafeAreaView
       style={{ flex: 1, backgroundColor: '#ffffff' }}
       edges={Platform.OS === 'ios' ? ['top'] : ['top', 'bottom']}
     >
       <StatusBar barStyle="dark-content" backgroundColor="#ffffff" />
-      <KeyboardAvoidingView
-        style={{ flex: 1 }}
-        behavior="padding"
-        enabled={needsKeyboardAvoiding}
-      >
-        <DoLinkWebView
-          source={{ uri: rootWebUrl }}
-          onNavigationStateChange={(e) => setCurrentUrl(e.url)}
-        />
+      <KeyboardAvoidingView behavior="padding" className="flex-1">
+        <DoLinkWebView source={{ uri: rootWebUrl }} />
       </KeyboardAvoidingView>
       <DebugButton />
     </SafeAreaView>

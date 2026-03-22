@@ -14,6 +14,7 @@ import type {
   BridgeErrorMessage,
   NavigationBackMessage,
   DeeplinkMessage,
+  KeyboardStateMessage,
 } from './types';
 
 /**
@@ -141,4 +142,13 @@ export const createNavigationBackMessage = (): NavigationBackMessage => ({
 export const createDeeplinkMessage = (path: string): DeeplinkMessage => ({
   type: 'navigate:deeplink',
   payload: { path },
+});
+
+export const createKeyboardStateMessage = (
+  visible: boolean,
+  height: number,
+  duration?: number,
+): KeyboardStateMessage => ({
+  type: 'keyboard:state',
+  payload: { visible, height, ...(duration !== undefined ? { duration } : {}) },
 });

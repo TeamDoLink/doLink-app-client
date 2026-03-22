@@ -7,18 +7,22 @@ import {
   useState,
 } from 'react';
 import {
+  interpolate,
   SharedValue,
+  useAnimatedReaction,
   useDerivedValue,
   useSharedValue,
   withSpring,
 } from 'react-native-reanimated';
 import {
+  useKeyboardHandler,
   useKeyboardState,
   useReanimatedKeyboardAnimation,
 } from 'react-native-keyboard-controller';
 import { useWindowDimensions } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { PortalProvider } from '../Portal';
+import { runOnJS, scheduleOnRN } from 'react-native-worklets';
 
 interface InboxBottomSheetContextType {
   // %단위의 높이로, 가장 가까운 step으로 이동합니다
@@ -82,8 +86,6 @@ export const InboxBottomSheetProvider = ({
 }: InboxBottomSheetProviderProps) => {
   const { height } = useWindowDimensions();
   const { top, bottom } = useSafeAreaInsets();
-  const keyboardState = useKeyboardState();
-  const { height: keyboardHeight } = useReanimatedKeyboardAnimation();
 
   const initialPercent = steps.at(initialStep ?? 0);
   if (!initialPercent) {
@@ -92,23 +94,27 @@ export const InboxBottomSheetProvider = ({
 
   const calculateHeight = (height * initialPercent) / 100;
 
-  const bottomSheetMaxHeight = useDerivedValue(() => {
-    return height - (top + bottom);
-  });
-  const initialHeight = Math.min(calculateHeight, bottomSheetMaxHeight.value);
-
-  const bottomSheetHeight = useSharedValue<number>(initialHeight);
   const footerHeight = useSharedValue<number>(0);
   const handleHeight = useSharedValue<number>(0);
   const contentHeight = useSharedValue<number>(0);
 
+  const bottomSheetMaxHeight = useDerivedValue(() => {
+    return height - (top + bottom) - footerHeight.value - handleHeight.value;
+  });
+  const initialHeight = Math.min(calculateHeight, bottomSheetMaxHeight.value);
+
+  const bottomSheetHeight = useSharedValue<number>(initialHeight);
+
   const [step, setStep] = useState<number>(initialStep ?? 0);
 
-  const handleStepChange = (step: number) => {
-    bottomSheetHeight.value = withSpring(
-      bottomSheetMaxHeight.value * (steps[step] / 100) - footerHeight.value ||
-        0,
+  const calculateStepHeight = (step: number) => {
+    return (
+      bottomSheetMaxHeight.value * (steps[step] / 100) - footerHeight.value || 0
     );
+  };
+
+  const handleStepChange = (step: number) => {
+    bottomSheetHeight.value = withSpring(calculateStepHeight(step) || 0);
     setStep(step);
   };
 
@@ -118,11 +124,25 @@ export const InboxBottomSheetProvider = ({
     );
   }, []);
 
-  useEffect(() => {
-    if (keyboardState.isVisible) {
-      handleStepChange(steps.length - 1);
-    }
-  }, [keyboardState.isVisible]);
+  const { progress } = useReanimatedKeyboardAnimation();
+
+  // 키보드가 열릴때 바텀시트의 높이를 최대 높이로 변경합니다
+  // 키보드가 열리는 변화량에 따라 바텀시트도 동일한 속도로 높이를 변경합니다
+  // useAnimatedReaction(
+  //   () => progress.value,
+  //   (progress) => {
+  //     bottomSheetHeight.value = interpolate(progress, [0, 1], [bottomSheetHeight.value, bottomSheetMaxHeight.value]);
+  //   }
+  // )
+
+  useKeyboardHandler({
+    onStart: (e) => {
+      'worklet';
+      if (e.progress === 1) {
+        bottomSheetHeight.value = withSpring(bottomSheetMaxHeight.value);
+      }
+    },
+  });
 
   return (
     <InboxBottomSheetContext.Provider
