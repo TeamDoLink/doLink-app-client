@@ -3,7 +3,10 @@ import { AppInboxAddCollectionStackScreenProps } from '../types';
 import InboxBottomSheet from '@/src/components/InboxBottomSheet';
 import Button from '@/src/components/common/Button';
 import AddCollectionView from '@/src/components/AddCollectionView';
-import { useCreateCollect } from '@/src/api/generated/endpoints/collection/collection';
+import {
+  getListAll1QueryKey,
+  useCreateCollect,
+} from '@/src/api/generated/endpoints/collection/collection';
 import { CollectionCreateRequestCategory } from '@/src/api/generated/models/collectionCreateRequestCategory';
 import { ArchiveCategory } from '@/src/constants/category';
 import { useInboxBottomSheet } from '@/src/components/InboxBottomSheet/context';
@@ -34,7 +37,7 @@ export default function AddCollectionScreen({
       },
       {
         onSuccess: () => {
-          queryClient.invalidateQueries({ queryKey: getListAllQueryKey() });
+          queryClient.invalidateQueries({ queryKey: getListAll1QueryKey() });
           navigation.goBack();
         },
         onError: (error) => console.error(error),
