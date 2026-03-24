@@ -6,7 +6,7 @@ export default {
     scheme: 'dolink',
     name: 'dolink',
     slug: 'dolink',
-    version: '1.0.2',
+    version: '1.0.3',
     runtimeVersion: '1.0.1',
     orientation: 'portrait',
     icon: './assets/icon.png',
@@ -37,7 +37,7 @@ export default {
       edgeToEdgeEnabled: true,
       predictiveBackGestureEnabled: false,
       package: 'com.teamdolink.dolink',
-      versionCode: 8,
+      versionCode: 9,
       intentFilters: [
         {
           action: 'VIEW',
@@ -126,18 +126,18 @@ export default {
       ],
       '@react-native-firebase/app',
       '@react-native-firebase/crashlytics',
-      [
-        '@dexical/expo-store-signing',
-        {
-          storeFile: path.resolve(
-            __dirname,
-            './fastlane/credentials/dolink.keystore',
-          ),
-          storePassword: process.env.ANDROID_KEYSTORE_PASSWORD,
-          keyAlias: process.env.ANDROID_KEY_ALIAS,
-          keyPassword: process.env.ANDROID_KEY_PASSWORD,
-        },
-      ],
+      // [
+      //   '@dexical/expo-store-signing',
+      //   {
+      //     storeFile: path.resolve(
+      //       __dirname,
+      //       './fastlane/credentials/dolink.keystore',
+      //     ),
+      //     storePassword: process.env.ANDROID_KEYSTORE_PASSWORD,
+      //     keyAlias: process.env.ANDROID_KEY_ALIAS,
+      //     keyPassword: process.env.ANDROID_KEY_PASSWORD,
+      //   },
+      // ],
     ],
   },
 };

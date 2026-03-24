@@ -120,6 +120,34 @@ Feat: 메인 UI 레이아웃 구현
 - 프로덕션 서버 자동 배포
 - 실제 운영 환경
 
+## Android 배포 자동화 (Fastlane)
+
+`doLink-app-client/.github/workflows/ios-testflight-fastlane.yml` 워크플로우는 `release-*` 형식 태그가 푸시될 때 Fastlane으로 Android AAB를 빌드하고 Play Store에 배포합니다.
+
+예시 태그:
+
+```bash
+git tag release-1.0.4
+git push origin release-1.0.4
+```
+
+### GitHub Actions Secrets 설정
+
+- `PLAY_STORE_SERVICE_ACCOUNT_JSON`: Google Play 서비스 계정 JSON 전체 문자열
+- `PLAY_STORE_TRACK`: 배포 트랙 (`internal`, `alpha`, `beta`, `production`)
+- `ANDROID_KEYSTORE_PASSWORD`: Android 키스토어 비밀번호
+- `ANDROID_KEY_ALIAS`: Android 키 별칭
+- `ANDROID_KEY_PASSWORD`: Android 키 비밀번호
+
+### 로컬 검증 명령
+
+```bash
+cd doLink-app-client
+bundle install
+npm ci
+bundle exec fastlane android build_and_deploy
+```
+
 ## 머지 전략
 
 **Merge Commit 방식 사용**

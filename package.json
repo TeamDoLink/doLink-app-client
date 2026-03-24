@@ -16,7 +16,9 @@
     "deploy": "bundle exec fastlane playstore",
     "build:deploy": "npm run prebuild && bundle exec fastlane build_and_deploy",
     "prebuild": "expo prebuild --clean --platform android",
-    "ota": "eas update --channel production"
+    "ota": "eas update --channel production",
+    "certs:ios": "bundle exec fastlane ios certificates",
+    "deploy:ios": "bundle exec fastlane ios deploy_testflight"
   },
   "lint-staged": {
     "*.{js,jsx,ts,tsx}": [

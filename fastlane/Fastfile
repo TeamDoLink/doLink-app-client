@@ -10,6 +10,8 @@ default_platform(:android)
 platform :android do
   desc "Build Android AAB (release)"
   lane :build do
+    bump_android_build_version
+
     gradle(
       project_dir: File.join(project_root, "android"),
       task: "bundleRelease",
@@ -24,14 +26,23 @@ platform :android do
   lane :playstore do
     aab_path = resolve_aab_path
     UI.message("Uploading AAB: #{aab_path}")
+    playstore_key_path = File.expand_path("credentials/playstore.json", __dir__)
 
-    upload_to_play_store(
+    options = {
       aab: aab_path,
       package_name: "com.teamdolink.dolink",
-      json_key: File.join(__dir__, "fastlane", "credentials", "playstore.json"),
       track: ENV.fetch("PLAY_STORE_TRACK", "internal"),
       release_status: "draft"
-    )
+    }
+
+    if ENV["PLAY_STORE_SERVICE_ACCOUNT_JSON"] && !ENV["PLAY_STORE_SERVICE_ACCOUNT_JSON"].empty?
+      options[:json_key_data] = ENV["PLAY_STORE_SERVICE_ACCOUNT_JSON"]
+    else
+      UI.user_error!("Play service account file missing: #{playstore_key_path}") unless File.exist?(playstore_key_path)
+      options[:json_key] = playstore_key_path
+    end
+
+    upload_to_play_store(options)
   end
 
   desc "Build and upload to Play Store"
@@ -63,6 +74,86 @@ def resolve_aab_path
   else
     UI.user_error!(
       "AAB file not found. Set AAB_PATH or place .aab in ./build/ or project root."
+    )
+  end
+end
+
+def bump_android_build_version
+  app_config_path = File.join(project_root, "app.config.js")
+  content = File.read(app_config_path)
+
+  version_code_pattern = /versionCode:\s*(\d+)/
+  version_code_match = content.match(version_code_pattern)
+  UI.user_error!("versionCode not found in app.config.js") unless version_code_match
+
+  current_version_code = version_code_match[1].to_i
+  next_version_code = current_version_code + 1
+  updated = content.sub(version_code_pattern, "versionCode: #{next_version_code}")
+
+  if ENV["RELEASE_TAG"] && ENV["RELEASE_TAG"].start_with?("release-")
+    release_version = ENV["RELEASE_TAG"].sub(/^release-/, "")
+    updated = updated.sub(/version:\s*'[^']*'/, "version: '#{release_version}'")
+    UI.message("Updated app version to #{release_version} from RELEASE_TAG")
+  end
+
+  File.write(app_config_path, updated)
+  UI.message("Bumped Android versionCode: #{current_version_code} -> #{next_version_code}")
+end
+
+platform :ios do
+  desc "Sync iOS certificates/profiles with match"
+  lane :certificates do
+    sync_code_signing(
+      type: ENV.fetch("MATCH_TYPE", "appstore"),
+      readonly: ENV.fetch("MATCH_READONLY", "true") == "true",
+      app_identifier: ENV.fetch("IOS_APP_IDENTIFIER", "com.teamdolink.dolink"),
+      git_url: ENV.fetch("MATCH_GIT_URL")
+    )
+  end
+
+  desc "Build iOS app and upload to TestFlight"
+  lane :deploy_testflight do
+    ensure_env_vars(
+      env_vars: %w[
+        APP_STORE_CONNECT_API_KEY_KEY_ID
+        APP_STORE_CONNECT_API_KEY_ISSUER_ID
+        APP_STORE_CONNECT_API_KEY_CONTENT
+        MATCH_GIT_URL
+        MATCH_PASSWORD
+        IOS_SCHEME
+      ]
+    )
+
+    setup_ci if ENV["CI"]
+
+    # Expo managed workflow projects do not include native folders in git.
+    # Re-generate ios/ before running match + build.
+    sh("npx expo prebuild --platform ios --non-interactive")
+
+    certificates
+
+    api_key = app_store_connect_api_key(
+      key_id: ENV["APP_STORE_CONNECT_API_KEY_KEY_ID"],
+      issuer_id: ENV["APP_STORE_CONNECT_API_KEY_ISSUER_ID"],
+      key_content: ENV["APP_STORE_CONNECT_API_KEY_CONTENT"],
+      is_key_content_base64: true
+    )
+
+    workspace_path = Dir.glob(File.join(project_root, "ios", "*.xcworkspace")).first
+    scheme = ENV.fetch("IOS_SCHEME")
+
+    UI.user_error!("No iOS workspace found under ./ios. Check Expo prebuild output.") unless workspace_path
+
+    build_app(
+      workspace: workspace_path,
+      scheme: scheme,
+      export_method: "app-store",
+      clean: true
+    )
+
+    upload_to_testflight(
+      api_key: api_key,
+      skip_waiting_for_build_processing: true
     )
   end
 end

@@ -1,0 +1,9 @@
+git_url(ENV["MATCH_GIT_URL"])
+
+storage_mode("git")
+type(ENV.fetch("MATCH_TYPE", "appstore"))
+
+app_identifier([ENV.fetch("IOS_APP_IDENTIFIER", "com.teamdolink.dolink")])
+username(ENV["FASTLANE_USER"]) if ENV["FASTLANE_USER"]
+
+readonly(ENV.fetch("MATCH_READONLY", "true") == "true")

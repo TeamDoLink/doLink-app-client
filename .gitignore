@@ -47,5 +47,5 @@ fastlane/credentials/
 .claude
 .vscode
 
-
 google-services.json
+debug.keystore
