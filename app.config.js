@@ -126,18 +126,18 @@ export default {
       ],
       '@react-native-firebase/app',
       '@react-native-firebase/crashlytics',
-      // [
-      //   '@dexical/expo-store-signing',
-      //   {
-      //     storeFile: path.resolve(
-      //       __dirname,
-      //       './fastlane/credentials/dolink.keystore',
-      //     ),
-      //     storePassword: process.env.ANDROID_KEYSTORE_PASSWORD,
-      //     keyAlias: process.env.ANDROID_KEY_ALIAS,
-      //     keyPassword: process.env.ANDROID_KEY_PASSWORD,
-      //   },
-      // ],
+      [
+        '@dexical/expo-store-signing',
+        {
+          storeFile: path.resolve(
+            __dirname,
+            './fastlane/credentials/dolink.keystore',
+          ),
+          storePassword: process.env.ANDROID_KEYSTORE_PASSWORD,
+          keyAlias: process.env.ANDROID_KEY_ALIAS,
+          keyPassword: process.env.ANDROID_KEY_PASSWORD,
+        },
+      ],
     ],
   },
 };
