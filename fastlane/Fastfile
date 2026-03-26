@@ -10,7 +10,7 @@ default_platform(:android)
 platform :android do
   desc "Build Android AAB (release)"
   lane :build do
-    bump_android_build_version
+    
 
     gradle(
       project_dir: File.join(project_root, "android"),
@@ -76,28 +76,6 @@ def resolve_aab_path
       "AAB file not found. Set AAB_PATH or place .aab in ./build/ or project root."
     )
   end
-end
-
-def bump_android_build_version
-  app_config_path = File.join(project_root, "app.config.js")
-  content = File.read(app_config_path)
-
-  version_code_pattern = /versionCode:\s*(\d+)/
-  version_code_match = content.match(version_code_pattern)
-  UI.user_error!("versionCode not found in app.config.js") unless version_code_match
-
-  current_version_code = version_code_match[1].to_i
-  next_version_code = current_version_code + 1
-  updated = content.sub(version_code_pattern, "versionCode: #{next_version_code}")
-
-  if ENV["RELEASE_TAG"] && ENV["RELEASE_TAG"].start_with?("release-")
-    release_version = ENV["RELEASE_TAG"].sub(/^release-/, "")
-    updated = updated.sub(/version:\s*'[^']*'/, "version: '#{release_version}'")
-    UI.message("Updated app version to #{release_version} from RELEASE_TAG")
-  end
-
-  File.write(app_config_path, updated)
-  UI.message("Bumped Android versionCode: #{current_version_code} -> #{next_version_code}")
 end
 
 platform :ios do

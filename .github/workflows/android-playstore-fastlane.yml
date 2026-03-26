@@ -25,9 +25,14 @@ jobs:
       ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
       ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
       ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+      ACT: ${{ vars.ACT }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
+      - name: is ACT
+        if: ${{ vars.ACT == '1' }}
+        run: echo "ACT is 1"
 
       - name: Setup Node
         uses: actions/setup-node@v4
@@ -48,24 +53,21 @@ jobs:
           distribution: temurin
           java-version: "17"
 
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+        if: ${{ vars.ACT == '1' }}
+        with:
+          log-android-sdk-licenses: false
+
+      - name: Accept Android SDK licenses
+        if: ${{ vars.ACT == '1' }}
+        run: yes | sdkmanager --licenses
+
       - name: Install JS dependencies
         run: npm ci
 
-      - name: Restore Android keystore
-        run: |
-          mkdir -p fastlane/credentials
-          echo "$ANDROID_KEYSTORE_BASE64" | base64 --decode > fastlane/credentials/dolink.keystore
-
-      - name: Restore Play service account json
-        run: |
-          mkdir -p fastlane/credentials
-          printf '%s' "$PLAY_STORE_SERVICE_ACCOUNT_JSON_BASE64" | base64 --decode > fastlane/credentials/playstore.json
-          jq empty fastlane/credentials/playstore.json
-
-      - name: Restore google-services.json
-        run: |
-          printf '%s' "$GOOGLE_SERVICES_JSON_BASE64" | base64 --decode > google-services.json
-          jq empty google-services.json
+      - name: Restore base64 files
+        run: bash ci/generate-files.sh
 
       - name: Expo prebuild (Android)
         run: npx expo prebuild --platform android --non-interactive
@@ -88,17 +90,8 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-gradle-
 
-      - name: Tune Gradle JVM memory for CI
-        run: |
-          if [ -f android/gradle.properties ] && rg -q '^org\.gradle\.jvmargs=' android/gradle.properties; then
-            sed -i.bak 's#^org\.gradle\.jvmargs=.*#org.gradle.jvmargs=-Xmx4096m -XX:MaxMetaspaceSize=1024m -Dfile.encoding=UTF-8#' android/gradle.properties
-          else
-            printf '\norg.gradle.jvmargs=-Xmx4096m -XX:MaxMetaspaceSize=1024m -Dfile.encoding=UTF-8\n' >> android/gradle.properties
-          fi
-
-          if ! rg -q '^org\.gradle\.caching=true$' android/gradle.properties; then
-            printf '\norg.gradle.caching=true\n' >> android/gradle.properties
-          fi
+      - name: Apply CI Gradle properties
+        run: node ci/update-gradle-properties.js
 
       - name: Build and deploy Android
         run: bundle exec fastlane android build_and_deploy

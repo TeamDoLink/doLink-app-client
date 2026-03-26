@@ -49,3 +49,9 @@ fastlane/credentials/
 
 google-services.json
 debug.keystore
+
+# act (local GitHub Actions)
+ci/act.vars
+ci/act.secrets
+ci/act/act.vars
+ci/act/act.secrets
