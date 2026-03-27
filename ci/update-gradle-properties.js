@@ -130,12 +130,20 @@ function main() {
   const appRoot = path.resolve(scriptDir, '..'); // .../doLink-app-client
 
   const { source, target } = parseArgs(process.argv.slice(2));
-  const sourcePath = source
-    ? path.resolve(source)
+
+  const isAct = process.env.ACT === '1';
+  const defaultSource = isAct
+    ? path.join(scriptDir, 'gradle-act.properties')
     : path.join(scriptDir, 'gradle.properties');
+
+  const sourcePath = source ? path.resolve(source) : defaultSource;
   const targetPath = target
     ? path.resolve(target)
     : path.join(appRoot, 'android', 'gradle.properties');
+
+  console.log(
+    `update-gradle-properties: using ${path.basename(sourcePath)} (ACT=${isAct ? '1' : '0'})`,
+  );
 
   const result = updateGradleProperties({ sourcePath, targetPath });
   // CI 로그용
