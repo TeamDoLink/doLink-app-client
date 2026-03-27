@@ -40,11 +40,7 @@ jobs:
       - name: Extract app version
         id: app_version
         run: |
-          VERSION=$(node --input-type=module <<'EOF'
-          import config from './app.config.js';
-          process.stdout.write(config.expo.version);
-          EOF
-          )
+          VERSION=$(grep -m1 "version:" app.config.js | sed "s/.*version: '//;s/',.*//")
           echo "version=$VERSION" >> $GITHUB_OUTPUT
           echo "App version: $VERSION"
 
