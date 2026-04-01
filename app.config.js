@@ -37,7 +37,7 @@ export default {
       edgeToEdgeEnabled: true,
       predictiveBackGestureEnabled: false,
       package: 'com.teamdolink.dolink',
-      versionCode: 13,
+      versionCode: 14,
       intentFilters: [
         {
           action: 'VIEW',
