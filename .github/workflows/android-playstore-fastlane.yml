@@ -93,5 +93,9 @@ jobs:
       - name: Apply CI Gradle properties
         run: node ci/update-gradle-properties.js
 
-      - name: Build and deploy Android
-        run: bundle exec fastlane android build_and_deploy
+      - name: Build Android
+        run: bundle exec fastlane android build
+
+      - name: Deploy to Play Store
+        if: ${{ vars.ACT != '1' }}
+        run: bundle exec fastlane android playstore

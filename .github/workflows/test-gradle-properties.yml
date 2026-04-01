@@ -1,0 +1,43 @@
+name: Test gradle properties update
+
+on:
+  workflow_dispatch:
+
+jobs:
+  test-gradle-properties:
+    runs-on: ubuntu-latest
+    env:
+      CI: true
+      GOOGLE_SERVICES_JSON_BASE64: ${{ secrets.GOOGLE_SERVICES_JSON_BASE64 }}
+      ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+      ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+      ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+      ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+      PLAY_STORE_SERVICE_ACCOUNT_JSON_BASE64: ${{ secrets.PLAY_STORE_SERVICE_ACCOUNT_JSON_BASE64 }}
+      ACT: ${{ vars.ACT }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install JS dependencies
+        run: npm ci
+
+      - name: Restore base64 files
+        run: bash ci/generate-files.sh
+
+      - name: Expo prebuild (Android)
+        run: npx expo prebuild --platform android --non-interactive
+
+      - name: Apply CI Gradle properties
+        run: node ci/update-gradle-properties.js
+
+      - name: Print android/gradle.properties
+        run: |
+          echo "===== android/gradle.properties ====="
+          cat android/gradle.properties
+          echo "====================================="

@@ -131,7 +131,8 @@ function main() {
 
   const { source, target } = parseArgs(process.argv.slice(2));
 
-  const isAct = process.env.ACT === '1';
+  // act runner injects ACT=true by default; workflow vars.ACT is '1'.
+  const isAct = process.env.ACT === '1' || process.env.ACT === 'true';
   const defaultSource = isAct
     ? path.join(scriptDir, 'gradle-act.properties')
     : path.join(scriptDir, 'gradle.properties');

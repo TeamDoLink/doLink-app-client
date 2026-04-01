@@ -168,3 +168,13 @@ bundle exec fastlane android build_and_deploy
 - Prettier 포맷팅 적용
 - 의미 있는 변수명 및 함수명 사용
 - 코드 가독성을 고려한 작성
+
+
+
+### github actions act 테스트
+
+```sh
+op run --env-file="./ci/act/.env" -- ./ci/act/act-test.sh run 2>&1 | tee ci/act/act-run.log
+
+# 에러 분석시 ci/act/act-run.log 를 확인하여 분석후 수정 
+```
