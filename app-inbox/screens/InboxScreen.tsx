@@ -11,15 +11,13 @@ import { useCreate } from '@/src/api/generated/endpoints/task/task';
 import { ApiResponseSliceCollectionResponse } from '@/src/api/generated/models';
 import { useShareIntent } from '@/src/components/SharedIntent';
 import TextInput from '@/src/components/common/inputField/TextInput';
-import { useLinkingURL } from 'expo-linking';
 import InboxLoading, { InboxLoadingProps } from '@/src/components/InboxLoading';
-import useReactQueryStatus from '@/src/components/InboxLoading/useRQLoadingStatus';
 import useRQLoadingStatus from '@/src/components/InboxLoading/useRQLoadingStatus';
 
 export default function InboxScreen({
   navigation,
 }: AppInboxStackScreenProps<'Inbox'>) {
-  const { data: collections } =
+  const { data: collections, refetch } =
     useListAll1<ApiResponseSliceCollectionResponse>();
   const { shareIntent } = useShareIntent();
 
