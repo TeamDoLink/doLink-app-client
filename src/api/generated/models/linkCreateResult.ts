@@ -15,4 +15,5 @@ export interface LinkCreateResult {
   originalUrl?: string;
   thumbnailKey?: string;
   thumbnailUrl?: string;
+  linkValid?: boolean;
 }

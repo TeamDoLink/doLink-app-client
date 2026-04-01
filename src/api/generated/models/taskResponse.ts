@@ -11,6 +11,7 @@ export interface TaskResponse {
   collectionId?: number;
   title?: string;
   link?: string;
+  linkValid?: boolean;
   memo?: string;
   domain?: string;
   thumbnailUrl?: string;

@@ -6,8 +6,6 @@
  * OpenAPI spec version: v1.0.0
  */
 
-export interface SortObject {
-  sorted?: boolean;
-  empty?: boolean;
-  unsorted?: boolean;
+export interface ShareTokenResponse {
+  shareToken?: string;
 }

@@ -12,7 +12,7 @@ export interface TaskCreateRequest {
    * @minLength 0
    * @maxLength 100
    */
-  title: string;
+  title?: string;
   link?: string;
   memo?: string;
   inout?: boolean;

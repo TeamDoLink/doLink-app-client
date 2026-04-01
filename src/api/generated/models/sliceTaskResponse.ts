@@ -10,13 +10,13 @@ import type { SortObject } from './sortObject';
 import type { TaskResponse } from './taskResponse';
 
 export interface SliceTaskResponse {
-  first?: boolean;
-  last?: boolean;
-  numberOfElements?: number;
   pageable?: PageableObject;
   size?: number;
   content?: TaskResponse[];
   number?: number;
   sort?: SortObject;
+  numberOfElements?: number;
+  first?: boolean;
+  last?: boolean;
   empty?: boolean;
 }
