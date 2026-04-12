@@ -14,7 +14,10 @@ export type ClipboardMessageType =
   | 'clipboard:error'; // Native → WebView 에러 응답
 
 // Auth 메시지 타입
-export type AuthMessageType = 'auth:login' | 'auth:logout';
+export type AuthMessageType =
+  | 'auth:login'
+  | 'auth:logout'
+  | 'auth:google-login';
 
 // Auth Handler Payload/Response (웹→앱 auth 메시지 처리용)
 export type AuthPayload = Record<string, never>;

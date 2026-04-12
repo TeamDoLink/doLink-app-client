@@ -29,6 +29,7 @@ import { clipboardHandler } from './handlers/clipboardHandler';
 import { linkHandler } from './handlers/linkHandler';
 import { shareHandler, osShareHandler } from './handlers/shareHandler';
 import { authHandler } from './handlers/authHandler';
+import { performGoogleLogin } from './handlers/googleAuthHandler';
 import useAuthStore from '../stores/useAuthStore';
 
 /**
@@ -194,6 +195,12 @@ export const handleBridgeMessage = async (
     if (type === 'auth:login') {
       await authHandler('auth:login', {});
       const accessToken = useAuthStore.getState().accessToken;
+      sendAuthLoginToWeb(webViewRef, accessToken);
+      return;
+    }
+
+    if (type === 'auth:google-login') {
+      const accessToken = await performGoogleLogin();
       sendAuthLoginToWeb(webViewRef, accessToken);
       return;
     }
