@@ -48,6 +48,7 @@ fastlane/credentials/
 .vscode
 
 google-services.json
+google-services-*
 debug.keystore
 
 # act (local GitHub Actions)

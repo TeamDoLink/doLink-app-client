@@ -9,14 +9,24 @@ import { issueAccessToken } from '@/src/api/generated/endpoints/auth/auth';
  * 로그인 성공 감지 또는 auth:reissue 처리에서 공통 사용.
  */
 export const performReissueFromCookies = async (): Promise<string | null> => {
-  const { setAccessToken, setRefreshToken } = useAuthStore.getState();
+  const {
+    setAccessToken,
+    setRefreshToken,
+    refreshToken: storedRefresh,
+  } = useAuthStore.getState();
   const cookies = await NitroCookies.get(config.domain);
 
-  if (!cookies) return null;
+  const cookieRefresh = cookies?.['refresh']?.value;
+  const refreshToken = cookieRefresh ?? storedRefresh ?? null;
 
-  const refreshToken = cookies['refresh']?.value;
-  if (refreshToken) {
-    setRefreshToken(refreshToken);
+  if (!refreshToken) {
+    return null;
+  }
+
+  if (cookieRefresh) {
+    setRefreshToken(cookieRefresh);
+  } else if (storedRefresh) {
+    setRefreshToken(storedRefresh);
   }
 
   try {
