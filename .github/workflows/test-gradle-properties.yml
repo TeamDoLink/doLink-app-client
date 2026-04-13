@@ -14,6 +14,7 @@ jobs:
       ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
       ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
       PLAY_STORE_SERVICE_ACCOUNT_JSON_BASE64: ${{ secrets.PLAY_STORE_SERVICE_ACCOUNT_JSON_BASE64 }}
+      EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID: ${{ vars.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID }}
       ACT: ${{ vars.ACT }}
     steps:
       - name: Checkout
