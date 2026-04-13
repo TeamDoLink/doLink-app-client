@@ -3,6 +3,7 @@
  */
 
 import type WebView from 'react-native-webview';
+import { config } from '@/src/utils/envConfig';
 import type {
   BridgeResponse,
   DraftMessageType,
@@ -33,12 +34,36 @@ export const sendToWebView = (
   webViewRef.current.postMessage(JSON.stringify(response));
 };
 
+function getRootWebViewUrl(): string {
+  const domain = config.domain;
+  const normalized = domain.endsWith('/') ? domain.slice(0, -1) : domain;
+  return `${normalized}/`;
+}
+
+/**
+ * WebView를 앱 루트(/)로 이동하고, 이미 루트면 새로고침합니다.
+ */
+export const navigateWebViewToRootAndReload = (
+  webViewRef: React.RefObject<WebView | null>,
+): void => {
+  const wv = webViewRef.current;
+  if (!wv) {
+    console.warn('[Bridge] WebView ref is not available for root navigation');
+    return;
+  }
+  const rootUrl = JSON.stringify(getRootWebViewUrl());
+  wv.injectJavaScript(
+    `(function(){var r=${rootUrl};var p="/";try{p=new URL(window.location.href).pathname||"/";}catch(e){}if(p==="/"||p===""){window.location.reload();}else{window.location.replace(r);}})();true;`,
+  );
+};
+
 /**
  * 로그인 성공 시 웹뷰에 auth:login 메시지로 access token 전달
  */
 export const sendAuthLoginToWeb = (
   webViewRef: React.RefObject<WebView | null>,
   accessToken?: string | null,
+  delayMs = 300,
 ): void => {
   if (!webViewRef.current) {
     console.warn('[Bridge] WebView ref is not available');
@@ -50,7 +75,7 @@ export const sendAuthLoginToWeb = (
   }
   setTimeout(() => {
     webViewRef.current?.postMessage(JSON.stringify(message));
-  }, 300);
+  }, delayMs);
 };
 
 /**

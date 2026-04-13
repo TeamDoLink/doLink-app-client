@@ -23,6 +23,7 @@ import {
   sendToWebView,
   createBridgeErrorResponse,
   sendAuthLoginToWeb,
+  navigateWebViewToRootAndReload,
 } from './sender';
 import { draftHandler } from './handlers/draftHandler';
 import { clipboardHandler } from './handlers/clipboardHandler';
@@ -201,7 +202,12 @@ export const handleBridgeMessage = async (
 
     if (type === 'auth:google-login') {
       const accessToken = await performGoogleLogin();
-      sendAuthLoginToWeb(webViewRef, accessToken);
+      if (accessToken) {
+        navigateWebViewToRootAndReload(webViewRef);
+        sendAuthLoginToWeb(webViewRef, accessToken, 750);
+      } else {
+        sendAuthLoginToWeb(webViewRef, null);
+      }
       return;
     }
 

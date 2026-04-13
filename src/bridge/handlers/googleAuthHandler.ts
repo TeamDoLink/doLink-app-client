@@ -1,4 +1,8 @@
-import { GoogleSignin } from '@react-native-google-signin/google-signin';
+import {
+  GoogleSignin,
+  statusCodes,
+} from '@react-native-google-signin/google-signin';
+import crashlytics from '@react-native-firebase/crashlytics';
 import { Platform } from 'react-native';
 import NitroCookies from 'react-native-nitro-cookies';
 import useAuthStore from '@/src/stores/useAuthStore';
@@ -20,6 +24,27 @@ function logGoogleAuthError(error: unknown): void {
   }
 }
 
+function isGoogleSignInUserCancelled(error: unknown): boolean {
+  if (error === null || typeof error !== 'object') return false;
+  return (error as { code?: string }).code === statusCodes.SIGN_IN_CANCELLED;
+}
+
+function recordGoogleAuthFailure(reason: string, detail?: unknown): void {
+  try {
+    const inst = crashlytics();
+    inst.log(`[GoogleAuth] ${reason}`);
+    const err =
+      detail instanceof Error
+        ? detail
+        : new Error(
+            detail !== undefined ? `${reason}: ${String(detail)}` : reason,
+          );
+    inst.recordError(err);
+  } catch {
+    /* Crashlytics 미연결·개발 환경 등 */
+  }
+}
+
 /**
  * Google 로그인 진행 후 서버에서 JWT 토큰 발급
  * - Google Sign-In → idToken 획득
@@ -38,6 +63,7 @@ export const performGoogleLogin = async (): Promise<string | null> => {
     console.log('idToken', idToken);
     if (!idToken) {
       console.error('[GoogleAuth] idToken을 받지 못했습니다');
+      recordGoogleAuthFailure('missing_id_token');
       return null;
     }
 
@@ -64,6 +90,12 @@ export const performGoogleLogin = async (): Promise<string | null> => {
         serverResponse.status,
         bodySnippet ? `body: ${bodySnippet}` : '',
       );
+      recordGoogleAuthFailure(
+        'server_oauth_error',
+        new Error(
+          `HTTP ${serverResponse.status}${bodySnippet ? ` body: ${bodySnippet}` : ''}`,
+        ),
+      );
       return null;
     }
 
@@ -75,6 +107,10 @@ export const performGoogleLogin = async (): Promise<string | null> => {
       console.error(
         '[GoogleAuth] 서버 응답에 accessToken 또는 refreshToken이 없습니다',
         { hasAccess: !!accessToken, hasRefresh: !!refreshToken },
+      );
+      recordGoogleAuthFailure(
+        'missing_tokens_in_response',
+        `hasAccess=${!!accessToken} hasRefresh=${!!refreshToken}`,
       );
       return null;
     }
@@ -108,6 +144,9 @@ export const performGoogleLogin = async (): Promise<string | null> => {
     return accessToken;
   } catch (error: unknown) {
     logGoogleAuthError(error);
+    if (!isGoogleSignInUserCancelled(error)) {
+      recordGoogleAuthFailure('google_sign_in_exception', error);
+    }
     return null;
   }
 };
