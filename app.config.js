@@ -6,8 +6,8 @@ export default {
     scheme: 'dolink',
     name: 'dolink',
     slug: 'dolink',
-    version: '1.0.3',
-    runtimeVersion: '1.0.1',
+    version: '1.0.4',
+    runtimeVersion: '1.0.2',
     orientation: 'portrait',
     icon: './assets/icon.png',
     userInterfaceStyle: 'light',
@@ -37,7 +37,7 @@ export default {
       edgeToEdgeEnabled: true,
       predictiveBackGestureEnabled: false,
       package: 'com.teamdolink.dolink',
-      versionCode: 14,
+      versionCode: 15,
       intentFilters: [
         {
           action: 'VIEW',
