@@ -6,8 +6,8 @@ export default {
     scheme: 'dolink',
     name: 'dolink',
     slug: 'dolink',
-    version: '1.1.0',
-    runtimeVersion: '1.1.0',
+    version: '1.1.1',
+    runtimeVersion: '1.1.1',
     orientation: 'portrait',
     icon: './assets/icon.png',
     userInterfaceStyle: 'light',
@@ -24,7 +24,7 @@ export default {
     ios: {
       supportsTablet: true,
       bundleIdentifier: 'com.teamdolink.dolink',
-      buildNumber: '20',
+      buildNumber: '21',
       infoPlist: {
         LSApplicationQueriesSchemes: ['http', 'https', 'tel', 'mailto'],
       },
@@ -38,7 +38,7 @@ export default {
       edgeToEdgeEnabled: true,
       predictiveBackGestureEnabled: false,
       package: 'com.teamdolink.dolink',
-      versionCode: 20,
+      versionCode: 21,
       intentFilters: [
         {
           action: 'VIEW',

@@ -2,4 +2,5 @@ EXPO_PUBLIC_DOMAIN=https://example.com
 EXPO_PUBLIC_API_URL=https://api.example.com
 EXPO_PUBLIC_ANDROID_EMULATOR_DOMAIN=10.0.2.2
 EXPO_PUBLIC_DEBUG_INBOX=false
+EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID=example-google-web-client-id.apps.googleusercontent.com
 PLAY_STORE_TRACK=internal

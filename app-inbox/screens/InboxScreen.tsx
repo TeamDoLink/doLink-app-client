@@ -1,30 +1,53 @@
 import { AppInboxStackScreenProps } from '../types';
-import { useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import InboxBottomSheet from '@/src/components/InboxBottomSheet';
-import { FlatList, View } from 'react-native';
+import { ActivityIndicator, FlatList, View } from 'react-native';
 import { closeShareOrExitApp } from '@/src/utils/closeShareOrExitApp';
 import ArchiveSocialMediaListItem from '@/src/components/ArchiveSocialMediaListItem';
 import SearchInputField from '@/src/components/common/inputField/searchInputField';
 import Button from '@/src/components/common/Button';
-import { useListAll1 } from '@/src/api/generated/endpoints/collection/collection';
 import { useCreate } from '@/src/api/generated/endpoints/task/task';
-import { ApiResponseSliceCollectionResponse } from '@/src/api/generated/models';
+import { type CollectionResponse } from '@/src/api/generated/models';
 import { useShareIntent } from '@/src/components/SharedIntent';
 import TextInput from '@/src/components/common/inputField/TextInput';
 import InboxLoading, { InboxLoadingProps } from '@/src/components/InboxLoading';
 import useRQLoadingStatus from '@/src/components/InboxLoading/useRQLoadingStatus';
+import {
+  COLLECTION_PAGE_SIZE_DEFAULT,
+  useSearchCollections,
+} from '../hooks/useSearchCollections';
 
-export default function InboxScreen({
-  navigation,
-}: AppInboxStackScreenProps<'Inbox'>) {
-  const { data: collections, refetch } =
-    useListAll1<ApiResponseSliceCollectionResponse>();
+const COLLECTION_PAGE_SIZE = COLLECTION_PAGE_SIZE_DEFAULT;
+const SEARCH_DEBOUNCE_MS = 1000;
+
+export default function InboxScreen(_props: AppInboxStackScreenProps<'Inbox'>) {
+  const [searchText, setSearchText] = useState('');
+  const [debouncedSearchText, setDebouncedSearchText] = useState('');
+
+  useEffect(() => {
+    const id = setTimeout(() => {
+      setDebouncedSearchText(searchText);
+    }, SEARCH_DEBOUNCE_MS);
+    return () => clearTimeout(id);
+  }, [searchText]);
+
+  const {
+    data: searchData,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+    isPending,
+  } = useSearchCollections(debouncedSearchText, COLLECTION_PAGE_SIZE);
+
+  const collectionRows = useMemo((): CollectionResponse[] => {
+    return searchData?.pages.flatMap((p) => p.result?.content ?? []) ?? [];
+  }, [searchData]);
+
   const { shareIntent } = useShareIntent();
 
   const [selectedCollectionId, setSelectedCollectionId] = useState<
     number | null
   >(null);
-  const [searchText, setSearchText] = useState('');
   const [memo, setMemo] = useState<string>('');
   const { mutate: createTask, status, reset } = useCreate();
 
@@ -82,7 +105,28 @@ export default function InboxScreen({
         </View>
         <FlatList
           className="flex-1"
-          data={collections?.result?.content ?? []}
+          data={collectionRows}
+          keyExtractor={(item) => String(item.collectionId ?? item.name)}
+          onEndReached={() => {
+            if (hasNextPage && !isFetchingNextPage) {
+              fetchNextPage();
+            }
+          }}
+          onEndReachedThreshold={0.35}
+          ListFooterComponent={
+            isFetchingNextPage ? (
+              <View className="py-4">
+                <ActivityIndicator />
+              </View>
+            ) : null
+          }
+          ListEmptyComponent={
+            isPending ? (
+              <View className="py-8">
+                <ActivityIndicator />
+              </View>
+            ) : null
+          }
           renderItem={({ item }) => (
             <ArchiveSocialMediaListItem
               title={item.name ?? ''}
