@@ -3,10 +3,8 @@ import { AppInboxAddCollectionStackScreenProps } from '../types';
 import InboxBottomSheet from '@/src/components/InboxBottomSheet';
 import Button from '@/src/components/common/Button';
 import AddCollectionView from '@/src/components/AddCollectionView';
-import {
-  getListAll1QueryKey,
-  useCreateCollect,
-} from '@/src/api/generated/endpoints/collection/collection';
+import { useCreateCollect } from '@/src/api/generated/endpoints/collection/collection';
+import { getSearchCollectionsQueryKey } from '@/src/api/generated/endpoints/search/search';
 import { CollectionCreateRequestCategory } from '@/src/api/generated/models/collectionCreateRequestCategory';
 import {
   ArchiveCategory,
@@ -17,7 +15,6 @@ import { useFocusEffect } from '@react-navigation/native';
 import InboxLoading, { InboxLoadingProps } from '@/src/components/InboxLoading';
 import useRQLoadingStatus from '@/src/components/InboxLoading/useRQLoadingStatus';
 import { useQueryClient } from '@tanstack/react-query';
-import { getListAllQueryKey } from '@/src/api/generated/endpoints/task/task';
 
 export default function AddCollectionScreen({
   navigation,
@@ -42,7 +39,9 @@ export default function AddCollectionScreen({
       },
       {
         onSuccess: () => {
-          queryClient.invalidateQueries({ queryKey: getListAll1QueryKey() });
+          queryClient.invalidateQueries({
+            queryKey: getSearchCollectionsQueryKey(),
+          });
           navigation.goBack();
         },
         onError: (error) => console.error(error),

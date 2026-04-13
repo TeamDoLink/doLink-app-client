@@ -2,7 +2,7 @@ module.exports = {
   'task-project': {
     input: {
       // local
-      target: 'http://localhost:8080/v3/api-docs',
+      target: 'https://api.dolink.team/v3/api-docs',
     },
     output: {
       mode: 'tags-split', // API 태그별로 파일(User, Task, Collect)을 나눠서 생성
