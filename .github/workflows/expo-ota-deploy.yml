@@ -20,7 +20,7 @@ jobs:
       EXPO_PUBLIC_API_URL: ${{ vars.EXPO_PUBLIC_API_URL }}
       EXPO_PUBLIC_ANDROID_EMULATOR_DOMAIN: ${{ vars.EXPO_PUBLIC_ANDROID_EMULATOR_DOMAIN }}
       EXPO_PUBLIC_DEBUG_INBOX: ${{ vars.EXPO_PUBLIC_DEBUG_INBOX }}
-      EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID: ${{ vars.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID }}
+      EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID: ${{ secrets.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -37,6 +37,9 @@ jobs:
 
       - name: Install JS dependencies
         run: npm ci
+
+      - name: Generate .env for Expo
+        run: node -e "const fs=require('fs'); const lines=[`EXPO_PUBLIC_DOMAIN=${process.env.EXPO_PUBLIC_DOMAIN||''}`,`EXPO_PUBLIC_API_URL=${process.env.EXPO_PUBLIC_API_URL||''}`,`EXPO_PUBLIC_ANDROID_EMULATOR_DOMAIN=${process.env.EXPO_PUBLIC_ANDROID_EMULATOR_DOMAIN||''}`,`EXPO_PUBLIC_DEBUG_INBOX=${process.env.EXPO_PUBLIC_DEBUG_INBOX||''}`,`EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID=${process.env.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID||''}`].join('\n')+'\n'; fs.writeFileSync('.env', lines); console.log('wrote .env');"
 
       - name: Extract app version
         id: app_version
