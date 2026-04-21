@@ -24,7 +24,9 @@ AXIOS_INSTANCE.interceptors.request.use(
     }
 
     if (refreshToken) {
-      config.headers.Cookie = `${refreshToken}`;
+      // 서버는 HttpOnly `refresh` 쿠키를 기대합니다. (Cookie: refresh=<token>)
+      // RN(Axios) 환경에선 CookieJar 자동 전송이 불안정할 수 있어 헤더로 명시합니다.
+      config.headers.Cookie = `refresh=${refreshToken}`;
     }
     return config;
   },
