@@ -24,7 +24,7 @@ export default {
     ios: {
       supportsTablet: true,
       bundleIdentifier: 'com.teamdolink.dolink',
-      buildNumber: '23',
+      buildNumber: '24',
       infoPlist: {
         LSApplicationQueriesSchemes: ['http', 'https', 'tel', 'mailto'],
       },
@@ -38,7 +38,7 @@ export default {
       edgeToEdgeEnabled: true,
       predictiveBackGestureEnabled: false,
       package: 'com.teamdolink.dolink',
-      versionCode: 24,
+      versionCode: 25,
       intentFilters: [
         {
           action: 'VIEW',
