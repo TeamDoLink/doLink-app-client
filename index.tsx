@@ -9,11 +9,15 @@ import { renderRootComponent } from 'expo-router/build/renderRootComponent';
 
 import Inbox from './app-inbox';
 import { registerRootComponent } from 'expo';
+import { ShareIntentData } from './src/types/shareIntent';
+
+const DebugInboxRoot = () => <Inbox />;
+const AndroidShareInboxRoot = (props: ShareIntentData) => <Inbox {...props} />;
 
 if (process.env.EXPO_PUBLIC_DEBUG_INBOX === 'true') {
-  registerRootComponent(Inbox);
+  registerRootComponent(DebugInboxRoot);
 } else {
   renderRootComponent(App);
 }
 
-AppRegistry.registerComponent('share-intent', () => Inbox);
+AppRegistry.registerComponent('share-intent', () => AndroidShareInboxRoot);

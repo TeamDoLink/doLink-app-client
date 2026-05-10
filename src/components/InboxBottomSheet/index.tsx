@@ -13,6 +13,9 @@ interface InboxBottomSheetProps {
   initialStep?: number;
   children: React.ReactNode;
   onClose?: () => void;
+  showOverlay?: boolean;
+  dockToBottom?: boolean;
+  viewportHeight?: number;
 }
 
 const InboxBottomSheet = ({
@@ -20,15 +23,19 @@ const InboxBottomSheet = ({
   initialStep = 0,
   children,
   onClose,
+  showOverlay = true,
+  dockToBottom = true,
+  viewportHeight,
 }: InboxBottomSheetProps) => {
   return (
     <InboxBottomSheetProvider
       steps={steps}
       initialStep={initialStep}
       onClose={onClose}
+      viewportHeight={viewportHeight}
     >
-      <View className="flex-1 justify-end">
-        <Overlay />
+      <View className={dockToBottom ? 'flex-1 justify-end' : 'flex-1'}>
+        {showOverlay ? <Overlay /> : null}
         {children}
         <PortalOut portalKey="footer" />
       </View>

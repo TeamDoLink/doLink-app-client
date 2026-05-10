@@ -24,6 +24,7 @@ export default {
     ios: {
       supportsTablet: true,
       bundleIdentifier: 'com.teamdolink.dolink',
+      googleServicesFile: './GoogleService-Info.plist',
       buildNumber: '24',
       infoPlist: {
         LSApplicationQueriesSchemes: ['http', 'https', 'tel', 'mailto'],
@@ -120,6 +121,9 @@ export default {
       [
         'expo-build-properties',
         {
+          ios: {
+            useFrameworks: 'static',
+          },
           android: {
             hardwareAccelerated: true,
           },
