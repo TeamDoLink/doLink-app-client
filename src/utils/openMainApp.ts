@@ -1,3 +1,4 @@
+import { openHostApp } from 'expo-share-extension';
 import { Linking, NativeModules, Platform } from 'react-native';
 import { closeShareOrExitApp } from './closeShareOrExitApp';
 
@@ -19,10 +20,17 @@ export function openMainApp(isShareContext: boolean): void {
     return;
   }
 
+  if (Platform.OS === 'ios' && isShareContext) {
+    try {
+      openHostApp('/');
+      return;
+    } catch {
+      // noop
+    }
+  }
+
   // 그 외(iOS 또는 모듈 없음): 딥링크로 메인 앱 진입 시도 후 기존 종료 로직 사용
-  Linking.openURL('dolink://').catch((error) => {
-    console.warn('Failed to open main app deeplink', error);
-  });
+  Linking.openURL('dolink://').catch(() => {});
 
   closeShareOrExitApp(isShareContext);
 }
