@@ -88,6 +88,7 @@ export default {
         },
       ],
       './plugins/withShareNative',
+      './plugins/withShareExtensionBundleFix',
       [
         'expo-dev-client',
         {
