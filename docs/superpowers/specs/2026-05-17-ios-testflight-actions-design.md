@@ -67,7 +67,7 @@ iOS-specific deployment values will come from GitHub Actions secrets:
 - `MATCH_PASSWORD`
 - `IOS_SCHEME`
 
-Optional iOS values can also be wired from secrets so Fastlane can use them when present:
+Optional iOS values should not be wired by default because absent GitHub secrets can become empty string environment variables, which would override Fastlane defaults. If the project later needs to override these values, add them deliberately and ensure they are non-empty:
 
 - `IOS_APP_IDENTIFIER`
 - `APPLE_TEAM_ID`
