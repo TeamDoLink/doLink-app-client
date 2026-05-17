@@ -26,9 +26,6 @@ export const useWebViewBridge = (
 ): UseWebViewBridgeReturn => {
   // 메시지 핸들러
   const handleMessage = (event: { nativeEvent: { data: string } }) => {
-    if (__DEV__) {
-      console.log('[WebViewBridge] 메시지 수신:', event);
-    }
     handleWebViewMessage(event, webViewRef);
   };
 

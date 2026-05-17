@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
-import { secureStorage } from './secureStorage';
+import { authStorage } from './secureStorage';
 
 type AuthStoreState = {
   accessToken: string | null;
@@ -31,7 +31,7 @@ const useAuthStore = create<AuthStoreState>()(
     }),
     {
       name: 'auth-storage',
-      storage: createJSONStorage(() => secureStorage),
+      storage: createJSONStorage(() => authStorage),
       partialize: (state) => ({
         accessToken: state.accessToken,
         refreshToken: state.refreshToken,
@@ -48,9 +48,9 @@ const useAuthStore = create<AuthStoreState>()(
         };
       },
       onRehydrateStorage: () => {
-        return () => {
+        return (_state, error) => {
           useAuthStore.setState({
-            rehydrate: 'fulfilled',
+            rehydrate: error ? 'rejected' : 'fulfilled',
           });
         };
       },

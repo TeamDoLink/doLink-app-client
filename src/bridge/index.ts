@@ -159,7 +159,11 @@ export const handleBridgeMessage = async (
 
     // Link 메시지 처리
     if (isLinkMessage(type)) {
-      const response = await linkHandler(type, payload as LinkPayload);
+      const response = await linkHandler(
+        type,
+        payload as LinkPayload,
+        webViewRef,
+      );
       sendToWebView(webViewRef, response);
       return;
     }
@@ -218,14 +222,12 @@ export const handleBridgeMessage = async (
     }
 
     // 알 수 없는 메시지 타입 - 에러 응답 전송
-    console.warn(`[Bridge] 지원하지 않는 메시지 타입: ${type}`);
     const errorResponse = createBridgeErrorResponse(
       `지원하지 않는 메시지 타입입니다: ${type}`,
       type,
     );
     sendToWebView(webViewRef, errorResponse);
   } catch (error) {
-    console.error(`[Bridge] ${type} 처리 중 오류:`, error);
     const errorResponse = createBridgeErrorResponse(
       error instanceof Error ? error.message : '처리 중 오류가 발생했습니다',
       type,
@@ -246,14 +248,11 @@ export const handleWebViewMessage = async (
 
     // 유효성 검사
     if (!message.type) {
-      console.error('[Bridge] 메시지에 type이 없습니다:', message);
       return;
     }
 
     await handleBridgeMessage(message, webViewRef);
-  } catch (error) {
-    console.error('[Bridge] 메시지 파싱 실패:', error);
-  }
+  } catch {}
 };
 
 // Export types and utilities

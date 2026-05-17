@@ -1,5 +1,5 @@
 /**
- * 외부 앱으로부터 공유받은 데이터 타입 (Android ShareActivity에서 전달)
+ * app-inbox가 소비하는 플랫폼 공통 공유 데이터 타입
  */
 
 // TODO thunbnailUrl 필드 사용 여부 검토 필요
@@ -37,6 +37,12 @@ export interface IOSShareExtensionData {
     [key: string]: unknown;
   };
 }
+
+export type ShareIntentInput =
+  | ShareIntentData
+  | IOSShareExtensionData
+  | null
+  | undefined;
 
 /**
  * 공유 데이터 저장 결과

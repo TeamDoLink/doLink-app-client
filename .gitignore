@@ -49,6 +49,7 @@ fastlane/credentials/
 
 google-services.json
 google-services-*
+GoogleService-Info.plist
 debug.keystore
 
 # act (local GitHub Actions)

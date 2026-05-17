@@ -26,11 +26,9 @@ export const sendToWebView = (
   response: BridgeResponse,
 ): void => {
   if (!webViewRef.current) {
-    console.warn('[Bridge] WebView ref is not available');
     return;
   }
 
-  console.log('[Bridge] 웹으로 응답 전송:', response);
   webViewRef.current.postMessage(JSON.stringify(response));
 };
 
@@ -48,12 +46,29 @@ export const navigateWebViewToRootAndReload = (
 ): void => {
   const wv = webViewRef.current;
   if (!wv) {
-    console.warn('[Bridge] WebView ref is not available for root navigation');
     return;
   }
   const rootUrl = JSON.stringify(getRootWebViewUrl());
   wv.injectJavaScript(
     `(function(){var r=${rootUrl};var p="/";try{p=new URL(window.location.href).pathname||"/";}catch(e){}if(p==="/"||p===""){window.location.reload();}else{window.location.replace(r);}})();true;`,
+  );
+};
+
+/**
+ * WebView를 절대 URL로 이동합니다.
+ */
+export const navigateWebViewToUrl = (
+  webViewRef: React.RefObject<WebView | null>,
+  url: string,
+): void => {
+  const wv = webViewRef.current;
+  if (!wv) {
+    return;
+  }
+
+  const serializedUrl = JSON.stringify(url);
+  wv.injectJavaScript(
+    `(function(){var url=${serializedUrl};window.setTimeout(function(){window.location.assign(url);}, 0);})();true;`,
   );
 };
 
@@ -66,13 +81,9 @@ export const sendAuthLoginToWeb = (
   delayMs = 300,
 ): void => {
   if (!webViewRef.current) {
-    console.warn('[Bridge] WebView ref is not available');
     return;
   }
   const message = { type: 'auth:login' as const, payload: { accessToken } };
-  if (__DEV__) {
-    console.log('[Bridge] 웹으로 응답 전송:', message);
-  }
   setTimeout(() => {
     webViewRef.current?.postMessage(JSON.stringify(message));
   }, delayMs);

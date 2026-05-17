@@ -1,7 +1,16 @@
+import { Platform } from 'react-native';
+
 const isDev = __DEV__;
 function getDomain() {
   if (isDev) {
-    return process.env.EXPO_PUBLIC_ANDROID_EMULATOR_DOMAIN;
+    if (Platform.OS === 'android') {
+      return (
+        process.env.EXPO_PUBLIC_ANDROID_EMULATOR_DOMAIN ??
+        process.env.EXPO_PUBLIC_DOMAIN
+      );
+    }
+
+    return process.env.EXPO_PUBLIC_DOMAIN;
   }
   return process.env.EXPO_PUBLIC_DOMAIN;
 }

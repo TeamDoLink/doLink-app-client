@@ -1,8 +1,20 @@
-import NitroCookies from 'react-native-nitro-cookies';
 import { AuthMessageType, AuthPayload, AuthResponse } from '../types';
 import { config } from '@/src/utils/envConfig';
 import useAuthStore from '@/src/stores/useAuthStore';
-import { issueAccessToken } from '@/src/api/generated/endpoints/auth/auth';
+import { getRefreshCookieValue } from '@/src/utils/authCookies';
+
+function getAccessTokenFromResponse(value: unknown): string | null {
+  if (
+    value &&
+    typeof value === 'object' &&
+    'result' in value &&
+    typeof value.result === 'string'
+  ) {
+    return value.result;
+  }
+
+  return null;
+}
 
 /**
  * 쿠키로 reissue 요청 후 스토어에 반영하고 access token을 반환한다.
@@ -14,9 +26,8 @@ export const performReissueFromCookies = async (): Promise<string | null> => {
     setRefreshToken,
     refreshToken: storedRefresh,
   } = useAuthStore.getState();
-  const cookies = await NitroCookies.get(config.domain);
+  const cookieRefresh = await getRefreshCookieValue();
 
-  const cookieRefresh = cookies?.['refresh']?.value;
   const refreshToken = cookieRefresh ?? storedRefresh ?? null;
 
   if (!refreshToken) {
@@ -40,15 +51,23 @@ export const performReissueFromCookies = async (): Promise<string | null> => {
       },
     );
 
-    const requestAccessTokenResponseJson =
-      await requestAccessTokenResponse.json();
-    const accessToken = requestAccessTokenResponseJson?.result;
+    const responseText = await requestAccessTokenResponse.text();
+    let requestAccessTokenResponseJson: unknown = null;
+
+    try {
+      requestAccessTokenResponseJson = JSON.parse(responseText);
+    } catch {
+      requestAccessTokenResponseJson = null;
+    }
+
+    const accessToken = getAccessTokenFromResponse(
+      requestAccessTokenResponseJson,
+    );
     if (accessToken) {
       setAccessToken(accessToken);
       return accessToken;
     }
-  } catch (error) {
-    console.log('reissue 실패', error);
+  } catch {
     // reissue 실패 시 null 반환
   }
   return null;
@@ -63,6 +82,11 @@ export const authHandler = async (
       return await handleLogin();
     case 'auth:logout':
       return await handleLogout();
+    default:
+      return {
+        type,
+        success: false,
+      };
   }
 };
 

@@ -1,4 +1,4 @@
-import { useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import { StyleSheet } from 'react-native';
 import WebView, { WebViewProps } from 'react-native-webview';
 import { WebViewNavigation } from 'react-native-webview/lib/WebViewTypes';
@@ -8,6 +8,8 @@ import { useWebViewBridge } from '../hooks/useWebViewBridge';
 import { useKeyboardWebViewBridge } from '../hooks/useKeyboardWebViewBridge';
 import { createDeeplinkMessage } from '../bridge';
 import { useLocalSearchParams } from 'expo-router';
+import useSyncLoginCookie from '../hooks/useSyncLoginCookie';
+import { useAppState } from '../hooks/useAppState';
 
 interface DoLinkWebViewProps extends WebViewProps {
   /**
@@ -37,6 +39,9 @@ export default function DoLinkWebView({
   const { handleMessage } = useWebViewBridge(webViewRef);
   const { navStateHandler } = useWebViewBackHandler(webViewRef);
   const { onLoginNavigation } = useLoginHandler(webViewRef);
+  const syncLoginCookie = useSyncLoginCookie();
+  const appState = useAppState();
+  const prevAppState = useRef(appState);
 
   const handleNavigationStateChange = (event: WebViewNavigation) => {
     navStateHandler(event);
@@ -58,6 +63,18 @@ export default function DoLinkWebView({
 
   useKeyboardWebViewBridge(webViewRef);
 
+  useEffect(() => {
+    const wasBackgrounded =
+      prevAppState.current === 'background' ||
+      prevAppState.current === 'inactive';
+
+    if (appState === 'active' && wasBackgrounded) {
+      void syncLoginCookie();
+    }
+
+    prevAppState.current = appState;
+  }, [appState, syncLoginCookie]);
+
   return (
     <WebView
       ref={webViewRef}
@@ -65,6 +82,7 @@ export default function DoLinkWebView({
       onNavigationStateChange={handleNavigationStateChange}
       onLoadEnd={(e) => {
         trySendNavigate();
+        void syncLoginCookie();
         onLoadEnd?.(e);
       }}
       style={[styles.webview, style]}

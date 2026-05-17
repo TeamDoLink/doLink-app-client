@@ -21,14 +21,12 @@ export const useKeyboardWebViewBridge = (
 
   useEffect(() => {
     const showSub = KeyboardEvents.addListener('keyboardWillShow', (e) => {
-      console.log('keyboardWillShow', e);
       sendToWebViewDebounced(
         webViewRef,
         createKeyboardStateMessage(true, e.height - bottom, e.duration),
       );
     });
     const hideSub = KeyboardEvents.addListener('keyboardWillHide', (e) => {
-      console.log('keyboardWillHide', e);
       sendToWebViewDebounced(
         webViewRef,
         createKeyboardStateMessage(false, 0, e.duration),

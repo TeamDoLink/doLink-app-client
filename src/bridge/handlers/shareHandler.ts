@@ -36,7 +36,6 @@ export const osShareHandler = async (
 
     return { type: 'os:share:response', success: false };
   } catch (error) {
-    console.error('[OsShareHandler] 공유 실패:', error);
     return {
       type: 'os:share:error',
       error:
@@ -108,7 +107,6 @@ export const shareHandler = async (
       success: false,
     };
   } catch (error) {
-    console.error('[ShareHandler] 공유 실패:', error);
     return {
       type: 'share:error',
       error:

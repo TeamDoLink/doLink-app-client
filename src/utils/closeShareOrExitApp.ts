@@ -1,3 +1,4 @@
+import { close } from 'expo-share-extension';
 import { BackHandler, NativeModules, Platform } from 'react-native';
 
 const { ShareActivityModule } = NativeModules;
@@ -8,10 +9,10 @@ const { ShareActivityModule } = NativeModules;
  */
 export function closeShareOrExitApp(isShareContext: boolean): void {
   if (Platform.OS === 'android' && isShareContext && ShareActivityModule) {
-    console.log('finishShareActivity');
     ShareActivityModule.finishShareActivity();
+  } else if (Platform.OS === 'ios' && isShareContext) {
+    close();
   } else {
-    console.log('exitApp');
     BackHandler.exitApp();
   }
 }

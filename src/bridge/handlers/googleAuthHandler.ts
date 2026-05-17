@@ -11,18 +11,8 @@ import { config } from '@/src/utils/envConfig';
 GoogleSignin.configure({
   webClientId: process.env.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID,
   offlineAccess: true,
+  forceCodeForRefreshToken: true,
 });
-
-function logGoogleAuthError(error: unknown): void {
-  console.error('[GoogleAuth] 로그인 오류 (원본)', error);
-  if (error !== null && typeof error === 'object') {
-    const dump: Record<string, unknown> = {};
-    for (const key of Object.getOwnPropertyNames(error)) {
-      dump[key] = (error as Record<string, unknown>)[key];
-    }
-    console.error('[GoogleAuth] 로그인 오류 (전체 필드)', dump);
-  }
-}
 
 function isGoogleSignInUserCancelled(error: unknown): boolean {
   if (error === null || typeof error !== 'object') return false;
@@ -57,27 +47,23 @@ export const performGoogleLogin = async (): Promise<string | null> => {
     await GoogleSignin.hasPlayServices();
     const response = await GoogleSignin.signIn();
 
-    console.log('response', response);
     const idToken = response.data?.idToken;
+    const serverAuthCode = response.data?.serverAuthCode;
 
-    console.log('idToken', idToken);
     if (!idToken) {
-      console.error('[GoogleAuth] idToken을 받지 못했습니다');
       recordGoogleAuthFailure('missing_id_token');
       return null;
     }
 
-    console.log('config.apiUrl', config.apiUrl);
     const serverResponse = await fetch(
       `${config.apiUrl}/v1/auth/oauth/google/native`,
       {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ idToken }),
+        body: JSON.stringify({ idToken, serverAuthCode }),
       },
     );
 
-    console.log('serverResponse', serverResponse);
     if (!serverResponse.ok) {
       let bodySnippet = '';
       try {
@@ -85,11 +71,6 @@ export const performGoogleLogin = async (): Promise<string | null> => {
       } catch {
         /* ignore */
       }
-      console.error(
-        '[GoogleAuth] 서버 응답 오류:',
-        serverResponse.status,
-        bodySnippet ? `body: ${bodySnippet}` : '',
-      );
       recordGoogleAuthFailure(
         'server_oauth_error',
         new Error(
@@ -104,10 +85,6 @@ export const performGoogleLogin = async (): Promise<string | null> => {
     const refreshToken: string | undefined = json?.result?.refreshToken;
 
     if (!accessToken || !refreshToken) {
-      console.error(
-        '[GoogleAuth] 서버 응답에 accessToken 또는 refreshToken이 없습니다',
-        { hasAccess: !!accessToken, hasRefresh: !!refreshToken },
-      );
       recordGoogleAuthFailure(
         'missing_tokens_in_response',
         `hasAccess=${!!accessToken} hasRefresh=${!!refreshToken}`,
@@ -136,14 +113,13 @@ export const performGoogleLogin = async (): Promise<string | null> => {
           },
           Platform.OS === 'ios',
         );
-      } catch (e) {
-        console.warn('[GoogleAuth] WebView용 refresh 쿠키 동기화 실패', e);
+      } catch {
+        /* ignore */
       }
     }
 
     return accessToken;
   } catch (error: unknown) {
-    logGoogleAuthError(error);
     if (!isGoogleSignInUserCancelled(error)) {
       recordGoogleAuthFailure('google_sign_in_exception', error);
     }

@@ -1,5 +1,7 @@
+import { performReissueFromCookies } from '@/src/bridge/handlers/authHandler';
 import useAuthStore from '@/src/stores/useAuthStore';
-import { ActivityIndicator } from 'react-native';
+import { useEffect, useState } from 'react';
+import { ActivityIndicator, View } from 'react-native';
 import { openMainApp } from '@/src/utils/openMainApp';
 
 interface AuthGuardProps {
@@ -7,19 +9,72 @@ interface AuthGuardProps {
 }
 
 const AuthGuard = ({ children }: AuthGuardProps) => {
-  const { isAuthenticated, rehydrate } = useAuthStore();
-  // 권한이 없는경우 Intent를 실행한다
+  const { isAuthenticated, refreshToken, rehydrate } = useAuthStore();
+  const [isReissuing, setIsReissuing] = useState(false);
+  const [hasAttemptedReissue, setHasAttemptedReissue] = useState(false);
+  const [hasRequestedMainAppOpen, setHasRequestedMainAppOpen] = useState(false);
 
-  if (rehydrate === 'pending') {
-    return <ActivityIndicator />;
+  useEffect(() => {
+    setHasAttemptedReissue(false);
+    setHasRequestedMainAppOpen(false);
+  }, [refreshToken]);
+
+  useEffect(() => {
+    let isCancelled = false;
+
+    if (
+      rehydrate !== 'fulfilled' ||
+      isAuthenticated ||
+      !refreshToken ||
+      hasAttemptedReissue
+    ) {
+      return;
+    }
+
+    setHasAttemptedReissue(true);
+    setIsReissuing(true);
+
+    void performReissueFromCookies().finally(() => {
+      if (!isCancelled) {
+        setIsReissuing(false);
+      }
+    });
+
+    return () => {
+      isCancelled = true;
+    };
+  }, [hasAttemptedReissue, isAuthenticated, refreshToken, rehydrate]);
+
+  useEffect(() => {
+    if (rehydrate === 'pending' || isAuthenticated || isReissuing) {
+      return;
+    }
+
+    if (refreshToken && !hasAttemptedReissue) {
+      return;
+    }
+
+    if (!hasRequestedMainAppOpen) {
+      setHasRequestedMainAppOpen(true);
+      openMainApp(true);
+    }
+  }, [
+    hasRequestedMainAppOpen,
+    isAuthenticated,
+    isReissuing,
+    refreshToken,
+    rehydrate,
+  ]);
+
+  if (rehydrate === 'pending' || isReissuing) {
+    return (
+      <View className="flex-1 items-center justify-center">
+        <ActivityIndicator />
+      </View>
+    );
   }
 
-  if (rehydrate === 'fulfilled' && !isAuthenticated) {
-    openMainApp(true);
-    return null;
-  }
-
-  return children;
+  return isAuthenticated ? children : null;
 };
 
 export default AuthGuard;

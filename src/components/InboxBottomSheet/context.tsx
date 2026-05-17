@@ -76,6 +76,7 @@ type InboxBottomSheetProviderProps = PropsWithChildren<{
   steps: number[];
   initialStep?: number;
   onClose?: () => void;
+  viewportHeight?: number;
 }>;
 
 export const InboxBottomSheetProvider = ({
@@ -83,9 +84,11 @@ export const InboxBottomSheetProvider = ({
   steps,
   initialStep,
   onClose,
+  viewportHeight,
 }: InboxBottomSheetProviderProps) => {
-  const { height } = useWindowDimensions();
+  const { height: windowHeight } = useWindowDimensions();
   const { top, bottom } = useSafeAreaInsets();
+  const height = viewportHeight ?? windowHeight;
 
   const initialPercent = steps.at(initialStep ?? 0);
   if (!initialPercent) {
